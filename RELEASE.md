@@ -1,6 +1,14 @@
 # Release History
 *****************
 
+## Release ONDEWO BPI v2.0.1
+### Bug Fixed
+
+* updated README
+* updated sip example import path
+
+*****************
+
 ## Release ONDEWO BPI v2.0.0
 ### New Features
 
