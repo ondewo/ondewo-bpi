@@ -1,0 +1,6 @@
+[submodule "ondewo-nlu-client-python"]
+	path = ondewo-nlu-client-python
+	url = https://github.com/ondewo/ondewo-nlu-client-python
+[submodule "ondewo-sip-client-python"]
+	path = ondewo-sip-client-python
+	url = git@bitbucket.org:ondewo/ondewo-sip-client-python
