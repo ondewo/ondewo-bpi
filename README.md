@@ -12,8 +12,7 @@ This module sits between the user and CAI:
 <==grpc==|       |<==grpc==|       |
          |_______|         |_______|
 ```
-and has full access to the outgoing request and the response. It also known the location of CAI and has authorization, meaning it can edit the state of CAI directly with additional informaion.
-
+and has full access to the outgoing requests and the returning response. It also knows the location of CAI and has authorization, meaning it can edit the state of CAI directly with additional information.
 
 A simple example of a server using the BPI looks like this:
 ```python
@@ -54,10 +53,18 @@ class MyServer(BpiServer):
         logging.warning("Default fallback was triggered!")
         return response
 ```
-There is a more complete example in ondewo_bpi.example.py which is hooked up to run via the Dockerfile (just do `docker-compose up -d && docker-compose logs -f`).
+There is a more complete example in ondewo_bpi/example/example.py which is hooked up to run via the Dockerfile (just do `docker-compose up -d && docker-compose logs -f`).
 
 Have a look at the docker-compose file, and the sample.env. The port that the bpi listens on functionally replaces the cai port, so at the frontend you just have to point to a different port to use the bpi, there is no other difference. And the cai port will still be available as well, so switching between using CAI directly and using the BPI is just a matter of changing a single variable, the port.
 
 |CAI|BPI|
 |---|---|
 |HOST=localhost:50055|HOST=localhost:50051|
+
+## BPI QA
+
+There is also an example server for integrating both CAI and the QA. It sends requests to both servers and returns the response that is most accurate.
+
+## BPI SIP
+
+There is an example for integration with ONDEWO-VTSI (Voice Telephone System Integration), however the sip client submodule is not publicly available. Please request access to it to build telephone-system compantible BPI servers.

@@ -34,7 +34,7 @@ RUN \
 COPY ondewo_bpi ondewo_bpi
 COPY ondewo_bpi_sip ondewo_bpi_sip
 
-CMD python -m ondewo_bpi_sip.example
+CMD python -m ondewo_bpi_sip.example.example
 
 # instantiate health check
 EXPOSE 50051
