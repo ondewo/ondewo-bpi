@@ -14,7 +14,6 @@
 
 from typing import Any, Dict, Optional, List
 
-from google.protobuf.struct_pb2 import Struct
 from grpc._channel import _InactiveRpcError
 from ondewo.nlu import context_pb2, session_pb2
 from ondewo.nlu.client import Client
