@@ -17,8 +17,8 @@ from typing import Dict, Optional, Tuple, Any
 
 import grpc
 from ondewo.nlu import intent_pb2, session_pb2
-from ondewologging.decorators import Timer
-from ondewologging.logger import logger_console
+from ondewo.logging.decorators import Timer
+from ondewo.logging.logger import logger_console
 from ondewo.sip.client_config import SipClientConfig
 from ondewo.sip.client import SipClient
 

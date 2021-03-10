@@ -21,7 +21,7 @@ from google.protobuf.empty_pb2 import Empty
 from ondewo.nlu import user_pb2
 from ondewo.nlu.client import Client
 from ondewo.nlu.user_pb2_grpc import UsersServicer
-from ondewologging.logger import logger
+from ondewo.logging.logger import logger
 
 
 class AutoUsersServicer(UsersServicer):

@@ -19,7 +19,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from google.protobuf.json_format import MessageToJson
 from google.protobuf.struct_pb2 import Struct
 from ondewo.nlu import context_pb2, intent_pb2, session_pb2
-from ondewologging.logger import logger_console
+from ondewo.logging.logger import logger_console
 
 from ondewo_bpi.constants import DATE_FORMAT, QueryTriggers, SipTriggers
 

@@ -20,7 +20,7 @@ import grpc
 from ondewo.nlu import aiservices_pb2
 from ondewo.nlu.client import Client
 from ondewo.nlu.aiservices_pb2_grpc import AiServicesServicer
-from ondewologging.logger import logger
+from ondewo.logging.logger import logger
 
 
 class AutoAiServicesServicer(AiServicesServicer):

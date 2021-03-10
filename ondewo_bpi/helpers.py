@@ -17,7 +17,7 @@ from typing import Any, Dict, Optional, List
 from grpc._channel import _InactiveRpcError
 from ondewo.nlu import context_pb2, session_pb2
 from ondewo.nlu.client import Client
-from ondewologging.logger import logger_console
+from ondewo.logging.logger import logger_console
 
 
 def add_params_to_cai_context(

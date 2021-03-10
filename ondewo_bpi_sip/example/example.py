@@ -15,7 +15,7 @@
 from typing import Dict, List
 
 from ondewo.nlu import intent_pb2, session_pb2
-from ondewologging.logger import logger_console
+from ondewo.logging.logger import logger_console
 
 import ondewo_bpi.helpers as helpers
 from ondewo_bpi.constants import SipTriggers

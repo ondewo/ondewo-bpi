@@ -475,7 +475,7 @@ class GRPCAutoCoder:
             + f"from {import_path} import {pb2_filename}\n"
             + f"from {import_path}.client import Client\n"
             + f"from {import_path}.{grpc_filename} import {class_info[0]}\n"
-            + "from ondewologging.logger import logger\n"
+            + "from ondewo.logging.logger import logger\n"
             + "\n"
             + "\n"
         )

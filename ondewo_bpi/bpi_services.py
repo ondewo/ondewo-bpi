@@ -18,8 +18,8 @@ from typing import Dict, Callable, List, Optional
 import grpc
 from ondewo.nlu import session_pb2, intent_pb2, user_pb2, context_pb2
 from ondewo.nlu.client import Client as NLUClient
-from ondewologging.decorators import Timer
-from ondewologging.logger import logger_console
+from ondewo.logging.decorators import Timer
+from ondewo.logging.logger import logger_console
 
 from ondewo_bpi.autocoded.agent_grpc_autocode import AutoAgentsServicer
 from ondewo_bpi.autocoded.aiservices_grpc_autocode import AutoAiServicesServicer

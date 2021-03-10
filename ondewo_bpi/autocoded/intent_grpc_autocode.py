@@ -22,7 +22,7 @@ from google.protobuf.empty_pb2 import Empty
 from ondewo.nlu import intent_pb2
 from ondewo.nlu.client import Client
 from ondewo.nlu.intent_pb2_grpc import IntentsServicer
-from ondewologging.logger import logger
+from ondewo.logging.logger import logger
 
 
 class AutoIntentsServicer(IntentsServicer):

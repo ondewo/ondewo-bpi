@@ -20,7 +20,7 @@ import grpc
 from grpc._channel import _InactiveRpcError
 from grpc_reflection.v1alpha import reflection
 from ondewo.nlu import user_pb2_grpc, user_pb2
-from ondewologging.logger import logger
+from ondewo.logging.logger import logger
 
 
 class MockUserLoginServer(user_pb2_grpc.UsersServicer):

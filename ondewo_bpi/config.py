@@ -19,7 +19,7 @@ from typing import Dict, Optional, Tuple
 from dotenv import load_dotenv
 from ondewo.nlu.client import Client
 from ondewo.nlu.client_config import ClientConfig
-from ondewologging.logger import logger, logger_console
+from ondewo.logging.logger import logger, logger_console
 
 import ondewo_bpi.__init__ as file_anchor
 
