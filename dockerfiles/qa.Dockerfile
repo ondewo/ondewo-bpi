@@ -25,6 +25,7 @@ RUN \
 
 COPY ondewo_bpi ondewo_bpi
 COPY ondewo_bpi_qa ondewo_bpi_qa
+COPY ondewo_bpi/example/example.env bpi.env
 
 CMD python -m ondewo_bpi_qa.example.example
 
