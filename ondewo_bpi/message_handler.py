@@ -17,15 +17,10 @@ import re
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from google.protobuf.json_format import MessageToJson
-from google.protobuf.struct_pb2 import Struct
 from ondewo.nlu import context_pb2, intent_pb2, session_pb2
 from ondewo.logging.logger import logger_console
 
 from ondewo_bpi.constants import DATE_FORMAT, QueryTriggers, SipTriggers
-
-
-def get_session_from_response(response: session_pb2.DetectIntentResponse) -> str:
-    return response.query_result.diagnostic_info.fields["sessionId"].string_value  # type: ignore
 
 
 def create_parameter_dict(my_dict: Dict) -> Optional[Dict[str, context_pb2.Context.Parameter]]:
@@ -63,6 +58,8 @@ class MessageHandler:
             if SingleMessageHandler.check_message_for_pattern(message, qtrigger.value):
                 content = SingleMessageHandler.get_pattern_from_message(message, qtrigger.value)
                 found_triggers[qtrigger.value] = content
+        if found_triggers:
+            logger_console.info({"message": f"Found triggers: {found_triggers}", "found_triggers": found_triggers})
         return found_triggers
 
     @staticmethod

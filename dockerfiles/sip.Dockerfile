@@ -35,6 +35,8 @@ COPY ondewo_bpi ondewo_bpi
 COPY ondewo_bpi_sip ondewo_bpi_sip
 COPY ondewo_bpi/example/example.env bpi.env
 
+COPY logging.yaml .
+
 CMD python -m ondewo_bpi_sip.example.example
 
 # instantiate health check

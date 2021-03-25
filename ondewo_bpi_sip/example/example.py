@@ -78,8 +78,8 @@ class MyServer(SipServer):
         trigger: str,
         found_triggers: Dict[str, List[str]],
     ) -> None:
-        logger_console.warning("Hangup Received.")
         client = self.session_information[helpers.get_session_from_response(response)]["client"]
+        logger_console.warning(f"Hangup Received, sip id: {client.sip_name}, url: {client.services.voip.voip_url}")
         client.services.voip.hang_up()
 
     def handle_handover(
@@ -89,7 +89,7 @@ class MyServer(SipServer):
         trigger: str,
         found_triggers: Dict[str, List[str]],
     ) -> None:
-        logger_console.warning("Handerover Received. Hanging up")
+        logger_console.warning("Handover Received. Hanging up")
         client = self.session_information[helpers.get_session_from_response(response)]["client"]
         client.services.voip.hang_up()
 
