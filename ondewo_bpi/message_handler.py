@@ -48,7 +48,7 @@ class MessageHandler:
     """
 
     @staticmethod
-    def get_triggers(message: intent_pb2.Intent.Message,) -> Dict[str, List[str]]:
+    def get_triggers(message: intent_pb2.Intent.Message, session_id: Optional[str] = None) -> Dict[str, List[str]]:
         found_triggers: Dict[str, List[str]] = {}
         for trigger in SipTriggers:
             if SingleMessageHandler.check_message_for_pattern(message, trigger.value):
@@ -58,8 +58,8 @@ class MessageHandler:
             if SingleMessageHandler.check_message_for_pattern(message, qtrigger.value):
                 content = SingleMessageHandler.get_pattern_from_message(message, qtrigger.value)
                 found_triggers[qtrigger.value] = content
-        if found_triggers:
-            logger_console.info({"message": f"Found triggers: {found_triggers}", "found_triggers": found_triggers})
+        if len(found_triggers):
+            logger_console.info({"message": f"Found triggers: {found_triggers}", "found_triggers": found_triggers, "session_id": session_id})
         return found_triggers
 
     @staticmethod
