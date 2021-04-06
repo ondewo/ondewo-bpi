@@ -37,7 +37,7 @@ USER_NAME: Optional[str] = os.getenv("USER_NAME")
 USER_PASS: Optional[str] = os.getenv("USER_PASS")
 SECURE: Optional[str] = os.getenv("SECURE")
 
-config_path = "/home/ondewo/config.json"
+config_path: str = os.getenv("CONFIG_PATH", "/home/ondewo/config.json")
 
 client_configuration_str = (
     "\nnlu-client configuration:\n"
