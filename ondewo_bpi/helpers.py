@@ -204,4 +204,4 @@ def strip_final_periods_from_request(request: session_pb2.DetectIntentRequest,) 
 
 
 def get_session_from_response(response: session_pb2.DetectIntentResponse) -> str:
-    return response.query_result.diagnostic_info["sessionId"]
+    return response.query_result.diagnostic_info["sessionId"]   # type: ignore
