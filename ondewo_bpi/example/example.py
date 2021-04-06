@@ -15,7 +15,7 @@
 import os
 
 from ondewo.nlu import session_pb2
-from ondewologging.logger import logger_console
+from ondewo.logging.logger import logger_console
 
 from ondewo_bpi.bpi_server import BpiServer
 from ondewo_bpi.config import CAI_PORT

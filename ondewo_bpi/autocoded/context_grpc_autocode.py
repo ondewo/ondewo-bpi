@@ -21,7 +21,7 @@ from google.protobuf.empty_pb2 import Empty
 from ondewo.nlu import context_pb2
 from ondewo.nlu.client import Client
 from ondewo.nlu.context_pb2_grpc import ContextsServicer
-from ondewologging.logger import logger
+from ondewo.logging.logger import logger
 
 
 class AutoContextsServicer(ContextsServicer):

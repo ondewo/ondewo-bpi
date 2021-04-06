@@ -21,7 +21,7 @@ from google.protobuf.empty_pb2 import Empty
 from ondewo.nlu import project_role_pb2
 from ondewo.nlu.client import Client
 from ondewo.nlu.project_role_pb2_grpc import ProjectRolesServicer
-from ondewologging.logger import logger
+from ondewo.logging.logger import logger
 
 
 class AutoProjectRolesServicer(ProjectRolesServicer):

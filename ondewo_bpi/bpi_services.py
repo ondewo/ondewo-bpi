@@ -18,8 +18,8 @@ from typing import Dict, Callable, List, Optional
 import grpc
 from ondewo.nlu import session_pb2, intent_pb2, user_pb2, context_pb2
 from ondewo.nlu.client import Client as NLUClient
-from ondewologging.decorators import Timer
-from ondewologging.logger import logger_console
+from ondewo.logging.decorators import Timer
+from ondewo.logging.logger import logger_console
 
 from ondewo_bpi.autocoded.agent_grpc_autocode import AutoAgentsServicer
 from ondewo_bpi.autocoded.aiservices_grpc_autocode import AutoAiServicesServicer
@@ -31,6 +31,8 @@ from ondewo_bpi.autocoded.session_grpc_autocode import AutoSessionsServicer
 from ondewo_bpi.autocoded.user_grpc_autocode import AutoUsersServicer
 from ondewo_bpi.constants import SipTriggers, QueryTriggers
 from ondewo_bpi.message_handler import MessageHandler, SingleMessageHandler
+
+from ondewo_bpi.helpers import get_session_from_response
 
 
 class BpiSessionsServices(AutoSessionsServicer):
@@ -91,6 +93,7 @@ class BpiSessionsServices(AutoSessionsServicer):
                 "message": f"CAI-DetectIntentResponse from CAI, intent_name: {intent_name}",
                 "content": intent_name,
                 "intent_name": intent_name,
+                "session_id": get_session_from_response(cai_response),
                 "tags": ["text"],
             }
         )
@@ -108,7 +111,7 @@ class BpiSessionsServices(AutoSessionsServicer):
                          response: session_pb2.DetectIntentResponse, ) -> session_pb2.DetectIntentResponse:
         new_response = None
         for j, message in enumerate(response.query_result.fulfillment_messages):
-            found_triggers = MessageHandler.get_triggers(message)
+            found_triggers = MessageHandler.get_triggers(message, get_session_from_response(response))
 
             for found_trigger in found_triggers:
                 new_response = self.trigger_handlers[found_trigger](response, message, found_trigger,

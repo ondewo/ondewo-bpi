@@ -106,7 +106,7 @@ logging:
             propagate: False
         console:
             handlers: [console]
-            level: WARNING
+            level: INFO
             propagate: True
         debug:
             handlers: [debug]

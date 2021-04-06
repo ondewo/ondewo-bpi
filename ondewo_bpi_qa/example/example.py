@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from ondewo.nlu import session_pb2
-from ondewologging.logger import logger_console
+from ondewo.logging.logger import logger_console
 
 from ondewo_bpi_qa.bpi_qa_server import QAServer
 

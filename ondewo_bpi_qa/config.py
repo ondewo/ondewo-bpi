@@ -17,7 +17,7 @@ from typing import Tuple, Optional
 
 from ondewo.qa.client import Client
 from ondewo.qa.client_config import ClientConfig
-from ondewologging.logger import logger_console, logger
+from ondewo.logging.logger import logger_console, logger
 
 QA_HOST: str = os.getenv("QA_HOST", "172.17.0.1")
 QA_PORT: str = os.getenv("QA_PORT", "50052")

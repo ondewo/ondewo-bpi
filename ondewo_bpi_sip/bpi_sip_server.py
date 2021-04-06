@@ -17,14 +17,14 @@ from typing import Dict, Optional, Tuple, Any
 
 import grpc
 from ondewo.nlu import intent_pb2, session_pb2
-from ondewologging.decorators import Timer
-from ondewologging.logger import logger_console
+from ondewo.logging.decorators import Timer
+from ondewo.logging.logger import logger_console
 from ondewo.sip.client_config import SipClientConfig
 from ondewo.sip.client import SipClient
 
 import ondewo_bpi.helpers as helpers
 from ondewo_bpi.bpi_server import BpiServer
-from ondewo_bpi_sip.config import LANG, PROVIDER_STT, PROVIDER_TTS, TIMEOUT_MINUTES
+from ondewo_bpi_sip.config import TIMEOUT_MINUTES
 
 
 def get_flask_url_from_session_id(session: str) -> str:
@@ -58,25 +58,41 @@ class SipServer(BpiServer):
             host, port, name = get_sip_host_name_port_from_session_id(request.session)
             if None in [host, port, name]:
                 logger_console.warning(
-                    "WARNING: Sip client not initialized correctly! No responses will be sent!"
+                    "WARNING: Sip client not initialized correctly!"
+                    " No responses will be sent!"
                 )
-                self.session_information[request.session] = {"client": None, "timestamp": time.time()}
+                self.session_information[request.session] = {
+                    "client": None,
+                    "timestamp": time.time()
+                }
             else:
                 logger_console.warning(
-                    f"Sip host: {host}:{port}/{name}, provider stt: {PROVIDER_STT}, provider_tts: {PROVIDER_TTS}, language: {LANG}"
+                    f"Sip host: {host}:{port}/{name}"
                 )
                 config: SipClientConfig = SipClientConfig(
-                    host=host, port=port, name=name, provider_stt=PROVIDER_STT, provider_tts=PROVIDER_TTS, language=LANG
+                    host=host,
+                    port=port,
+                    name=name,
                 )
 
                 sip_client: SipClient = SipClient(config=config)
-                self.session_information[request.session] = {"client": sip_client, "timestamp": time.time()}
-            logger_console.warning(f"New session in bpi. {len(self.session_information)} sessions currently stored.")
+                self.session_information[request.session] = {
+                    "client": sip_client,
+                    "timestamp": time.time()
+                }
+            logger_console.warning(
+                "New session in bpi."
+                f" {len(self.session_information)} sessions currently stored."
+            )
 
         for session in self.session_information.copy():
-            if time.time() - self.session_information[session]["timestamp"] > (TIMEOUT_MINUTES * 60):
+            current_age = time.time() - self.session_information[session]["timestamp"]
+            if current_age > (TIMEOUT_MINUTES * 60):
                 logger_console.warning(
-                    f"Popping old session: session = {session} timestamp = {self.session_information[session]['timestamp']} age = {time.time() - self.session_information[session]['timestamp']}, timeout is {TIMEOUT_MINUTES} minutes."
+                    f"Popping old session: session = {session}"
+                    f" timestamp = {self.session_information[session]['timestamp']}"
+                    f" age = {current_age},"
+                    f" timeout is {TIMEOUT_MINUTES} minutes."
                 )
                 self.session_information.pop(session)
 

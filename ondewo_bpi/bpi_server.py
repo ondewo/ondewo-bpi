@@ -37,8 +37,8 @@ from ondewo.nlu import (
     project_role_pb2_grpc,
 )
 from ondewo.nlu.client import Client as NLUClient
-from ondewologging.decorators import Timer
-from ondewologging.logger import logger, logger_console
+from ondewo.logging.decorators import Timer
+from ondewo.logging.logger import logger, logger_console
 
 from ondewo_bpi.bpi_services import BpiSessionsServices, BpiUsersServices, BpiContextServices, \
     BpiAgentsServices, BpiEntityTypeServices, BpiAiServicesServices, BpiIntentsServices, \

@@ -20,8 +20,8 @@ import grpc
 from ondewo.nlu import session_pb2
 from ondewo.nlu.session_pb2 import DetectIntentResponse, DetectIntentRequest
 from ondewo.qa import qa_pb2, qa_pb2_grpc
-from ondewologging.decorators import Timer
-from ondewologging.logger import logger_console
+from ondewo.logging.decorators import Timer
+from ondewo.logging.logger import logger_console
 
 from ondewo_bpi_qa.bpi_qa_base_server import BpiQABaseServer
 from ondewo_bpi_qa.config import (

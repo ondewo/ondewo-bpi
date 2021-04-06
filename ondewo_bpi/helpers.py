@@ -17,7 +17,7 @@ from typing import Any, Dict, Optional, List
 from grpc._channel import _InactiveRpcError
 from ondewo.nlu import context_pb2, session_pb2
 from ondewo.nlu.client import Client
-from ondewologging.logger import logger_console
+from ondewo.logging.logger import logger_console
 
 
 def add_params_to_cai_context(
@@ -151,23 +151,36 @@ def create_parameter_dict(my_dict: Dict) -> Optional[Dict[str, context_pb2.Conte
 #   using the 'exact intent' trigger
 def trigger_intent(
     client: Client,
-    session_id: str,
+    session: str,
     intent_name: str,
     language: str = "de-DE",
     additional_contexts: Optional[List[context_pb2.Context]] = None,
 ) -> session_pb2.DetectIntentResponse:
+    """
+    Trigger a specific intent in the NLU backend without intent matching.
+
+    Args:
+        client: nlu client
+        session: full session to perform the trigger in ('parent/<PROJECT_ID>/agent/sessions/<SESSION_ID>')
+        intent_name: intent that you want to trigger
+        language: language of the project
+        additional_contexts: if you want to add additional contexts to the session
+
+    Returns:
+        session_pb2.DetectIntentResponse
+    """
     if not additional_contexts:
         additional_contexts = []
 
     logger_console.warning({"message": "triggering specific intent", "intent_name": intent_name})
     trigger_context = create_context_struct(
-        context=f"{session_id}/contexts/exact_intent",
+        context=f"{session}/contexts/exact_intent",
         parameters=create_parameter_dict({"intent_name": intent_name}),
         lifespan_count=1,
     )
     request = get_detect_intent_request(
         text=f"Triggering Specific Intent: {intent_name}",
-        session=session_id,
+        session=session,
         language=language,
         query_params=session_pb2.QueryParameters(contexts=[trigger_context, *additional_contexts]),
     )
@@ -191,4 +204,4 @@ def strip_final_periods_from_request(request: session_pb2.DetectIntentRequest,) 
 
 
 def get_session_from_response(response: session_pb2.DetectIntentResponse) -> str:
-    return response.query_result.diagnostic_info.fields["sessionId"].string_value  # type: ignore
+    return response.query_result.diagnostic_info["sessionId"]   # type: ignore

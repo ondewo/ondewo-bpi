@@ -6,11 +6,11 @@
 
 This module sits between the user and CAI:
 ```
-          _______           _______
-         |       |         |       |
-==grpc==>|  BPI  |==grpc==>|  CAI  |
-<==grpc==|       |<==grpc==|       |
-         |_______|         |_______|
+                _______           _______
+  ___          |       |         |       |
+  NLU ==grpc==>|  BPI  |==grpc==>|  CAI  |
+ |___|<==grpc==|       |<==grpc==|       |
+               |_______|         |_______|
 ```
 and has full access to the outgoing requests and the returning response. It also knows the location of CAI and has authorization, meaning it can edit the state of CAI directly with additional information.
 

@@ -24,7 +24,9 @@ RUN \
       apt autoremove -y
 
 COPY ondewo_bpi ondewo_bpi
-COPY bpi.env bpi.env
+COPY ondewo_bpi/example/example.env bpi.env
+
+COPY logging.yaml .
 
 CMD python -m ondewo_bpi.example.example
 

@@ -19,7 +19,7 @@ from typing import Dict, Optional, Tuple
 from dotenv import load_dotenv
 from ondewo.nlu.client import Client
 from ondewo.nlu.client_config import ClientConfig
-from ondewologging.logger import logger, logger_console
+from ondewo.logging.logger import logger, logger_console
 
 import ondewo_bpi.__init__ as file_anchor
 
@@ -37,7 +37,7 @@ USER_NAME: Optional[str] = os.getenv("USER_NAME")
 USER_PASS: Optional[str] = os.getenv("USER_PASS")
 SECURE: Optional[str] = os.getenv("SECURE")
 
-config_path = "/home/ondewo/config.json"
+config_path: str = os.getenv("CONFIG_PATH", "/home/ondewo/config.json")
 
 client_configuration_str = (
     "\nnlu-client configuration:\n"
