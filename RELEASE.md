@@ -1,8 +1,15 @@
 # Release History
 *****************
 
+## Release ONDEWO BPI v2.0.2
+### Bug Fixes
+
+* imrpoved log output for debugging
+* updated to use ondewo-logging pip repo
+
+*****************
 ## Release ONDEWO BPI v2.0.1
-### Bug Fixed
+### Bug Fixes
 
 * updated README
 * updated sip example import path
