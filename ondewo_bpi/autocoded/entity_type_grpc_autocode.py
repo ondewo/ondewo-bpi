@@ -118,34 +118,34 @@ class AutoEntityTypesServicer(EntityTypesServicer):
         response = self.client.services.entity_types.batch_delete_entity_types(request=request)
         return response
 
-    def BatchCreateEntities(self, request: entity_type_pb2.BatchCreateEntitiesRequest, context: grpc.ServicerContext) -> Operation:
+    def CreateEntityBatch(self, request: entity_type_pb2.CreateEntityBatchRequest, context: grpc.ServicerContext) -> Operation:
         """
         [AUTO-GENERATED FUNCTION]
         Creates multiple new entities in the specified entity type (extends the
 
         """
         logger.info("relaying BatchCreateEntities() to nlu-client...")
-        response = self.client.services.entity_types.batch_create_entities(request=request)
+        response = self.client.services.entity_types.create_entity_batch(request=request)
         return response
 
-    def BatchUpdateEntities(self, request: entity_type_pb2.BatchUpdateEntitiesRequest, context: grpc.ServicerContext) -> Operation:
+    def UpdateEntityBatch(self, request: entity_type_pb2.UpdateEntityBatchRequest, context: grpc.ServicerContext) -> Operation:
         """
         [AUTO-GENERATED FUNCTION]
         Updates entities in the specified entity type (replaces the existing
 
         """
         logger.info("relaying BatchUpdateEntities() to nlu-client...")
-        response = self.client.services.entity_types.batch_update_entities(request=request)
+        response = self.client.services.entity_types.update_entity_batch(request=request)
         return response
 
-    def BatchDeleteEntities(self, request: entity_type_pb2.BatchDeleteEntitiesRequest, context: grpc.ServicerContext) -> Operation:
+    def DeleteEntityBatch(self, request: entity_type_pb2.DeleteEntityBatchRequest, context: grpc.ServicerContext) -> Operation:
         """
         [AUTO-GENERATED FUNCTION]
         Deletes entities in the specified entity type.
 
         """
         logger.info("relaying BatchDeleteEntities() to nlu-client...")
-        response = self.client.services.entity_types.batch_delete_entities(request=request)
+        response = self.client.services.entity_types.delete_entity_batch(request=request)
         return response
 
 # [make flake8 shut up]
