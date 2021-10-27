@@ -289,9 +289,8 @@ class GRPCAutoCoder:
     ) -> Tuple[List[FunctionCoder], List[bool]]:
         functions = []
 
-        include_google_import, include_empty_import, include_operation_import, include_typing_import = (
-            False, False, False, False)
-        for function_name, (request, response, request_type, response_type) in endpoint_info.items():
+        include_google_import, include_empty_import, include_operation_import, include_typing_import = (False, False, False, False)
+        for function_name, (request, response, request_type, response_type ) in endpoint_info.items():
 
             # try to find corresponding client function by request/response types
             client_function_name = "[NOT_FOUND]"
@@ -340,7 +339,7 @@ class GRPCAutoCoder:
                     else:
                         type_dict[arg] = f"{pb2_filename}.{request}"
                 if arg == "request_iterator":
-                    request = re.findall("\[(.*)\]", request)
+                    request = re.findall("\[(.*)\]",request)
                     type_dict[arg] = (f"Iterator[{pb2_filename}.{request[0]}]")
                     request_str = "request_iterator"
                 if arg == "context":
@@ -474,7 +473,7 @@ class GRPCAutoCoder:
         )
 
         # create imports
-        google_import, empty_import, operation_import, typing_import = ("", "", "", "")
+        google_import, empty_import, operation_import, typing_import = ("", "", "","")
         if include_google_import:
             google_import = "import google\n"
         if include_typing_import:
