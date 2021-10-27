@@ -145,3 +145,5 @@ cython_debug/
 venv*/
 dev_user/
 config.json
+bpi.env
+ondewo_bpi/example/bpi.env
