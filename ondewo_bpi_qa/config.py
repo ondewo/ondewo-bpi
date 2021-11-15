@@ -28,6 +28,7 @@ SESSION_TIMEOUT_MINUTES: int = 20
 QA_MAX_ANSWERS: int = int(os.getenv("QA_MAX_ANSWERS", "3"))
 QA_THRESHOLD_READER: float = float(os.getenv("QA_THRESHOLD_READER", "0.5"))
 QA_THRESHOLD_RETRIEVER: float = float(os.getenv("QA_THRESHOLD_RETRIEVER", "0.5"))
+QA_THRESHOLD_OVERALL: float = float(os.getenv("QA_THRESHOLD_OVERALL", "0.5"))
 QA_ACTIVE: bool = True if os.getenv("QA_ACTIVE", "False") == "True" else False
 QA_SECURE: Optional[str] = os.getenv("QA_SECURE", "False")
 
@@ -40,6 +41,7 @@ client_configuration_str = (
     + f"   Number of answers per query: {QA_MAX_ANSWERS}\n"
     + f"   Reader threshold: {QA_THRESHOLD_READER}\n"
     + f"   Retriever threshold: {QA_THRESHOLD_RETRIEVER}\n"
+    + f"   Overall threshold: {QA_THRESHOLD_OVERALL}\n"
     + f"   Is active?: {QA_ACTIVE}\n"
 )
 logger_console.info(client_configuration_str)

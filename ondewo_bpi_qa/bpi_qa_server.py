@@ -32,7 +32,7 @@ from ondewo_bpi_qa.config import (
     QA_THRESHOLD_RETRIEVER,
     QA_HOST,
     QA_PORT,
-    SESSION_TIMEOUT_MINUTES,
+    SESSION_TIMEOUT_MINUTES, QA_THRESHOLD_OVERALL,
 )
 
 
@@ -121,6 +121,8 @@ class QAServer(BpiQABaseServer):
             max_num_answers=QA_MAX_ANSWERS,
             threshold_reader=QA_THRESHOLD_READER,
             threshold_retriever=QA_THRESHOLD_RETRIEVER,
+            threshold_overall=QA_THRESHOLD_OVERALL,
+            url_filter=qa_pb2.UrlFilter(),
         )
 
         logger_console.warning(
