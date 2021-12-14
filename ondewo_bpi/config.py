@@ -14,6 +14,7 @@
 
 import json
 import os
+import sys
 from typing import Dict, Optional, Tuple
 
 from dotenv import load_dotenv
@@ -36,6 +37,7 @@ HTTP_AUTH_TOKEN: Optional[str] = os.getenv("HTTP_BASIC_AUTH")
 USER_NAME: Optional[str] = os.getenv("USER_NAME")
 USER_PASS: Optional[str] = os.getenv("USER_PASS")
 SECURE: Optional[str] = os.getenv("SECURE", "False")
+SENTENCE_TRUNCATION: int = os.getenv("SENTENCE_TRUNCATION", 130)
 
 CONFIG_PATH: str = os.getenv("CONFIG_PATH", "/home/ondewo/config.json")
 

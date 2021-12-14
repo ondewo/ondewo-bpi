@@ -1,5 +1,11 @@
 # Release History
 *****************
+## Release ONDEWO BPI v3.0.1
+
+### Improvements
+* Add configurable "truncation" limit for long input sentences 
+
+*****************
 ## Release ONDEWO BPI v3.0.0
 ### Improvements 
 * Enable the configuration of the CentralClientProvider to be passed (optionally)
