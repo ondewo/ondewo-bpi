@@ -1,8 +1,9 @@
 from collections import Counter
-from typing import Dict
+from typing import Dict, List, Optional
 
 from google.protobuf.json_format import MessageToDict
 from ondewo.nlu import context_pb2
+from ondewo.nlu.client import Client
 from ondewo.nlu.session_pb2 import DetectIntentResponse, DetectIntentRequest, QueryInput, TextInput, GetSessionRequest, \
     Session, QueryParameters
 
@@ -11,44 +12,44 @@ class IntentMaxTriggerHandler:
     intent_with_max_number_triggers_dict = {'Default Fallback Intent': 2, 'Default Exit Intent': 2}
 
     @classmethod
-    def _get_session(cls, nlu_client, session_id):
+    def _get_session(cls, nlu_client: Client, session_id: str) -> Session:
         get_session_request: GetSessionRequest = GetSessionRequest(session_id=session_id,
                                                                    session_view=Session.View.VIEW_SPARSE)
-        nlu_session = nlu_client.services.sessions.get_session(request=get_session_request)
+        nlu_session: Session = nlu_client.services.sessions.get_session(request=get_session_request)
         return nlu_session
 
     @classmethod
-    def _get_matched_intents(cls, nlu_client, session_id):
-        session_dict = MessageToDict(cls._get_session(nlu_client, session_id))
-        matched_intents = session_dict['sessionInfo']['matchedIntents']
+    def _get_matched_intents(cls, nlu_client: Client, session_id: str) -> List[Dict]:
+        session_dict: Dict = MessageToDict(cls._get_session(nlu_client, session_id))
+        matched_intents: List[Dict] = session_dict['sessionInfo']['matchedIntents']
         return matched_intents
 
     @classmethod
-    def _get_intent_display_name_list(cls, nlu_client, session_id):
-        matched_intents = cls._get_matched_intents(nlu_client, session_id)
-        intent_display_name_list = []
+    def _get_intent_display_name_list(cls, nlu_client: Client, session_id: str) -> List[str]:
+        matched_intents: List[Dict] = cls._get_matched_intents(nlu_client, session_id)
+        intent_display_name_list: List[str] = []
         for matched_intent in matched_intents:
             intent_display_name_list.append(matched_intent['displayName'])
         return intent_display_name_list
 
     @classmethod
-    def _get_intent_display_name_counter(cls, nlu_client, session_id):
-        intent_display_name_list = cls._get_intent_display_name_list(nlu_client, session_id)
+    def _get_intent_display_name_counter(cls, nlu_client: Client, session_id: str) -> Counter:
+        intent_display_name_list: List[str] = cls._get_intent_display_name_list(nlu_client, session_id)
         return Counter(intent_display_name_list)
 
     @classmethod
-    def _check_if_intent_reached_number_triggers_max(cls, intent_name, nlu_client, session_id):
-        max_number_triggers_for_intent = cls.intent_with_max_number_triggers_dict.get(intent_name)
+    def _check_if_intent_reached_number_triggers_max(cls, intent_name: str, nlu_client: Client, session_id: str):
+        max_number_triggers_for_intent: Optional[int] = cls.intent_with_max_number_triggers_dict.get(intent_name)
         if max_number_triggers_for_intent:
-            intent_display_name_counter = cls._get_intent_display_name_counter(nlu_client, session_id)
-            current_number_triggers = intent_display_name_counter.get(intent_name)
+            intent_display_name_counter: Counter = cls._get_intent_display_name_counter(nlu_client, session_id)
+            current_number_triggers: Optional[int] = intent_display_name_counter.get(intent_name)
             if current_number_triggers and current_number_triggers == max_number_triggers_for_intent:
                 return True
         return False
 
     @classmethod
-    def _get_default_exit_intent_request(cls, session_id, language_code):
-        context = cls._make_context(session_id)
+    def _get_default_exit_intent_request(cls, session_id: str, language_code: str) -> DetectIntentRequest:
+        context: context_pb2.Context = cls._make_context(session_id)
 
         nlu_request: DetectIntentRequest = DetectIntentRequest(
             session=session_id,
@@ -65,7 +66,7 @@ class IntentMaxTriggerHandler:
         return nlu_request
 
     @classmethod
-    def _make_context(cls, session_id) -> context_pb2.Context:
+    def _make_context(cls, session_id: str) -> context_pb2.Context:
         # Enter intent name .. Example would be i.order.pizza
         intent_name: str = "Default Exit Intent"
         context_parameter: context_pb2.Context.Parameter = context_pb2.Context.Parameter(
@@ -86,14 +87,15 @@ class IntentMaxTriggerHandler:
         return context
 
     @classmethod
-    def handle_if_intent_reached_number_triggers_max(cls, nlu_response, nlu_client):
-        nlu_response_dict = MessageToDict(nlu_response)
-        intent_name = nlu_response_dict['queryResult']['intent']['displayName']
-        language_code = nlu_response_dict['queryResult']["languageCode"]
-        session_id = nlu_response_dict['queryResult']['diagnosticInfo']['sessionId']
+    def handle_if_intent_reached_number_triggers_max(cls, nlu_response: DetectIntentResponse, nlu_client: Client) -> \
+            Optional[DetectIntentResponse]:
+        nlu_response_dict: Dict = MessageToDict(nlu_response)
+        intent_name: str = nlu_response_dict['queryResult']['intent']['displayName']
+        language_code: str = nlu_response_dict['queryResult']["languageCode"]
+        session_id: str = nlu_response_dict['queryResult']['diagnosticInfo']['sessionId']
 
         if cls._check_if_intent_reached_number_triggers_max(intent_name, nlu_client, session_id):
-            nlu_request = cls._get_default_exit_intent_request(session_id, language_code)
+            nlu_request: DetectIntentRequest = cls._get_default_exit_intent_request(session_id, language_code)
             nlu_response: DetectIntentResponse = nlu_client.services.sessions.detect_intent(
                 request=nlu_request,
             )
