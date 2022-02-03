@@ -14,12 +14,14 @@
 
 import os
 
-from ondewo.nlu import session_pb2
 from ondewo.logging.logger import logger_console
+from ondewo.nlu import session_pb2
+from ondewo.nlu.client import Client
 
 from ondewo_bpi.bpi_server import BpiServer
 from ondewo_bpi.config import CAI_PORT
 from ondewo_bpi.example.login_mock import MockUserLoginServer, PortChecker
+from ondewo_bpi.intent_max_trigger_handler import IntentMaxTriggerHandler
 from ondewo_bpi.message_handler import MessageHandler
 
 
@@ -46,7 +48,8 @@ class MyServer(BpiServer):
             intent_pattern="Default Fallback Intent", handlers=[self.handle_default_fallback],
         )
         self.register_intent_handler(
-            intent_pattern="Default Exit Intent", handlers=[self.handle_default_exit],
+            intent_pattern="Default Exit Intent",
+            handlers=[self.handle_default_exit, self.handle_if_intent_reached_number_triggers_max],
         )
         self.register_intent_handler(
             intent_pattern=r"i.my_\.*", handlers=[self.reformat_text_in_intent],
@@ -56,21 +59,29 @@ class MyServer(BpiServer):
         )
 
     def reformat_text_in_intent(self,
-                                response: session_pb2.DetectIntentResponse) -> session_pb2.DetectIntentResponse:
+                                response: session_pb2.DetectIntentResponse,
+                                nlu_client: Client) -> session_pb2.DetectIntentResponse:
         return MessageHandler.substitute_pattern(
             pattern="<REPLACE:REPLACE_THIS_TEXT>", replace="new text", response=response
         )
 
     @staticmethod
     def handle_default_fallback(
-            response: session_pb2.DetectIntentResponse) -> session_pb2.DetectIntentResponse:
+            response: session_pb2.DetectIntentResponse,
+            nlu_client: Client) -> session_pb2.DetectIntentResponse:
         logger_console.warning("Default fallback was triggered!")
         return response
 
     @staticmethod
-    def handle_default_exit(response: session_pb2.DetectIntentResponse) -> session_pb2.DetectIntentResponse:
+    def handle_default_exit(response: session_pb2.DetectIntentResponse,
+                            nlu_client: Client) -> session_pb2.DetectIntentResponse:
         logger_console.warning("Default exit was triggered!")
         return response
+
+    @staticmethod
+    def handle_if_intent_reached_number_triggers_max(response: session_pb2.DetectIntentResponse,
+                                                     nlu_client: Client) -> session_pb2.DetectIntentResponse:
+        IntentMaxTriggerHandler.handle_if_intent_reached_number_triggers_max(response, nlu_client)
 
     def serve(self) -> None:
         super().serve()

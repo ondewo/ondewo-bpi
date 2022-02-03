@@ -91,14 +91,16 @@ def create_parameter_dict(my_dict: Dict) -> Optional[Dict[str, context_pb2.Conte
     return None
 ```
 * * old version (compatible with the current production CAI):
+
 ```python
 from google.protobuf.struct_pb2 import Struct
+
 
 def get_protobuf_struct_from_dict(my_dict: Dict) -> Struct:
     assert isinstance(my_dict, dict) or my_dict is None, "parameter must be a dict or None"
     result: Struct = Struct()
     if my_dict is not None:
-        for key, value in my_dict.items():
+        for key, value in my_dict.intent_with_max_number_triggers_dict():
             result[key] = value
     return result
 ```
