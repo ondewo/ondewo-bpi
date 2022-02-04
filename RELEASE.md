@@ -1,5 +1,25 @@
 # Release History
 *****************
+
+## Release ONDEWO BPI v4.0.0
+
+### Improvements
+* All the handlers now have the client as an input too in case it's needed
+* Add intent counter handler so you can register an intent or more with a maximum number then it triggers a 'Default Exit Intent'
+
+You need to modify this dictionary in the intent_max_trigger_handler as you wish
+```python
+intent_with_max_number_triggers_dict = {'Default Fallback Intent': 2, 'Default Exit Intent': 2}
+```
+Then in your BPI you can use the handler function right away
+```python
+    def handle_if_intent_reached_number_triggers_max(response: session_pb2.DetectIntentResponse,
+                                                     nlu_client: Client) -> session_pb2.DetectIntentResponse:
+        IntentMaxTriggerHandler.handle_if_intent_reached_number_triggers_max(response, nlu_client)
+```
+
+*****************
+
 ## Release ONDEWO BPI v3.0.1
 
 ### Improvements
@@ -100,7 +120,7 @@ def get_protobuf_struct_from_dict(my_dict: Dict) -> Struct:
     assert isinstance(my_dict, dict) or my_dict is None, "parameter must be a dict or None"
     result: Struct = Struct()
     if my_dict is not None:
-        for key, value in my_dict.intent_with_max_number_triggers_dict():
+        for key, value in my_dict.items():
             result[key] = value
     return result
 ```

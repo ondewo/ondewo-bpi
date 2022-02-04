@@ -43,19 +43,19 @@ class IntentMaxTriggerHandler:
         if max_number_triggers_for_intent:
             intent_display_name_counter: Counter = cls._get_intent_display_name_counter(nlu_client, session_id)
             current_number_triggers: Optional[int] = intent_display_name_counter.get(intent_name)
-            if current_number_triggers and current_number_triggers == max_number_triggers_for_intent:
+            if current_number_triggers and current_number_triggers >= max_number_triggers_for_intent:
                 return True
         return False
 
     @classmethod
-    def _get_default_exit_intent_request(cls, session_id: str, language_code: str) -> DetectIntentRequest:
-        context: context_pb2.Context = cls._make_context(session_id)
+    def _get_default_exit_detect_intent_request(cls, session_id: str, language_code: str) -> DetectIntentRequest:
+        context: context_pb2.Context = cls._create_context_for_triggering_default_exit_intent(session_id)
 
         nlu_request: DetectIntentRequest = DetectIntentRequest(
             session=session_id,
             query_input=QueryInput(
                 text=TextInput(
-                    text="",
+                    text=" ",
                     language_code=language_code,
                 )
             ),
@@ -66,7 +66,7 @@ class IntentMaxTriggerHandler:
         return nlu_request
 
     @classmethod
-    def _make_context(cls, session_id: str) -> context_pb2.Context:
+    def _create_context_for_triggering_default_exit_intent(cls, session_id: str) -> context_pb2.Context:
         # Enter intent name .. Example would be i.order.pizza
         intent_name: str = "Default Exit Intent"
         context_parameter: context_pb2.Context.Parameter = context_pb2.Context.Parameter(
@@ -95,7 +95,7 @@ class IntentMaxTriggerHandler:
         session_id: str = nlu_response_dict['queryResult']['diagnosticInfo']['sessionId']
 
         if cls._check_if_intent_reached_number_triggers_max(intent_name, nlu_client, session_id):
-            nlu_request: DetectIntentRequest = cls._get_default_exit_intent_request(session_id, language_code)
+            nlu_request: DetectIntentRequest = cls._get_default_exit_detect_intent_request(session_id, language_code)
             nlu_response: DetectIntentResponse = nlu_client.services.sessions.detect_intent(
                 request=nlu_request,
             )
