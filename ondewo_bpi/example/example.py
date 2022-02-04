@@ -49,13 +49,15 @@ class MyServer(BpiServer):
         )
         self.register_intent_handler(
             intent_pattern="Default Exit Intent",
-            handlers=[self.handle_default_exit, self.handle_if_intent_reached_number_triggers_max],
+            handlers=[self.handle_default_exit],
         )
         self.register_intent_handler(
             intent_pattern=r"i.my_\.*", handlers=[self.reformat_text_in_intent],
         )
         self.register_intent_handler(
-            intent_pattern="i.my_handled_intent", handlers=[self.reformat_text_in_intent],
+            intent_pattern="i.my_handled_intent",
+            handlers=[self.reformat_text_in_intent,
+                      IntentMaxTriggerHandler.handle_if_intent_reached_number_triggers_max],
         )
 
     def reformat_text_in_intent(self,
