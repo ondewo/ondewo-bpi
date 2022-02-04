@@ -9,7 +9,7 @@
 
 You need to modify this dictionary in the intent_max_trigger_handler as you wish
 ```python
-intent_with_max_number_triggers_dict = {'Default Fallback Intent': 2, 'Default Exit Intent': 2}
+intent_with_max_number_triggers_dict = {'Default Fallback Intent': 2, 'intent-A': 3}
 ```
 Then in your BPI you can use the handler function right away and register handlers with this Callable
 ```python
