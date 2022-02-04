@@ -172,7 +172,7 @@ class BpiSessionsServices(AutoSessionsServicer):
         intent_name = cai_response.query_result.intent.display_name
         handlers: List[Callable] = self._get_handlers_for_intent(intent_name, self.intent_handlers)
         for handler in handlers:
-            cai_response = handler(cai_response)
+            cai_response = handler(cai_response, self.client)
             text = [i.text.text for i in cai_response.query_result.fulfillment_messages]
             logger_console.info(
                 {
