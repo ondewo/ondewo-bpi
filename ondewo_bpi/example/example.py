@@ -83,6 +83,7 @@ class MyServer(BpiServer):
     @staticmethod
     def handle_if_intent_reached_number_triggers_max(response: session_pb2.DetectIntentResponse,
                                                      nlu_client: Client) -> session_pb2.DetectIntentResponse:
+        logger_console.warning("Intent was triggered a maximum amount of times!")
         IntentMaxTriggerHandler.handle_if_intent_reached_number_triggers_max(response, nlu_client)
 
     def serve(self) -> None:
