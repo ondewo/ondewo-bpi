@@ -55,7 +55,7 @@ class IntentMaxTriggerHandler:
             session=session_id,
             query_input=QueryInput(
                 text=TextInput(
-                    text=" ",
+                    text="Default Exit Intent",
                     language_code=language_code,
                 )
             ),
