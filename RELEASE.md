@@ -11,7 +11,7 @@ You need to modify this dictionary in the intent_max_trigger_handler as you wish
 ```python
 intent_with_max_number_triggers_dict = {'Default Fallback Intent': 2, 'Default Exit Intent': 2}
 ```
-Then in your BPI you can use the handler function right away
+Then in your BPI you can use the handler function right away and register handlers with this Callable
 ```python
     def handle_if_intent_reached_number_triggers_max(response: session_pb2.DetectIntentResponse,
                                                      nlu_client: Client) -> session_pb2.DetectIntentResponse:
