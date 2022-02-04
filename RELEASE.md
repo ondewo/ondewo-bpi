@@ -5,7 +5,7 @@
 
 ### Improvements
 * All the handlers now have the client as an input too in case it's needed
-* Add intent counter handler so you can register an intent or more with a maximum number then it triggers a 'Default Exit Intent'
+* Add intent counter handler so you can register an intent or more with a maximum number of occurrences then it triggers a 'Default Exit Intent'
 
 You need to modify this dictionary in the intent_max_trigger_handler as you wish
 ```python
