@@ -60,8 +60,8 @@ class MyServer(BpiServer):
                       IntentMaxTriggerHandler.handle_if_intent_reached_number_triggers_max],
         )
 
-    def reformat_text_in_intent(self,
-                                response: session_pb2.DetectIntentResponse,
+    @staticmethod
+    def reformat_text_in_intent(response: session_pb2.DetectIntentResponse,
                                 nlu_client: Client) -> session_pb2.DetectIntentResponse:
         return MessageHandler.substitute_pattern(
             pattern="<REPLACE:REPLACE_THIS_TEXT>", replace="new text", response=response
@@ -78,6 +78,13 @@ class MyServer(BpiServer):
     def handle_default_exit(response: session_pb2.DetectIntentResponse,
                             nlu_client: Client) -> session_pb2.DetectIntentResponse:
         logger_console.warning("Default exit was triggered!")
+        return response
+
+    @staticmethod
+    def handle_if_intent_reached_number_triggers_max(response: session_pb2.DetectIntentResponse,
+                                                     nlu_client: Client) -> session_pb2.DetectIntentResponse:
+        logger_console.warning("Intent was triggered a maximum amount of times!")
+        IntentMaxTriggerHandler.handle_if_intent_reached_number_triggers_max(response, nlu_client)
         return response
 
     @staticmethod
