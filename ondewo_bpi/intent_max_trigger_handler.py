@@ -88,8 +88,7 @@ class IntentMaxTriggerHandler:
         return context
 
     @classmethod
-    def handle_if_intent_reached_number_triggers_max(cls, nlu_response: DetectIntentResponse, nlu_client: Client) -> \
-            Optional[DetectIntentResponse]:
+    def handle_if_intent_reached_number_triggers_max(cls, nlu_response: DetectIntentResponse, nlu_client: Client) -> DetectIntentResponse:
         nlu_response_dict: Dict = MessageToDict(nlu_response)
         intent_name: str = nlu_response_dict['queryResult']['intent']['displayName']
         language_code: str = nlu_response_dict['queryResult']["languageCode"]
@@ -100,5 +99,5 @@ class IntentMaxTriggerHandler:
             nlu_response: DetectIntentResponse = nlu_client.services.sessions.detect_intent(
                 request=nlu_request,
             )
-            return nlu_response
-        return None
+                
+        return nlu_response
