@@ -22,6 +22,7 @@ from ondewo.logging.decorators import Timer
 from ondewo.logging.logger import logger_console
 from ondewo.nlu import session_pb2, intent_pb2, user_pb2, context_pb2
 from ondewo.nlu.client import Client as NLUClient
+from ondewo.nlu.session_pb2 import TextInput
 
 from ondewo_bpi.autocoded.agent_grpc_autocode import AutoAgentsServicer
 from ondewo_bpi.autocoded.aiservices_grpc_autocode import AutoAiServicesServicer
@@ -31,6 +32,7 @@ from ondewo_bpi.autocoded.intent_grpc_autocode import AutoIntentsServicer
 from ondewo_bpi.autocoded.project_role_grpc_autocode import AutoProjectRolesServicer
 from ondewo_bpi.autocoded.session_grpc_autocode import AutoSessionsServicer
 from ondewo_bpi.autocoded.user_grpc_autocode import AutoUsersServicer
+from ondewo_bpi.config import SENTENCE_TRUNCATION
 from ondewo_bpi.constants import SipTriggers, QueryTriggers
 from ondewo_bpi.helpers import get_session_from_response
 from ondewo_bpi.message_handler import MessageHandler, SingleMessageHandler
@@ -95,9 +97,16 @@ class BpiSessionsServices(AutoSessionsServicer):
             self, request: session_pb2.DetectIntentRequest, context: grpc.ServicerContext
     ) -> session_pb2.DetectIntentResponse:
         try:
+            if len(request.query_input.text.text) > SENTENCE_TRUNCATION:
+                logger_console.warning(f'The received text is too long, it will be truncated '
+                                       f'to {SENTENCE_TRUNCATION} characters!')
+            truncated_text: TextInput = TextInput(text=request.query_input.text.text[:SENTENCE_TRUNCATION])
+            request.query_input.text.CopyFrom(truncated_text)
             text = request.query_input.text.text
-        except Exception:
-            logger_console.exception("something wrong in the bpi")
+        except Exception as e:
+            logger_console.exception(f"An issue was encountered in BPI:\n"
+                                     f"\tSeems like the request query_input data was not properly formatted\n"
+                                     f"\tDetails: {e}")
             text = "error"
         logger_console.warning(
             {
@@ -163,7 +172,7 @@ class BpiSessionsServices(AutoSessionsServicer):
         intent_name = cai_response.query_result.intent.display_name
         handlers: List[Callable] = self._get_handlers_for_intent(intent_name, self.intent_handlers)
         for handler in handlers:
-            cai_response = handler(cai_response)
+            cai_response = handler(cai_response, self.client)
             text = [i.text.text for i in cai_response.query_result.fulfillment_messages]
             logger_console.info(
                 {

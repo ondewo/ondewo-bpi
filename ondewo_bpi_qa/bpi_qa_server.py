@@ -14,15 +14,16 @@
 
 import asyncio
 import time
-from typing import List, Tuple, Coroutine
+from typing import List, Tuple, Coroutine, Any, Dict
 
 import grpc
 from ondewo.nlu import session_pb2
-from ondewo.nlu.session_pb2 import DetectIntentResponse, DetectIntentRequest
+from ondewo.nlu.session_pb2 import DetectIntentResponse, DetectIntentRequest, TextInput
 from ondewo.qa import qa_pb2, qa_pb2_grpc
 from ondewo.logging.decorators import Timer
 from ondewo.logging.logger import logger_console
 
+from ondewo_bpi.config import SENTENCE_TRUNCATION
 from ondewo_bpi_qa.bpi_qa_base_server import BpiQABaseServer
 from ondewo_bpi_qa.config import (
     QA_LANG,
@@ -40,7 +41,7 @@ class QAServer(BpiQABaseServer):
     def __init__(self) -> None:
         super().__init__()
         self.qa_client_stub = qa_pb2_grpc.QAStub(channel=grpc.insecure_channel(f"{QA_HOST}:{QA_PORT}"))
-        self.loops = {}  # type: ignore
+        self.loops: Dict[str, Any] = {}  # Async execution loops
 
     def serve(self) -> None:
         super().serve()
@@ -48,6 +49,13 @@ class QAServer(BpiQABaseServer):
     @Timer(log_arguments=False)
     def DetectIntent(self, request: DetectIntentRequest, context: grpc.ServicerContext) -> DetectIntentResponse:
         self.check_session_id(request)
+
+        if len(request.query_input.text.text) > SENTENCE_TRUNCATION:
+            logger_console.warning(f'The received text is too long, it will be truncated '
+                                   f'to {SENTENCE_TRUNCATION} characters!')
+        truncated_text: TextInput = TextInput(text=request.query_input.text.text[:SENTENCE_TRUNCATION])
+        request.query_input.text.CopyFrom(truncated_text)
+
         response, response_name = self.handle_async(request)
 
         if response_name == "cai_response":
