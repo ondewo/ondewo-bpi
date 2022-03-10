@@ -1,7 +1,7 @@
 # The only requirements are included in the ondewo-nlu-client-python and ondewo-logging submodules, make sure they are properly installed.
 grpcio
 grpcio_reflection
-protobuf==3.13.0
+protobuf>=3.13.0
 python-dotenv
 ondewo-logging==3.1.0
-ondewo-nlu-client==2.5.0
+ondewo-nlu-client==2.5.1

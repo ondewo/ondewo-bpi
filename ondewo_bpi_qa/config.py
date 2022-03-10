@@ -15,7 +15,7 @@
 import os
 from typing import Tuple, Optional
 
-from google.protobuf.json_format import MessageToDict, Parse
+from google.protobuf.json_format import Parse
 
 from ondewo.qa import qa_pb2
 from ondewo.qa.client import Client

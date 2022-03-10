@@ -14,20 +14,20 @@ services:
       - 50051:50051
     # network_mode: host
 
-  bpi_sip:
-    image: registry-dev.ondewo.com:5000/bpi-sip-example-image:develop
-    restart: "no"
-    env_file:
-    - "ondewo_bpi_sip/example/example.env"
-    volumes:
-    - "./logging.yaml:/home/ondewo/logging.yaml"
-    - "./config.json:/home/ondewo/config.json"
-    ports:
-      - 50051:50051
-    network_mode: host
+#  bpi_sip:
+#    image: registry-dev.ondewo.com:5000/bpi-sip-example-image:develop
+#    restart: "no"
+#    env_file:
+#    - "ondewo_bpi_sip/example/example.env"
+#    volumes:
+#    - "./logging.yaml:/home/ondewo/logging.yaml"
+#    - "./config.json:/home/ondewo/config.json"
+#    ports:
+#      - 50051:50051
+#    network_mode: host
 
   bpi_qa:
-    image: registry-dev.ondewo.com:5000/bpi-qa-example-image:develop
+    image: registry-dev.ondewo.com:5000/ondewo/bpi-example-image:5.0.0
     restart: "no"
     env_file:
     - "ondewo_bpi_qa/example/example.env"
@@ -36,4 +36,4 @@ services:
     - "./config.json:/home/ondewo/config.json"
     ports:
       - 50051:50051
-    network_mode: host
+#    network_mode: host
