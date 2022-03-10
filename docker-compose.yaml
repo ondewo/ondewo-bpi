@@ -27,7 +27,7 @@ services:
 #    network_mode: host
 
   bpi_qa:
-    image: registry-dev.ondewo.com:5000/ondewo/bpi-example-image:5.0.0
+    image: registry-dev.ondewo.com:5000/ondewo/bpi-example-image:develop
     restart: "no"
     env_file:
     - "ondewo_bpi_qa/example/example.env"
