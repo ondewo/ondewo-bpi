@@ -15,6 +15,9 @@
 import os
 from typing import Tuple, Optional
 
+from google.protobuf.json_format import MessageToDict, Parse
+
+from ondewo.qa import qa_pb2
 from ondewo.qa.client import Client
 from ondewo.qa.client_config import ClientConfig
 from ondewo.logging.logger import logger_console, logger
@@ -29,6 +32,15 @@ QA_MAX_ANSWERS: int = int(os.getenv("QA_MAX_ANSWERS", "3"))
 QA_THRESHOLD_READER: float = float(os.getenv("QA_THRESHOLD_READER", "0.5"))
 QA_THRESHOLD_RETRIEVER: float = float(os.getenv("QA_THRESHOLD_RETRIEVER", "0.5"))
 QA_THRESHOLD_OVERALL: float = float(os.getenv("QA_THRESHOLD_OVERALL", "0.5"))
+URL_FILTER: Optional[str] = os.getenv("URL_FILTER", None)
+URL_FILTER_OBJECT: Optional[qa_pb2.UrlFilter] = None
+if URL_FILTER:
+    try:
+        URL_FILTER_OBJECT = Parse(URL_FILTER, qa_pb2.UrlFilter(), ignore_unknown_fields=False)
+    except Exception as e:
+        logger_console.warning(f"Could not convert URL_FILTER string to qa_pb2.UrlFilter object. "
+                               f"Error message {str(e)}.")
+
 QA_ACTIVE: bool = True if os.getenv("QA_ACTIVE", "False") == "True" else False
 QA_SECURE: Optional[str] = os.getenv("QA_SECURE", "False")
 
@@ -42,6 +54,7 @@ client_configuration_str = (
     + f"   Reader threshold: {QA_THRESHOLD_READER}\n"
     + f"   Retriever threshold: {QA_THRESHOLD_RETRIEVER}\n"
     + f"   Overall threshold: {QA_THRESHOLD_OVERALL}\n"
+    + f"   URL filter: {URL_FILTER}\n"
     + f"   Is active?: {QA_ACTIVE}\n"
 )
 logger_console.info(client_configuration_str)
