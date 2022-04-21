@@ -32,12 +32,12 @@ class MyQAServer(QAServer):
 
     @staticmethod
     def handle_default_fallback(response: session_pb2.DetectIntentResponse) -> session_pb2.DetectIntentResponse:
-        logger_console.warning("Default fallback was triggered!")
+        logger_console.info("Default fallback was triggered!")
         return response
 
     @staticmethod
     def handle_default_exit(response: session_pb2.DetectIntentResponse) -> session_pb2.DetectIntentResponse:
-        logger_console.warning("Default exit was triggered!")
+        logger_console.info("Default exit was triggered!")
         return response
 
     def serve(self) -> None:

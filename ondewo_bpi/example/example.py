@@ -71,7 +71,7 @@ class MyServer(BpiServer):
     def handle_default_fallback(
             response: session_pb2.DetectIntentResponse,
             nlu_client: Client) -> session_pb2.DetectIntentResponse:
-        logger_console.warning("Default fallback was triggered!")
+        logger_console.info("Default fallback was triggered!")
         return response
 
     @staticmethod

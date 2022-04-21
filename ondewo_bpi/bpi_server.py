@@ -108,8 +108,8 @@ class BpiServer(
     def serve(self) -> None:
         logger_console.info(f"attempting to start server on port {PORT}")
         self._setup_server()
-        logger_console.warning({"message": f"Server started on port {PORT}", "content": PORT})
-        logger_console.warning(
+        logger_console.info({"message": f"Server started on port {PORT}", "content": PORT})
+        logger_console.info(
             {
                 "message": f"using intent handlers list: {self.intent_handlers}",
                 "content": self.intent_handlers,
