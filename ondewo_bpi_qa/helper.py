@@ -23,6 +23,22 @@ class ContextHelper:
         agent_path: str = match.group()
         return agent_path
 
+    @classmethod
+    def get_last_uuid_from_path(cls, path: str) -> str:
+        """ Extract the last resource uuid from the full path.
+
+        Examples:
+            "projects/project_1/agent/sessions/123" -> "123"
+            "projects/project_1/agent/sessions/123/reviews/456" -> "456"
+
+        Args:
+            path: full DFv2 name in format "projects/<project_id>/agent/.../<uuid>"
+
+        Returns:
+            last resource uuid of the path
+        """
+        return path.rsplit('/', maxsplit=1)[-1]
+
 
 if __name__ == '__main__':
     print(f'should match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2/agent/sessions/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2")}')
