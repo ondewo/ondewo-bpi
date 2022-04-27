@@ -20,8 +20,9 @@ import grpc
 from ondewo.logging.decorators import Timer
 from ondewo.logging.logger import logger_console
 from ondewo.nlu import session_pb2
-from ondewo.nlu.context_pb2 import GetContextRequest, Context
-from ondewo.nlu.session_pb2 import DetectIntentResponse, DetectIntentRequest, TextInput
+from ondewo.nlu.context_pb2 import GetContextRequest, Context, CreateContextRequest, UpdateContextRequest
+from ondewo.nlu.session_pb2 import DetectIntentResponse, DetectIntentRequest, TextInput, GetSessionRequest, \
+    Session, CreateSessionRequest
 from ondewo.qa import qa_pb2, qa_pb2_grpc
 from ondewo.qa.qa_pb2 import UrlFilter
 
@@ -39,6 +40,7 @@ from ondewo_bpi_qa.config import (
 )
 from ondewo_bpi_qa.contants import QA_URL_FILTER_CONTEXT_NAME, QA_URL_FILTER_DEFAULT_PARAM_NAME, \
     QA_URL_FILTER_PROVISIONAL_PARAM_NAME, QA_URL_DEFAULT_FILTER, QA_RESPONSE_NAME, CAI_RESPONSE_NAME
+from ondewo_bpi_qa.helper import ContextHelper
 
 
 class QAServer(BpiQABaseServer):
@@ -50,7 +52,7 @@ class QAServer(BpiQABaseServer):
     def serve(self) -> None:
         super().serve()
 
-    @Timer(log_arguments=False)
+    @Timer(log_arguments=False, logger=logger_console.debug)
     def DetectIntent(self, request: DetectIntentRequest,
                      context: grpc.ServicerContext) -> DetectIntentResponse:
         self.check_session_id(request)
@@ -61,7 +63,9 @@ class QAServer(BpiQABaseServer):
         truncated_text: TextInput = TextInput(text=request.query_input.text.text[:SENTENCE_TRUNCATION])
         request.query_input.text.CopyFrom(truncated_text)
 
-        response, response_name = self.handle_predictions(request)
+        self.create_session_if_not_exists(request=request)
+        request: DetectIntentRequest = self.handle_context_injection_for_qa(request=request)  # Side-effect!
+        response, response_name = self.handle_predictions(request=request)
 
         if response_name == CAI_RESPONSE_NAME:
             # Process CAI response
@@ -88,7 +92,70 @@ class QAServer(BpiQABaseServer):
                 f"New session in bpi: {request.session}. {len(self.loops)} sessions currently stored."
             )
 
-    @Timer(log_arguments=False)
+    @Timer(log_arguments=False, logger=logger_console.debug)
+    def handle_context_injection_for_qa(self, request: DetectIntentRequest, ) -> DetectIntentRequest:
+        """
+        Note: to enable Q&A to leverage context injection, we made the context injection happen BEFORE
+            detect intent is called. This way we can guarantee on our async calls that both Q&A and CAI
+            have the same contexts set.
+
+        Note 2: By the nature of it, this function contains a SIDE-EFFECT! It modifies the
+            DetectIntentRequest by removing the context "c-qa-url-filter" if found, this context
+            is managed manually instead.
+        """
+        parent: str = ContextHelper.get_agent_path_from_path(request.session)
+        unaffected_contexts: List[Context] = []
+
+        if not request.query_params:
+            return request
+
+        try:
+            qa_url_context: Optional[Context] = self.client.services.contexts.get_context(
+                GetContextRequest(name=f'{request.session}/contexts/{QA_URL_FILTER_CONTEXT_NAME}')
+            )
+        except Exception:
+            qa_url_context = None
+
+        for context in request.query_params.contexts:
+
+            if QA_URL_FILTER_CONTEXT_NAME not in context.name:
+                unaffected_contexts.append(context)
+                continue
+
+            context_to_inject: Context = Context(
+                name=context.name,
+                lifespan_count=context.lifespan_count,
+                parameters={
+                    key: Context.Parameter(
+                        name=param.name,
+                        display_name=param.display_name,
+                        value_original=param.value_original,
+                        value=param.value,
+                    )
+                    for key, param in context.parameters.items()
+                },
+                lifespan_time=context.lifespan_time
+            )
+
+            if qa_url_context:
+                # Update
+                update_context_req: UpdateContextRequest = UpdateContextRequest(context=context_to_inject)
+                self.client.services.contexts.update_context(request=update_context_req)
+                logger_console.debug(f'Context: {context_to_inject.name} updated!')
+            else:
+                # Create
+                create_context_req: CreateContextRequest = CreateContextRequest(
+                    parent=parent,
+                    context=context_to_inject
+                )
+                self.client.services.contexts.create_context(request=create_context_req)
+                logger_console.debug(f'Context: {context_to_inject.name} created!')
+
+        del request.query_params.contexts[:]
+        request.query_params.contexts.extend(unaffected_contexts)
+        return request
+
+    @Timer(log_arguments=False, logger=logger_console.debug)
     def handle_predictions(self, request: DetectIntentRequest, ) -> Tuple[DetectIntentResponse, str]:
         tasks: List[Coroutine] = [self.send_to_cai(request)]
         if QA_ACTIVE:
@@ -199,3 +266,19 @@ class QAServer(BpiQABaseServer):
             }
         )
         return cai_response, CAI_RESPONSE_NAME
+
+    def create_session_if_not_exists(self, request: DetectIntentRequest, ) -> None:
+
+        try:
+            self.client.services.sessions.get_session(
+                request=GetSessionRequest(session_id=request.session, session_view=Session.View.VIEW_SPARSE)
+            )
+        except Exception:
+            logger_console.debug(f'Session {request.session} does not exists.')
+            self.client.services.sessions.create_session(
+                CreateSessionRequest(
+                    parent=ContextHelper.get_agent_path_from_path(request.session),
+                    session_uuid=ContextHelper.get_last_uuid_from_path(request.session),
+                )
+            )
+            logger_console.debug(f'Session {request.session} created!')
