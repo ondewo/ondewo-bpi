@@ -21,10 +21,11 @@ from ondewo.logging.decorators import Timer
 from ondewo.logging.logger import logger_console
 from ondewo.nlu import session_pb2
 from ondewo.nlu.context_pb2 import GetContextRequest, Context, CreateContextRequest, UpdateContextRequest
+from ondewo.nlu.intent_pb2 import Intent
 from ondewo.nlu.session_pb2 import DetectIntentResponse, DetectIntentRequest, TextInput, GetSessionRequest, \
-    Session, CreateSessionRequest
+    Session, CreateSessionRequest, TrackSessionStepRequest, SessionStep
 from ondewo.qa import qa_pb2, qa_pb2_grpc
-from ondewo.qa.qa_pb2 import UrlFilter
+from ondewo.qa.qa_pb2 import UrlFilter, GetAnswerResponse
 
 from ondewo_bpi.config import SENTENCE_TRUNCATION
 from ondewo_bpi_qa.bpi_qa_base_server import BpiQABaseServer
@@ -158,6 +159,9 @@ class QAServer(BpiQABaseServer):
     @Timer(log_arguments=False, logger=logger_console.debug)
     def handle_predictions(self, request: DetectIntentRequest, ) -> Tuple[DetectIntentResponse, str]:
         tasks: List[Coroutine] = [self.send_to_cai(request)]
+        cai_response: Optional[DetectIntentResponse] = None
+        qa_response: Optional[GetAnswerResponse] = None
+
         if QA_ACTIVE:
             tasks.append(self.send_to_qa(request))
 
@@ -190,6 +194,20 @@ class QAServer(BpiQABaseServer):
         messages = qa_response.query_result.query_result.fulfillment_messages
 
         if messages:
+            # track session step if there is a CAI response
+            if cai_response:
+                qa_response = self._fill_in_qa_response_with_cai_response(qa_response, cai_response)
+                self.client.services.sessions.track_session_step(
+                    TrackSessionStepRequest(
+                        session_id=request.session,
+                        session_step=SessionStep(
+                            detect_intent_request=request,
+                            detect_intent_response=qa_response.query_result,
+                            contexts=[],
+                        ),
+                        session_view=Session.View.VIEW_SPARSE,
+                    )
+                )
             return qa_response.query_result, QA_RESPONSE_NAME
 
         logger_console.debug("No response from QA, passing back Default Fallback.")
@@ -282,3 +300,60 @@ class QAServer(BpiQABaseServer):
                 )
             )
             logger_console.debug(f'Session {request.session} created!')
+
+    # noinspection PyMethodMayBeStatic
+    def _fill_in_qa_response_with_cai_response(self, qa_response, cai_response) -> GetAnswerResponse:
+        """ This function updates the QA response with information from the CAI response.
+            The objective is to create a QA response that can be added to the Session Review History.
+
+            Note: this function modifies the qa_response directly.
+        """
+        qa_response.query_result.query_result.action = \
+            cai_response.query_result.action
+        qa_response.query_result.query_result.parameters.CopyFrom(
+            cai_response.query_result.parameters
+        )
+        qa_response.query_result.query_result.all_required_params_present = \
+            cai_response.query_result.all_required_params_present
+        qa_response.query_result.query_result.output_contexts.extend(
+            cai_response.query_result.output_contexts
+        )
+        qa_response.query_result.query_result.intent.CopyFrom(
+            cai_response.query_result.intent
+        )
+        qa_response.query_result.query_result.diagnostic_info.CopyFrom(
+            cai_response.query_result.diagnostic_info
+        )
+
+        current_messages: List[Intent.Message] = list(
+            qa_response.query_result.query_result.fulfillment_messages)
+        del qa_response.query_result.query_result.fulfillment_messages[:]
+
+        for p in Intent.Message.Platform.keys():
+            if 'PLACEHOLDER' in p:
+
+                for fm in current_messages:
+                    _fm_button: Intent.Message.BasicCard.Button = fm.basic_card.buttons[0]
+                    _message: Intent.Message = Intent.Message()
+                    _message.is_prompt = False
+                    _message.platform = Intent.Message.Platform.Value(p)
+                    _message.card.CopyFrom(
+                        Intent.Message.Card(
+                            title=fm.basic_card.title,
+                            subtitle=f'{fm.basic_card.subtitle} - {fm.basic_card.formatted_text}',
+                            buttons=[
+                                Intent.Message.Card.Button(
+                                    text=f'{_fm_button.title}',
+                                    postback=f'{_fm_button.open_uri_action.uri}'
+                                )
+                            ],
+                            image_uri='https://vera.wkooe.at/ki/embed/img/anpassungen/chat/chatleiste_vera_neu.svg',
+                        )
+                    )
+                    qa_response.query_result.query_result.fulfillment_messages.append(_message)
+
+        qa_response.query_result.query_result.intent.messages.extend(
+            qa_response.query_result.query_result.fulfillment_messages
+        )
+
+        return qa_response
