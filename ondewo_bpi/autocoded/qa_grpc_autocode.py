@@ -18,10 +18,10 @@ from abc import ABCMeta, abstractmethod
 
 import grpc
 from google.protobuf.empty_pb2 import Empty
+from ondewo.logging.logger import logger
 from ondewo.qa import qa_pb2
 from ondewo.qa.client import Client
 from ondewo.qa.qa_pb2_grpc import QAServicer
-from ondewo.logging.logger import logger
 
 
 class AutoQAServicer(QAServicer):
@@ -56,7 +56,7 @@ class AutoQAServicer(QAServicer):
         response = self.qa_client.services.qa.get_answer(request=request)
         return response
 
-    def RunScraper(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.RunScraperResponse:
+    def RunScraper(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.qa_pb2.RunScraperResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Missing associated documentation comment in .proto file.

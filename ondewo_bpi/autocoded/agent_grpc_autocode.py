@@ -19,10 +19,10 @@ from abc import ABCMeta, abstractmethod
 import grpc
 from google.longrunning.operations_grpc_pb2 import Operation
 from google.protobuf.empty_pb2 import Empty
-from ondewo.nlu import agent_pb2
-from ondewo.nlu.client import Client
-from ondewo.nlu.agent_pb2_grpc import AgentsServicer
 from ondewo.logging.logger import logger
+from ondewo.nlu import agent_pb2
+from ondewo.nlu.agent_pb2_grpc import AgentsServicer
+from ondewo.nlu.client import Client
 
 
 class AutoAgentsServicer(AgentsServicer):
@@ -38,7 +38,7 @@ class AutoAgentsServicer(AgentsServicer):
     override functions if other functionality than a client call is needed
 
     [original docstring]
-    Agents are best described as Natural Language Understanding (NLU) modules
+    Agents are best described as Natural Language Understanding (NLU) modules that transform user requests into actionable data. You can include agents in your app, product, or service to determine user intent and respond to the user in a natural way.
 
     """
     __metaclass__ = ABCMeta
@@ -205,6 +205,17 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.export_agent(request=request)
         return response
 
+    def ExportBenchmarkAgent(self, request: agent_pb2.ExportBenchmarkAgentRequest,
+                             context: grpc.ServicerContext) -> Operation:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Exports the specified train agent to a ZIP file after train-test split, returns the test TrainingPhrase list.
+
+        """
+        logger.info("relaying ExportBenchmarkAgent() to nlu-client...")
+        response = self.client.services.agents.export_benchmark_agent(request=request)
+        return response
+
     def ImportAgent(self, request: agent_pb2.ImportAgentRequest, context: grpc.ServicerContext) -> Operation:
         """
         [AUTO-GENERATED FUNCTION]
@@ -270,13 +281,47 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.delete_resources(request=request)
         return response
 
-    def ExportResources(self, request: agent_pb2.ExportResourcesRequest, context: grpc.ServicerContext) -> agent_pb2.ExportResourcesResponse:
+    def ExportResources(self, request: agent_pb2.ExportResourcesRequest,
+                        context: grpc.ServicerContext) -> agent_pb2.ExportResourcesResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Missing associated documentation comment in .proto file.
         """
         logger.info("relaying ExportResources() to nlu-client...")
         response = self.client.services.agents.export_resources(request=request)
+        return response
+
+    def GetModelStatuses(self, request: agent_pb2.GetModelStatusesRequest,
+                         context: grpc.ServicerContext) -> agent_pb2.GetModelStatusesResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Get statuses of models related to project
+
+        """
+        logger.info("relaying GetModelStatuses() to nlu-client...")
+        response = self.client.services.agents.get_model_statuses(request=request)
+        return response
+
+    def GetPlatformMapping(self, request: agent_pb2.GetPlatformMappingRequest,
+                           context: grpc.ServicerContext) -> agent_pb2.PlatformMapping:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Get all set platform name mappings for an Agent
+
+        """
+        logger.info("relaying GetPlatformMapping() to nlu-client...")
+        response = self.client.services.agents.get_platform_mapping(request=request)
+        return response
+
+    def SetPlatformMapping(self, request: agent_pb2.PlatformMapping,
+                           context: grpc.ServicerContext) -> agent_pb2.PlatformMapping:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Set platform name mappings for an Agent
+
+        """
+        logger.info("relaying SetPlatformMapping() to nlu-client...")
+        response = self.client.services.agents.set_platform_mapping(request=request)
         return response
 
 # [make flake8 shut up]

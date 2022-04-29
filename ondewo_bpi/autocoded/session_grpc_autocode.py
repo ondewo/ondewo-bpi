@@ -15,15 +15,14 @@
 # [AUTO-GENERATED FILE]
 
 from abc import ABCMeta, abstractmethod
-
 from typing import Iterator
 
 import grpc
 from google.protobuf.empty_pb2 import Empty
+from ondewo.logging.logger import logger
 from ondewo.nlu import session_pb2
 from ondewo.nlu.client import Client
 from ondewo.nlu.session_pb2_grpc import SessionsServicer
-from ondewo.logging.logger import logger
 
 
 class AutoSessionsServicer(SessionsServicer):
@@ -79,7 +78,8 @@ class AutoSessionsServicer(SessionsServicer):
         response = self.client.services.sessions.list_sessions(request=request)
         return response
 
-    def GetSession(self, request: session_pb2.GetSessionRequest, context: grpc.ServicerContext) -> session_pb2.Session:
+    def GetSession(self, request: session_pb2.GetSessionRequest,
+                   context: grpc.ServicerContext) -> session_pb2.Session:
         """
         [AUTO-GENERATED FUNCTION]
         GetSession: returns a session(=conversation) from ondewo-kb
@@ -89,7 +89,19 @@ class AutoSessionsServicer(SessionsServicer):
         response = self.client.services.sessions.get_session(request=request)
         return response
 
-    def TrackSessionStep(self, request: session_pb2.TrackSessionStepRequest, context: grpc.ServicerContext) -> session_pb2.Session:
+    def CreateSession(self, request: session_pb2.CreateSessionRequest,
+                      context: grpc.ServicerContext) -> session_pb2.Session:
+        """
+        [AUTO-GENERATED FUNCTION]
+        CreateSession: creates and returns a session(=conversation) from ondewo-kb
+
+        """
+        logger.info("relaying CreateSession() to nlu-client...")
+        response = self.client.services.sessions.create_session(request=request)
+        return response
+
+    def TrackSessionStep(self, request: session_pb2.TrackSessionStepRequest,
+                         context: grpc.ServicerContext) -> session_pb2.Session:
         """
         [AUTO-GENERATED FUNCTION]
         TrackSessionStep: append to an existing session; creates it if not existing
