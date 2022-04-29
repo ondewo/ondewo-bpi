@@ -18,6 +18,7 @@ from typing import List, Optional
 
 import grpc
 from grpc_reflection.v1alpha import reflection
+from ondewo.logging.logger import logger, logger_console
 from ondewo.nlu import (
     agent_pb2,
     entity_type_pb2,
@@ -37,8 +38,6 @@ from ondewo.nlu import (
     project_role_pb2_grpc,
 )
 from ondewo.nlu.client import Client as NLUClient
-from ondewo.logging.decorators import Timer
-from ondewo.logging.logger import logger, logger_console
 
 from ondewo_bpi.bpi_services import BpiSessionsServices, BpiUsersServices, BpiContextServices, \
     BpiAgentsServices, BpiEntityTypeServices, BpiAiServicesServices, BpiIntentsServices, \
@@ -95,7 +94,6 @@ class BpiServer(
         project_role_pb2_grpc.add_ProjectRolesServicer_to_server(self, self.server)
         user_pb2_grpc.add_UsersServicer_to_server(self, self.server)
 
-    @Timer(log_arguments=False)
     def _setup_server(self) -> None:
         logger.info("attempting to setup server...")
         self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
