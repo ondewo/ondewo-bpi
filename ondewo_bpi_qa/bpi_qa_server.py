@@ -39,7 +39,7 @@ from ondewo_bpi_qa.config import (
     QA_PORT,
     SESSION_TIMEOUT_MINUTES,
 )
-from ondewo_bpi_qa.contants import QA_URL_FILTER_CONTEXT_NAME, QA_URL_FILTER_DEFAULT_PARAM_NAME, \
+from ondewo_bpi_qa.constants import QA_URL_FILTER_CONTEXT_NAME, QA_URL_FILTER_BASE_PARAM_NAME, \
     QA_URL_FILTER_PROVISIONAL_PARAM_NAME, QA_URL_DEFAULT_FILTER, QA_RESPONSE_NAME, CAI_RESPONSE_NAME
 from ondewo_bpi_qa.helper import ContextHelper
 
@@ -54,7 +54,8 @@ class QAServer(BpiQABaseServer):
         super().serve()
 
     @Timer(log_arguments=False, logger=logger_console.debug)
-    def DetectIntent(self, request: DetectIntentRequest,
+    def DetectIntent(self,
+                     request: DetectIntentRequest,
                      context: grpc.ServicerContext) -> DetectIntentResponse:
         self.check_session_id(request)
 
@@ -123,20 +124,8 @@ class QAServer(BpiQABaseServer):
                 unaffected_contexts.append(context)
                 continue
 
-            context_to_inject: Context = Context(
-                name=context.name,
-                lifespan_count=context.lifespan_count,
-                parameters={
-                    key: Context.Parameter(
-                        name=param.name,
-                        display_name=param.display_name,
-                        value_original=param.value_original,
-                        value=param.value,
-                    )
-                    for key, param in context.parameters.items()
-                },
-                lifespan_time=context.lifespan_time
-            )
+            context_to_inject: Context = Context()
+            context_to_inject.CopyFrom(context)
 
             if qa_url_context:
                 # Update
@@ -224,7 +213,7 @@ class QAServer(BpiQABaseServer):
                 GetContextRequest(name=f'{request.session}/contexts/{QA_URL_FILTER_CONTEXT_NAME}')
             )
             default_filter: Optional[Context.Parameter] = filter_context.parameters.get(
-                QA_URL_FILTER_DEFAULT_PARAM_NAME, None
+                QA_URL_FILTER_BASE_PARAM_NAME, None
             )
             provisional_filter: Optional[Context.Parameter] = filter_context.parameters.get(
                 QA_URL_FILTER_PROVISIONAL_PARAM_NAME, None

@@ -38,7 +38,9 @@ class AutoAgentsServicer(AgentsServicer):
     override functions if other functionality than a client call is needed
 
     [original docstring]
-    Agents are best described as Natural Language Understanding (NLU) modules that transform user requests into actionable data. You can include agents in your app, product, or service to determine user intent and respond to the user in a natural way.
+    Agents are best described as Natural Language Understanding (NLU) modules that transform user requests
+        into actionable data. You can include agents in your app, product, or service to determine user intent
+        and respond to the user in a natural way.
 
     """
     __metaclass__ = ABCMeta
@@ -48,7 +50,8 @@ class AutoAgentsServicer(AgentsServicer):
     def client(self) -> Client:
         pass
 
-    def CreateAgent(self, request: agent_pb2.CreateAgentRequest, context: grpc.ServicerContext) -> agent_pb2.Agent:
+    def CreateAgent(self, request: agent_pb2.CreateAgentRequest,
+                    context: grpc.ServicerContext) -> agent_pb2.Agent:
         """
         [AUTO-GENERATED FUNCTION]
         Creates the specified agent.
@@ -58,7 +61,8 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.create_agent(request=request)
         return response
 
-    def UpdateAgent(self, request: agent_pb2.UpdateAgentRequest, context: grpc.ServicerContext) -> agent_pb2.Agent:
+    def UpdateAgent(self, request: agent_pb2.UpdateAgentRequest,
+                    context: grpc.ServicerContext) -> agent_pb2.Agent:
         """
         [AUTO-GENERATED FUNCTION]
         Updates the specified agent.
@@ -98,7 +102,8 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.delete_all_agents()
         return response
 
-    def ListAgents(self, request: agent_pb2.ListAgentsRequest, context: grpc.ServicerContext) -> agent_pb2.ListAgentsResponse:
+    def ListAgents(self, request: agent_pb2.ListAgentsRequest,
+                   context: grpc.ServicerContext) -> agent_pb2.ListAgentsResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Lists agents in the server associated to the current user
@@ -108,7 +113,8 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.list_agents(request=request)
         return response
 
-    def ListAgentsOfUser(self, request: agent_pb2.ListAgentsRequest, context: grpc.ServicerContext) -> agent_pb2.ListAgentsOfUserResponse:
+    def ListAgentsOfUser(self, request: agent_pb2.ListAgentsRequest,
+                         context: grpc.ServicerContext) -> agent_pb2.ListAgentsOfUserResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Lists agents in the server associated to the given user
@@ -118,7 +124,8 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.list_agents_of_user(request=request)
         return response
 
-    def ListAllAgents(self, request: agent_pb2.ListAgentsRequest, context: grpc.ServicerContext) -> agent_pb2.ListAgentsResponse:
+    def ListAllAgents(self, request: agent_pb2.ListAgentsRequest,
+                      context: grpc.ServicerContext) -> agent_pb2.ListAgentsResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Lists all agents in the server
@@ -128,7 +135,8 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.list_agents(request=request)
         return response
 
-    def AddUserToProject(self, request: agent_pb2.AddUserToProjectRequest, context: grpc.ServicerContext) -> Empty:
+    def AddUserToProject(self, request: agent_pb2.AddUserToProjectRequest,
+                         context: grpc.ServicerContext) -> Empty:
         """
         [AUTO-GENERATED FUNCTION]
         Adds a user with specified id to the project (agent)
@@ -138,7 +146,8 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.add_user_to_project(request=request)
         return response
 
-    def RemoveUserFromProject(self, request: agent_pb2.RemoveUserFromProjectRequest, context: grpc.ServicerContext) -> Empty:
+    def RemoveUserFromProject(self, request: agent_pb2.RemoveUserFromProjectRequest,
+                              context: grpc.ServicerContext) -> Empty:
         """
         [AUTO-GENERATED FUNCTION]
         Removes a user with specified id from the project (agent)
@@ -148,7 +157,8 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.remove_user_from_project(request=request)
         return response
 
-    def ListUsersInProject(self, request: agent_pb2.ListUsersInProjectRequest, context: grpc.ServicerContext) -> agent_pb2.ListUsersInProjectResponse:
+    def ListUsersInProject(self, request: agent_pb2.ListUsersInProjectRequest,
+                           context: grpc.ServicerContext) -> agent_pb2.ListUsersInProjectResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Missing associated documentation comment in .proto file.
@@ -157,7 +167,8 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.list_users_in_project(request=request)
         return response
 
-    def GetPlatformInfo(self, request: Empty, context: grpc.ServicerContext) -> agent_pb2.GetPlatformInfoResponse:
+    def GetPlatformInfo(self, request: Empty,
+                        context: grpc.ServicerContext) -> agent_pb2.GetPlatformInfoResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Missing associated documentation comment in .proto file.
@@ -166,7 +177,8 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_platform_info()
         return response
 
-    def ListProjectPermissions(self, request: agent_pb2.ListProjectPermissionsRequest, context: grpc.ServicerContext) -> agent_pb2.ListProjectPermissionsResponse:
+    def ListProjectPermissions(self, request: agent_pb2.ListProjectPermissionsRequest,
+                               context: grpc.ServicerContext) -> agent_pb2.ListProjectPermissionsResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Missing associated documentation comment in .proto file.
@@ -226,7 +238,8 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.import_agent(request=request)
         return response
 
-    def OptimizeRankingMatch(self, request: agent_pb2.OptimizeRankingMatchRequest, context: grpc.ServicerContext) -> Operation:
+    def OptimizeRankingMatch(self, request: agent_pb2.OptimizeRankingMatchRequest,
+                             context: grpc.ServicerContext) -> Operation:
         """
         [AUTO-GENERATED FUNCTION]
         Missing associated documentation comment in .proto file.
@@ -235,7 +248,8 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.optimize_ranking_match(request=request)
         return response
 
-    def RestoreAgent(self, request: agent_pb2.RestoreAgentRequest, context: grpc.ServicerContext) -> Operation:
+    def RestoreAgent(self, request: agent_pb2.RestoreAgentRequest,
+                     context: grpc.ServicerContext) -> Operation:
         """
         [AUTO-GENERATED FUNCTION]
         Restores the specified agent from a ZIP file.
@@ -245,7 +259,8 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.restore_agent(request=request)
         return response
 
-    def GetAgentStatistics(self, request: agent_pb2.GetAgentStatisticsRequest, context: grpc.ServicerContext) -> agent_pb2.GetAgentStatisticsResponse:
+    def GetAgentStatistics(self, request: agent_pb2.GetAgentStatisticsRequest,
+                           context: grpc.ServicerContext) -> agent_pb2.GetAgentStatisticsResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Missing associated documentation comment in .proto file.
@@ -254,7 +269,8 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_agent_statistics(request=request)
         return response
 
-    def SetAgentStatus(self, request: agent_pb2.SetAgentStatusRequest, context: grpc.ServicerContext) -> agent_pb2.Agent:
+    def SetAgentStatus(self, request: agent_pb2.SetAgentStatusRequest,
+                       context: grpc.ServicerContext) -> agent_pb2.Agent:
         """
         [AUTO-GENERATED FUNCTION]
         Missing associated documentation comment in .proto file.
@@ -272,7 +288,8 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.set_resources(request=request)
         return response
 
-    def DeleteResources(self, request: agent_pb2.DeleteResourcesRequest, context: grpc.ServicerContext) -> Empty:
+    def DeleteResources(self, request: agent_pb2.DeleteResourcesRequest,
+                        context: grpc.ServicerContext) -> Empty:
         """
         [AUTO-GENERATED FUNCTION]
         Missing associated documentation comment in .proto file.
