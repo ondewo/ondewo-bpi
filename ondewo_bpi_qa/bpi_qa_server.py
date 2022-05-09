@@ -212,18 +212,22 @@ class QAServer(BpiQABaseServer):
             filter_context: Context = self.client.services.contexts.get_context(
                 GetContextRequest(name=f'{request.session}/contexts/{QA_URL_FILTER_CONTEXT_NAME}')
             )
-            default_filter: Optional[Context.Parameter] = filter_context.parameters.get(
+            base_filter: Optional[Context.Parameter] = filter_context.parameters.get(
                 QA_URL_FILTER_BASE_PARAM_NAME, None
             )
             provisional_filter: Optional[Context.Parameter] = filter_context.parameters.get(
                 QA_URL_FILTER_PROVISIONAL_PARAM_NAME, None
             )
-            active_filter = default_filter.value if default_filter else ''
+            active_filter = base_filter.value if base_filter else active_filter
 
             if provisional_filter:
                 active_filter = provisional_filter.value
+
         except Exception as e:
-            logger_console.info(f'No URL filters found')
+            logger_console.info(f'No context: {QA_URL_FILTER_CONTEXT_NAME} found.')
+        finally:
+            if active_filter == QA_URL_DEFAULT_FILTER:
+                logger_console.info(f'No URL filters found')
 
         qa_request = qa_pb2.GetAnswerRequest(
             session_id=request.session,

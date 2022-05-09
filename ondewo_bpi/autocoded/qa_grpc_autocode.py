@@ -56,7 +56,7 @@ class AutoQAServicer(QAServicer):
         response = self.qa_client.services.qa.get_answer(request=request)
         return response
 
-    def RunScraper(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.qa_pb2.RunScraperResponse:
+    def RunScraper(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.RunScraperResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Missing associated documentation comment in .proto file.
