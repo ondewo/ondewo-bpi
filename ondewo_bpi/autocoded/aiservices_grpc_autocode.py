@@ -17,10 +17,10 @@
 from abc import ABCMeta, abstractmethod
 
 import grpc
-from ondewo.nlu import aiservices_pb2
-from ondewo.nlu.client import Client
-from ondewo.nlu.aiservices_pb2_grpc import AiServicesServicer
 from ondewo.logging.logger import logger
+from ondewo.nlu import aiservices_pb2
+from ondewo.nlu.aiservices_pb2_grpc import AiServicesServicer
+from ondewo.nlu.client import Client
 
 
 class AutoAiServicesServicer(AiServicesServicer):
@@ -92,13 +92,35 @@ class AutoAiServicesServicer(AiServicesServicer):
         response = self.client.services.aiservices.get_alternative_training_phrases(request=request)
         return response
 
-    def GetSynonyms(self, request: aiservices_pb2.GetSynonymsRequest, context: grpc.ServicerContext) -> aiservices_pb2.GetSynonymsResponse:
+    def GetSynonyms(self, request: aiservices_pb2.GetSynonymsRequest,
+                    context: grpc.ServicerContext) -> aiservices_pb2.GetSynonymsResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Missing associated documentation comment in .proto file.
         """
         logger.info("relaying GetSynonyms() to nlu-client...")
         response = self.client.services.aiservices.get_synonyms(request=request)
+        return response
+
+    def ClassifyIntents(self, request: aiservices_pb2.ClassifyIntentsRequest,
+                        context: grpc.ServicerContext) -> aiservices_pb2.ClassifyIntentsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying ClassifyIntents() to nlu-client...")
+        response = self.client.services.aiservices.classify_intents(request=request)
+        return response
+
+    def ExtractEntitiesFuzzy(self, request: aiservices_pb2.ExtractEntitiesFuzzyRequest,
+                             context: grpc.ServicerContext) -> aiservices_pb2.ExtractEntitiesResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Processes a natural language query and returns detected entities
+
+        """
+        logger.info("relaying ExtractEntitiesFuzzy() to nlu-client...")
+        response = self.client.services.aiservices.extract_entities_fuzzy(request=request)
         return response
 
 # [make flake8 shut up]

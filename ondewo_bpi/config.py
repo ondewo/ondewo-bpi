@@ -14,13 +14,12 @@
 
 import json
 import os
-import sys
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional
 
 from dotenv import load_dotenv
+from ondewo.logging.logger import logger, logger_console
 from ondewo.nlu.client import Client
 from ondewo.nlu.client_config import ClientConfig
-from ondewo.logging.logger import logger, logger_console
 
 import ondewo_bpi.__init__ as file_anchor
 

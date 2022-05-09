@@ -108,7 +108,7 @@ class BpiSessionsServices(AutoSessionsServicer):
                                      f"\tSeems like the request query_input data was not properly formatted\n"
                                      f"\tDetails: {e}")
             text = "error"
-        logger_console.warning(
+        logger_console.debug(
             {
                 "message": f"CAI-DetectIntentRequest to CAI, text input: {text}",
                 "content": text,
@@ -118,7 +118,7 @@ class BpiSessionsServices(AutoSessionsServicer):
         )
         cai_response = self.perform_detect_intent(request)
         intent_name = cai_response.query_result.intent.display_name
-        logger_console.warning(
+        logger_console.debug(
             {
                 "message": f"CAI-DetectIntentResponse from CAI, intent_name: {intent_name}",
                 "content": intent_name,

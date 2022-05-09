@@ -117,7 +117,7 @@ def detect_intent(
     request = get_detect_intent_request(text=text, session=get_session_from_response(response=response),)
     logger_console.info({"message": "detect intent returned in bpi helpers", "tags": ["timing"]})
     result = client.services.sessions.detect_intent(request)
-    logger_console.warning(f"wrote {text}, received {result.query_result.fulfillment_messages}")
+    logger_console.info(f"wrote {text}, received {result.query_result.fulfillment_messages}")
     return result
 
 
@@ -173,7 +173,7 @@ def trigger_intent(
     if not additional_contexts:
         additional_contexts = []
 
-    logger_console.warning({"message": "triggering specific intent", "intent_name": intent_name})
+    logger_console.info({"message": "triggering specific intent", "intent_name": intent_name})
     trigger_context = create_context_struct(
         context=f"{session}/contexts/exact_intent",
         parameters=create_parameter_dict({"intent_name": intent_name}),
@@ -186,7 +186,7 @@ def trigger_intent(
         query_params=session_pb2.QueryParameters(contexts=[trigger_context, *additional_contexts]),
     )
     result = client.services.sessions.detect_intent(request)
-    logger_console.warning(f"triggered {intent_name}")
+    logger_console.info(f"triggered {intent_name}")
     return result
 
 
