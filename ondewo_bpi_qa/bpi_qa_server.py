@@ -40,7 +40,8 @@ from ondewo_bpi_qa.config import (
     SESSION_TIMEOUT_MINUTES,
 )
 from ondewo_bpi_qa.constants import QA_URL_FILTER_CONTEXT_NAME, QA_URL_FILTER_BASE_PARAM_NAME, \
-    QA_URL_FILTER_PROVISIONAL_PARAM_NAME, QA_URL_DEFAULT_FILTER, QA_RESPONSE_NAME, CAI_RESPONSE_NAME
+    QA_URL_FILTER_PROVISIONAL_PARAM_NAME, QA_URL_DEFAULT_FILTER, QA_RESPONSE_NAME, CAI_RESPONSE_NAME, \
+    QA_PUBLIC_IMAGE_URI_LINK
 from ondewo_bpi_qa.helper import ContextHelper
 
 
@@ -185,13 +186,16 @@ class QAServer(BpiQABaseServer):
         if messages:
             # track session step if there is a CAI response
             if cai_response:
-                qa_response = self._fill_in_qa_response_with_cai_response(qa_response, cai_response)
+                qa_response_to_track: GetAnswerResponse = self._fill_in_qa_response_with_cai_response(
+                    qa_response=qa_response,
+                    cai_response=cai_response
+                )
                 self.client.services.sessions.track_session_step(
                     TrackSessionStepRequest(
                         session_id=request.session,
                         session_step=SessionStep(
                             detect_intent_request=request,
-                            detect_intent_response=qa_response.query_result,
+                            detect_intent_response=qa_response_to_track.query_result,
                             contexts=[],
                         ),
                         session_view=Session.View.VIEW_SPARSE,
@@ -295,32 +299,41 @@ class QAServer(BpiQABaseServer):
             logger_console.debug(f'Session {request.session} created!')
 
     # noinspection PyMethodMayBeStatic
-    def _fill_in_qa_response_with_cai_response(self, qa_response, cai_response) -> GetAnswerResponse:
-        """ This function updates the QA response with information from the CAI response.
-            The objective is to create a QA response that can be added to the Session Review History.
-
-            Note: this function modifies the qa_response directly.
+    def _fill_in_qa_response_with_cai_response(
+            self,
+            qa_response: GetAnswerResponse,
+            cai_response: DetectIntentResponse
+    ) -> GetAnswerResponse:
         """
-        qa_response.query_result.query_result.action = \
+        This function updates the QA response with information from the CAI response.
+        The objective is to create a QA response that can be added to the Session Review History.
+
+            -> Returns a copy of the original qa_response with the modified fields.
+        """
+
+        modified_qa_response: GetAnswerResponse = GetAnswerResponse()
+        modified_qa_response.CopyFrom(qa_response)
+
+        modified_qa_response.query_result.query_result.action = \
             cai_response.query_result.action
-        qa_response.query_result.query_result.parameters.CopyFrom(
+        modified_qa_response.query_result.query_result.parameters.CopyFrom(
             cai_response.query_result.parameters
         )
-        qa_response.query_result.query_result.all_required_params_present = \
+        modified_qa_response.query_result.query_result.all_required_params_present = \
             cai_response.query_result.all_required_params_present
-        qa_response.query_result.query_result.output_contexts.extend(
+        modified_qa_response.query_result.query_result.output_contexts.extend(
             cai_response.query_result.output_contexts
         )
-        qa_response.query_result.query_result.intent.CopyFrom(
+        modified_qa_response.query_result.query_result.intent.CopyFrom(
             cai_response.query_result.intent
         )
-        qa_response.query_result.query_result.diagnostic_info.CopyFrom(
+        modified_qa_response.query_result.query_result.diagnostic_info.CopyFrom(
             cai_response.query_result.diagnostic_info
         )
 
         current_messages: List[Intent.Message] = list(
-            qa_response.query_result.query_result.fulfillment_messages)
-        del qa_response.query_result.query_result.fulfillment_messages[:]
+            modified_qa_response.query_result.query_result.fulfillment_messages)
+        del modified_qa_response.query_result.query_result.fulfillment_messages[:]
 
         for p in Intent.Message.Platform.keys():
             if 'PLACEHOLDER' in p:
@@ -340,13 +353,13 @@ class QAServer(BpiQABaseServer):
                                     postback=f'{_fm_button.open_uri_action.uri}'
                                 )
                             ],
-                            image_uri='https://vera.wkooe.at/ki/embed/img/anpassungen/chat/chatleiste_vera_neu.svg',
+                            image_uri=QA_PUBLIC_IMAGE_URI_LINK,
                         )
                     )
-                    qa_response.query_result.query_result.fulfillment_messages.append(_message)
+                    modified_qa_response.query_result.query_result.fulfillment_messages.append(_message)
 
-        qa_response.query_result.query_result.intent.messages.extend(
-            qa_response.query_result.query_result.fulfillment_messages
+        modified_qa_response.query_result.query_result.intent.messages.extend(
+            modified_qa_response.query_result.query_result.fulfillment_messages
         )
 
-        return qa_response
+        return modified_qa_response

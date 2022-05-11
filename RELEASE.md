@@ -2,6 +2,14 @@
 
 *****************
 
+## Release ONDEWO BPI v4.1.1
+
+### Bug Fixes
+
+* QA Response. The original QA response is no longer overridden by the QA response to track in the CAI.
+
+*****************
+
 ## Release ONDEWO BPI v4.1.0
 
 ### Improvements
