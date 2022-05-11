@@ -2,11 +2,19 @@
 
 *****************
 
+## Release ONDEWO BPI v4.1.1
+
+### Bug Fixes
+
+* QA Response. The original QA response is no longer overridden by the QA response to track in the CAI.
+
+*****************
+
 ## Release ONDEWO BPI v4.1.0
 
 ### Improvements
 
-* Extend the Q&A BPI version to support filtering functionality through context injection
+* Extend the Q&A BPI version to support filte<ring functionality through context injection
 
 The Q&A URL filter can be leveraged to control which resources can Q&A look into for answers.
 The resources are identified by their URLs, therefore, the filters are regexes applied to the URLS.
