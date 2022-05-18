@@ -1,17 +1,5 @@
-# install grpcurl for grpc health check
-FROM ubuntu:20.04 as lux_base
-
-ARG DEBIAN_FRONTEND=noninteractive
-
-# install grpcurl
-# docker.io needed for 'go get'
-RUN apt update && apt install -y docker.io && apt install -y golang
-RUN go get github.com/fullstorydev/grpcurl/...
-RUN go install github.com/fullstorydev/grpcurl/cmd/grpcurl
-
-# install server
-FROM python:3.7-slim as pybase
-COPY --from=lux_base /root/go/bin/ /usr/local/bin/
+FROM python:3.8-slim as pybase
+COPY --from=fullstorydev/grpcurl:latest /root/go/bin/ /usr/local/bin/
 ENV GIT_REPO_NAME=ondewo-bpi
 
 WORKDIR /home/ondewo/
