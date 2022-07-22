@@ -1,4 +1,53 @@
 # Release History
+
+*****************
+
+## Release ONDEWO BPI v4.1.1
+
+### Bug Fixes
+
+* QA Response. The original QA response is no longer overridden by the QA response to track in the CAI.
+
+*****************
+
+## Release ONDEWO BPI v4.1.0
+
+### Improvements
+
+* Extend the Q&A BPI version to support filtering functionality through context injection
+
+The Q&A URL filter can be leveraged to control which resources can Q&A look into for answers.
+The resources are identified by their URLs, therefore, the filters are regexes applied to the URLS.
+
+See below and example of a 'c-qa-url-filter' injection:
+
+```json
+{
+  "name": "projects/11111111-1111-1111-1111-111111111111/agent/sessions/00000000-0000-4000-8000-decaf0cafe06/c-qa-url-filter",
+  "lifespan_count": "100000",
+  "parameters": {
+    "base-filter": {
+      "display_name": "base-filter",
+      "value": ".*/my_base_filter/.*"
+    },
+    "provisional-filter": {
+      "display_name": "provisional-filter",
+      "value": ".*/my_provisional_filter/.*"
+    }
+  }
+}
+```
+
+> The *base filter* defines the base behaviour of the filter.
+>
+> The *provisional filter* will override the *base filter* if defined.
+>
+> If filter context parameters are specified, or no 'c-qa-url-filter' is specified, the filter applied will be `.*` (default behaviour == no filter).
+
+### Bug Fixes
+
+* Correct mis-usage of logging levels
+
 *****************
 
 ## Release ONDEWO BPI v4.0.1
@@ -11,6 +60,7 @@
 ## Release ONDEWO BPI v4.0.0
 
 ### Improvements
+
 * All the handlers now have the client as an input too in case it's needed
 * Add intent counter handler so you can register an intent or more with a maximum number of occurrences then it triggers a 'Default Exit Intent'
 

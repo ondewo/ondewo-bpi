@@ -145,3 +145,4 @@ cython_debug/
 venv*/
 dev_user/
 config.json
+.pypirc

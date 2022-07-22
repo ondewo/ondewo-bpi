@@ -18,10 +18,10 @@ from abc import ABCMeta, abstractmethod
 
 import grpc
 from google.protobuf.empty_pb2 import Empty
+from ondewo.logging.logger import logger
 from ondewo.qa import qa_pb2
 from ondewo.qa.client import Client
 from ondewo.qa.qa_pb2_grpc import QAServicer
-from ondewo.logging.logger import logger
 
 
 class AutoQAServicer(QAServicer):

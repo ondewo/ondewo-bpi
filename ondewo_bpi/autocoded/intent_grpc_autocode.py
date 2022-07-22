@@ -19,10 +19,10 @@ from abc import ABCMeta, abstractmethod
 import grpc
 from google.longrunning.operations_grpc_pb2 import Operation
 from google.protobuf.empty_pb2 import Empty
+from ondewo.logging.logger import logger
 from ondewo.nlu import intent_pb2
 from ondewo.nlu.client import Client
 from ondewo.nlu.intent_pb2_grpc import IntentsServicer
-from ondewo.logging.logger import logger
 
 
 class AutoIntentsServicer(IntentsServicer):
@@ -108,7 +108,8 @@ class AutoIntentsServicer(IntentsServicer):
         response = self.client.services.intents.batch_update_intents(request=request)
         return response
 
-    def BatchDeleteIntents(self, request: intent_pb2.BatchDeleteIntentsRequest, context: grpc.ServicerContext) -> Operation:
+    def BatchDeleteIntents(self, request: intent_pb2.BatchDeleteIntentsRequest,
+                           context: grpc.ServicerContext) -> Operation:
         """
         [AUTO-GENERATED FUNCTION]
         Deletes intents in the specified agent.
@@ -116,6 +117,156 @@ class AutoIntentsServicer(IntentsServicer):
         """
         logger.info("relaying BatchDeleteIntents() to nlu-client...")
         response = self.client.services.intents.batch_delete_intents(request=request)
+        return response
+
+    def TagIntent(self, request: intent_pb2.IntentTagRequest, context: grpc.ServicerContext) -> Empty:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying TagIntent() to nlu-client...")
+        response = self.client.services.intents.tag_intent(request=request)
+        return response
+
+    def DeleteIntentTag(self, request: intent_pb2.IntentTagRequest, context: grpc.ServicerContext) -> Empty:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying DeleteIntentTag() to nlu-client...")
+        response = self.client.services.intents.tag_intent(request=request)
+        return response
+
+    def BatchCreateTrainingPhrases(self, request: intent_pb2.BatchCreateTrainingPhrasesRequest,
+                                   context: grpc.ServicerContext) -> intent_pb2.BatchTrainingPhrasesStatusResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        ************************ Training Phrase RPC Endpoints ***************************
+
+        """
+        logger.info("relaying BatchCreateTrainingPhrases() to nlu-client...")
+        response = self.client.services.intents.batch_create_training_phrases(request=request)
+        return response
+
+    def BatchGetTrainingPhrases(self, request: intent_pb2.BatchGetTrainingPhrasesRequest,
+                                context: grpc.ServicerContext) -> intent_pb2.BatchTrainingPhrasesStatusResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Retrieve a training phrases batch of the specified names.
+
+        """
+        logger.info("relaying BatchGetTrainingPhrases() to nlu-client...")
+        response = self.client.services.intents.batch_get_training_phrases(request=request)
+        return response
+
+    def BatchUpdateTrainingPhrases(self, request: intent_pb2.BatchUpdateTrainingPhrasesRequest,
+                                   context: grpc.ServicerContext) -> intent_pb2.BatchTrainingPhrasesStatusResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Updates batch of training phrases
+
+        """
+        logger.info("relaying BatchUpdateTrainingPhrases() to nlu-client...")
+        response = self.client.services.intents.batch_update_training_phrases(request=request)
+        return response
+
+    def BatchDeleteTrainingPhrases(self, request: intent_pb2.BatchDeleteTrainingPhrasesRequest,
+                                   context: grpc.ServicerContext) -> intent_pb2.BatchDeleteTrainingPhrasesResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Delete a training phrases batch of the specified names.
+
+        """
+        logger.info("relaying BatchDeleteTrainingPhrases() to nlu-client...")
+        response = self.client.services.intents.batch_delete_training_phrases(request=request)
+        return response
+
+    def BatchCreateResponseMessages(self, request: intent_pb2.BatchCreateResponseMessagesRequest,
+                                    context: grpc.ServicerContext) -> intent_pb2.BatchResponseMessagesStatusResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        ************************ Response RPC Endpoints ***************************
+
+        """
+        logger.info("relaying BatchCreateResponseMessages() to nlu-client...")
+        response = self.client.services.intents.batch_create_response_messages(request=request)
+        return response
+
+    def BatchGetResponseMessages(self, request: intent_pb2.BatchGetResponseMessagesRequest,
+                                 context: grpc.ServicerContext) -> intent_pb2.BatchResponseMessagesStatusResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Retrieve a intent messages batch of the specified names.
+
+        """
+        logger.info("relaying BatchGetResponseMessages() to nlu-client...")
+        response = self.client.services.intents.batch_get_response_messages(request=request)
+        return response
+
+    def BatchUpdateResponseMessages(self, request: intent_pb2.BatchUpdateResponseMessagesRequest,
+                                    context: grpc.ServicerContext) -> intent_pb2.BatchResponseMessagesStatusResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Updates batch of intent messages
+
+        """
+        logger.info("relaying BatchUpdateResponseMessages() to nlu-client...")
+        response = self.client.services.intents.batch_update_response_messages(request=request)
+        return response
+
+    def BatchDeleteResponseMessages(self, request: intent_pb2.BatchDeleteResponseMessagesRequest,
+                                    context: grpc.ServicerContext) -> intent_pb2.BatchDeleteResponseMessagesResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Delete a intent messages batch of the specified names.
+
+        """
+        logger.info("relaying BatchDeleteResponseMessages() to nlu-client...")
+        response = self.client.services.intents.batch_delete_response_messages(request=request)
+        return response
+
+    def BatchCreateParameters(self, request: intent_pb2.BatchCreateParametersRequest,
+                              context: grpc.ServicerContext) -> intent_pb2.BatchParametersStatusResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        ************************ Parameter RPC Endpoints ***************************
+
+        """
+        logger.info("relaying BatchCreateParameters() to nlu-client...")
+        response = self.client.services.intents.batch_create_parameters(request=request)
+        return response
+
+    def BatchGetParameters(self, request: intent_pb2.BatchGetParametersRequest,
+                           context: grpc.ServicerContext) -> intent_pb2.BatchParametersStatusResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Retrieve a intent messages batch of the specified names.
+
+        """
+        logger.info("relaying BatchGetParameters() to nlu-client...")
+        response = self.client.services.intents.batch_get_parameters(request=request)
+        return response
+
+    def BatchUpdateParameters(self, request: intent_pb2.BatchUpdateParametersRequest,
+                              context: grpc.ServicerContext) -> intent_pb2.BatchParametersStatusResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Updates batch of intent messages
+
+        """
+        logger.info("relaying BatchUpdateParameters() to nlu-client...")
+        response = self.client.services.intents.batch_update_parameters(request=request)
+        return response
+
+    def BatchDeleteParameters(self, request: intent_pb2.BatchDeleteParametersRequest,
+                              context: grpc.ServicerContext) -> intent_pb2.BatchDeleteParametersResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Delete a intent messages batch of the specified names.
+
+        """
+        logger.info("relaying BatchDeleteParameters() to nlu-client...")
+        response = self.client.services.intents.batch_delete_parameters(request=request)
         return response
 
 # [make flake8 shut up]
