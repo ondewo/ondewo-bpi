@@ -50,6 +50,13 @@ See below and example of a 'c-qa-url-filter' injection:
 
 *****************
 
+## Release ONDEWO BPI v4.0.1
+
+### Bug Fixes
+* Improvements on the example usage of the `IntentMaxTriggerHandler`
+
+*****************
+
 ## Release ONDEWO BPI v4.0.0
 
 ### Improvements
