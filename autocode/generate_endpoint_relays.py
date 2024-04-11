@@ -75,6 +75,13 @@ files_to_generate = [
         "client_type": ClientType.NLU,
     },
     {
+        "in_file": "./ondewo-nlu-client-python/ondewo/nlu/ccai_project_pb2_grpc.py",
+        "out_file": "./ondewo_bpi/autocoded/ccai_project_grpc_autocode.py",
+        "proto_file": "./ondewo-nlu-client-python/ondewo-nlu-api/ondewo/nlu/ccai_project.proto",
+        "client_file": "./ondewo-nlu-client-python/ondewo/nlu/services/ccai_projects.py",
+        "client_type": ClientType.NLU,
+    },
+    {
         "in_file": "./ondewo-nlu-client-python/ondewo/qa/qa_pb2_grpc.py",
         "out_file": "./ondewo_bpi/autocoded/qa_grpc_autocode.py",
         "proto_file": "./ondewo-nlu-client-python/ondewo-nlu-api/ondewo/qa/qa.proto",
@@ -82,7 +89,6 @@ files_to_generate = [
         "client_type": ClientType.QA,
     },
 ]
-
 
 if __name__ == "__main__":
 

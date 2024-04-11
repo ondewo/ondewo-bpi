@@ -12,10 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import regex as re
-from typing import List, Tuple, Dict, Optional
+from typing import (
+    Dict,
+    List,
+    Optional,
+    Tuple,
+)
 
-from autocode.base_coder import ClassCoder, FunctionCoder
+import regex as re
+
+from autocode.base_coder import (
+    ClassCoder,
+    FunctionCoder,
+)
 from autocode.client_type import ClientType
 
 
@@ -41,12 +50,12 @@ class GRPCAutoCoder:
     """
 
     def __init__(
-            self,
-            in_file: str,
-            out_file: str,
-            proto_file: str,
-            client_file: str,
-            client_type: ClientType
+        self,
+        in_file: str,
+        out_file: str,
+        proto_file: str,
+        client_file: str,
+        client_type: ClientType
     ):
         self.in_file = in_file
         self.out_file = out_file
@@ -104,9 +113,9 @@ class GRPCAutoCoder:
             if line == "\n":
                 continue
             elif (
-                    line[:tab_length_in_spaces] != "    "
-                    or "def" in line[:tab_length_in_spaces]
-                    or "class" in line[:tab_length_in_spaces]
+                line[:tab_length_in_spaces] != "    "
+                or "def" in line[:tab_length_in_spaces]
+                or "class" in line[:tab_length_in_spaces]
             ):
                 class_end_idx = i - 1
                 break
@@ -207,12 +216,13 @@ class GRPCAutoCoder:
         # stream requests/responses also supported
         endpoint_info = {}
         for line in rpc_lines:
-            endpoint = line.split("rpc ")[1].split(" (")[0]
-            request = line.split(f"{endpoint} (")[1].split(") returns")[0]
+            line = line.replace(" (", "(")
+            endpoint = line.split("rpc ")[1].split("(")[0].strip()
+            request = line.split(f"{endpoint}(")[1].split(") returns")[0]
             request_type = "stream" if "stream" in request else None
             request = request.replace("stream ", "")
 
-            response = line.split("returns (")[1].split(")")[0]
+            response = line.split("returns(")[1].split(")")[0]
             response_type = "stream" if "stream" in response else None
             response = response.replace("stream ", "")
 
@@ -267,6 +277,10 @@ class GRPCAutoCoder:
     @staticmethod
     def try_convert_function_name(function_name: str) -> str:
         """converters CamelCase to camel_case"""
+        # workaround # FIXME: "of" should be split in proto definition, e.g.'ListTrainingPhrasesofIntentsWithEnrichment'
+        if "ListTrainingPhrasesofIntentsWithEnrichment" in function_name:
+            function_name = "ListTrainingPhrasesOfIntentsWithEnrichment"
+
         new_function_name = ""
         for i, letter in enumerate(function_name):
             if letter.isupper():
@@ -276,28 +290,31 @@ class GRPCAutoCoder:
                     new_function_name += "_" + letter.lower()
             else:
                 new_function_name += letter
+
         return new_function_name
 
     def build_functions_coder_objects(
-            self,
-            indent_lvl: int,
-            function_info: Dict[str, Tuple[List[str], List[str]]],
-            pb2_filename: str,
-            endpoint_info: Dict[str, Tuple[str, str, Optional[str], Optional[str]]],
-            client_info: Dict[str, Tuple[str, str]],
-            client_service_name: str,
+        self,
+        indent_lvl: int,
+        function_info: Dict[str, Tuple[List[str], List[str]]],
+        pb2_filename: str,
+        endpoint_info: Dict[str, Tuple[str, str, Optional[str], Optional[str]]],
+        client_info: Dict[str, Tuple[str, str]],
+        client_service_name: str,
     ) -> Tuple[List[FunctionCoder], List[bool]]:
         functions = []
 
-        include_google_import, include_empty_import, include_operation_import, include_typing_import = (False, False, False, False)
-        for function_name, (request, response, request_type, response_type ) in endpoint_info.items():
+        include_google_import, include_empty_import, include_operation_import, include_typing_import = (
+            False, False, False, False
+        )
+        for function_name, (request, response, request_type, response_type) in endpoint_info.items():
 
             # try to find corresponding client function by request/response types
             client_function_name = "[NOT_FOUND]"
             for some_client_function_name, (search_request, search_response) in client_info.items():
                 if (request, response) == (
-                        search_request.replace(pb2_filename + ".", ""),
-                        search_response.replace(pb2_filename + ".", ""),
+                    search_request.replace(pb2_filename + ".", ""),
+                    search_response.replace(pb2_filename + ".", ""),
                 ):
                     client_function_name = some_client_function_name
                     break
@@ -339,7 +356,7 @@ class GRPCAutoCoder:
                     else:
                         type_dict[arg] = f"{pb2_filename}.{request}"
                 if arg == "request_iterator":
-                    request = re.findall("\[(.*)\]",request)
+                    request = re.findall("\[(.*)\]", request)
                     type_dict[arg] = (f"Iterator[{pb2_filename}.{request[0]}]")
                     request_str = "request_iterator"
                 if arg == "context":
@@ -419,11 +436,11 @@ class GRPCAutoCoder:
         return generated_code
 
     def _generate_code(
-            self,
-            in_file: str,
-            out_file: str,
-            proto_file: str,
-            client_file: str,
+        self,
+        in_file: str,
+        out_file: str,
+        proto_file: str,
+        client_file: str,
     ) -> None:
 
         # parse information from files
@@ -455,25 +472,25 @@ class GRPCAutoCoder:
 
         # create header
         header = (
-                "# Copyright 2021 ONDEWO GmbH\n" +
-                "#\n" +
-                "# Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
-                "# you may not use this file except in compliance with the License.\n" +
-                "# You may obtain a copy of the License at\n" +
-                "#\n" +
-                "#     http://www.apache.org/licenses/LICENSE-2.0\n" +
-                "#\n" +
-                "# Unless required by applicable law or agreed to in writing, software\n" +
-                "# distributed under the License is distributed on an \"AS IS\" BASIS,\n" +
-                "# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
-                "# See the License for the specific language governing permissions and\n" +
-                "# limitations under the License.\n" +
-                "#\n" +
-                "# [AUTO-GENERATED FILE]\n\n"
+            "# Copyright 2021 ONDEWO GmbH\n" +
+            "#\n" +
+            "# Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
+            "# you may not use this file except in compliance with the License.\n" +
+            "# You may obtain a copy of the License at\n" +
+            "#\n" +
+            "#     http://www.apache.org/licenses/LICENSE-2.0\n" +
+            "#\n" +
+            "# Unless required by applicable law or agreed to in writing, software\n" +
+            "# distributed under the License is distributed on an \"AS IS\" BASIS,\n" +
+            "# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
+            "# See the License for the specific language governing permissions and\n" +
+            "# limitations under the License.\n" +
+            "#\n" +
+            "# [AUTO-GENERATED FILE]\n\n"
         )
 
         # create imports
-        google_import, empty_import, operation_import, typing_import = ("", "", "","")
+        google_import, empty_import, operation_import, typing_import = ("", "", "", "")
         if include_google_import:
             google_import = "import google\n"
         if include_typing_import:
@@ -483,19 +500,19 @@ class GRPCAutoCoder:
         if include_operation_import:
             operation_import = "from google.longrunning.operations_grpc_pb2 import Operation\n"
         imports = (
-                "from abc import ABCMeta, abstractmethod\n"
-                + "\n"
-                + f"{typing_import}"
-                + f"{google_import}"
-                + "import grpc\n"
-                + f"{operation_import}"
-                + f"{empty_import}"
-                + f"from {import_path} import {pb2_filename}\n"
-                + f"from {import_path}.client import Client\n"
-                + f"from {import_path}.{grpc_filename} import {class_info[0]}\n"
-                + "from ondewo.logging.logger import logger\n"
-                + "\n"
-                + "\n"
+            "from abc import ABCMeta, abstractmethod\n"
+            + "\n"
+            + f"{typing_import}"
+            + f"{google_import}"
+            + "import grpc\n"
+            + f"{operation_import}"
+            + f"{empty_import}"
+            + f"from {import_path} import {pb2_filename}\n"
+            + f"from {import_path}.client import Client\n"
+            + f"from {import_path}.{grpc_filename} import {class_info[0]}\n"
+            + "from ondewo.logging.logger import logger\n"
+            + "\n"
+            + "\n"
         )
 
         # create class docstring
