@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -308,7 +308,7 @@ class GRPCAutoCoder:
             False, False, False, False
         )
         for function_name, (request, response, request_type, response_type) in endpoint_info.items():
-
+            assert function_name
             # try to find corresponding client function by request/response types
             client_function_name = "[NOT_FOUND]"
             for some_client_function_name, (search_request, search_response) in client_info.items():
@@ -392,18 +392,20 @@ class GRPCAutoCoder:
             docstring = ["[AUTO-GENERATED FUNCTION]"] + docstring
 
             # create Function object, which can generate the python code and append it to a list
-            f = FunctionCoder(
-                function_name=function_name,
-                indent_lvl=indent_lvl,
-                arguments=arg_dict,
-                add_lines=[
-                    f'logger.info("relaying {function_name}() to nlu-client...")',
-                    f"response = self.{self.client_type_call}.services.{client_service_name}.{client_function_name}({fc_input})",
-                ],
-                returns=returns,
-                docstring=docstring,
+            functions.append(
+                FunctionCoder(
+                    function_name=function_name,
+                    indent_lvl=indent_lvl,
+                    arguments=arg_dict,
+                    add_lines=[
+                        f'logger.info("relaying {function_name}() to nlu-client...")',
+                        f"response = self.{self.client_type_call}.services."
+                        f"{client_service_name}.{client_function_name}({fc_input})",
+                    ],
+                    returns=returns,
+                    docstring=docstring,
+                )
             )
-            functions.append(f)
         bools = [include_google_import, include_empty_import, include_operation_import, include_typing_import]
         return functions, bools
 
@@ -472,7 +474,7 @@ class GRPCAutoCoder:
 
         # create header
         header = (
-            "# Copyright 2021 ONDEWO GmbH\n" +
+            "# Copyright 2021-2024 ONDEWO GmbH\n" +
             "#\n" +
             "# Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
             "# you may not use this file except in compliance with the License.\n" +

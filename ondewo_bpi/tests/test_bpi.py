@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ import pytest  # noqa:
 
 from ondewo_bpi.bpi_server import BpiServer
 from ondewo_bpi.config import Client
+
 
 # from ondewo.nlu import session_pb2_grpc
 

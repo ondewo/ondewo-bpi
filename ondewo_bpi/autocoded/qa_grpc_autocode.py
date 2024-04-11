@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ from abc import ABCMeta, abstractmethod
 
 import grpc
 from google.protobuf.empty_pb2 import Empty
-from ondewo.logging.logger import logger
 from ondewo.qa import qa_pb2
 from ondewo.qa.client import Client
 from ondewo.qa.qa_pb2_grpc import QAServicer
+from ondewo.logging.logger import logger
 
 
 class AutoQAServicer(QAServicer):
@@ -37,7 +37,7 @@ class AutoQAServicer(QAServicer):
     override functions if other functionality than a client call is needed
 
     [original docstring]
-    ///// Services ///////
+    gRPC service for QA functionalities.
 
     """
     __metaclass__ = ABCMeta
@@ -50,28 +50,71 @@ class AutoQAServicer(QAServicer):
     def GetAnswer(self, request: qa_pb2.GetAnswerRequest, context: grpc.ServicerContext) -> qa_pb2.GetAnswerResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Retrieves an answer based on the provided request.
+
         """
         logger.info("relaying GetAnswer() to nlu-client...")
         response = self.qa_client.services.qa.get_answer(request=request)
         return response
 
-    def RunScraper(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.RunScraperResponse:
+    def RunScraper(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.qa_pb2.RunScraperResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Runs a web scraper job for specified project IDs.
+
         """
         logger.info("relaying RunScraper() to nlu-client...")
         response = self.qa_client.services.qa.run_scraper()
         return response
 
+    def UpdateDatabase(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.qa_pb2.UpdateDatabaseResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Updates the database for specified project IDs.
+
+        """
+        logger.info("relaying UpdateDatabase() to nlu-client...")
+        response = self.qa_client.services.qa.update_database()
+        return response
+
     def RunTraining(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.RunTrainingResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Runs a training job for the QA system.
+
         """
         logger.info("relaying RunTraining() to nlu-client...")
         response = self.qa_client.services.qa.run_training()
+        return response
+
+    def GetServerState(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.GetServerStateResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Retrieves the server state for QA.
+
+        """
+        logger.info("relaying GetServerState() to nlu-client...")
+        response = self.qa_client.services.qa.get_server_state()
+        return response
+
+    def ListProjectIds(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.ListProjectIdsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Lists project IDs associated with QA.
+
+        """
+        logger.info("relaying ListProjectIds() to nlu-client...")
+        response = self.qa_client.services.qa.list_project_ids()
+        return response
+
+    def GetProjectConfig(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.qa_pb2.GetProjectConfigResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Retrieves the configuration of a specific project.
+
+        """
+        logger.info("relaying GetProjectConfig() to nlu-client...")
+        response = self.qa_client.services.qa.get_project_config()
         return response
 
 # [make flake8 shut up]

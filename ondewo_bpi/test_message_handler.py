@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -14,15 +14,31 @@
 
 import datetime
 from contextlib import nullcontext as does_not_raise
-from typing import Any, Dict, List
+from typing import (
+    Any,
+    Dict,
+    List,
+)
 
 import pytest
-from ondewo.nlu import intent_pb2, session_pb2
+from ondewo.nlu import (
+    intent_pb2,
+    session_pb2,
+)
 
 import ondewo_bpi.config as file_anchor  # noqa: F401
 from ondewo_bpi.bpi_server import BpiServer
-from ondewo_bpi.constants import DATE_FORMAT, QueryTriggers, SipTriggers, EnglishDays, GermanDays
-from ondewo_bpi.message_handler import MessageHandler, SingleMessageHandler
+from ondewo_bpi.constants import (
+    DATE_FORMAT,
+    EnglishDays,
+    GermanDays,
+    QueryTriggers,
+    SipTriggers,
+)
+from ondewo_bpi.message_handler import (
+    MessageHandler,
+    SingleMessageHandler,
+)
 
 REPLACEMENT_STRING = "replacement string"
 

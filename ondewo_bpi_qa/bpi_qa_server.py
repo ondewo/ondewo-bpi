@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -14,34 +14,66 @@
 
 import asyncio
 import time
-from typing import List, Tuple, Coroutine, Any, Dict, Optional
+from typing import (
+    Any,
+    Coroutine,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+)
 
 import grpc
 from ondewo.logging.decorators import Timer
 from ondewo.logging.logger import logger_console
 from ondewo.nlu import session_pb2
-from ondewo.nlu.context_pb2 import GetContextRequest, Context, CreateContextRequest, UpdateContextRequest
+from ondewo.nlu.context_pb2 import (
+    Context,
+    CreateContextRequest,
+    GetContextRequest,
+    UpdateContextRequest,
+)
 from ondewo.nlu.intent_pb2 import Intent
-from ondewo.nlu.session_pb2 import DetectIntentResponse, DetectIntentRequest, TextInput, GetSessionRequest, \
-    Session, CreateSessionRequest, TrackSessionStepRequest, SessionStep
-from ondewo.qa import qa_pb2, qa_pb2_grpc
-from ondewo.qa.qa_pb2 import UrlFilter, GetAnswerResponse
+from ondewo.nlu.session_pb2 import (
+    CreateSessionRequest,
+    DetectIntentRequest,
+    DetectIntentResponse,
+    GetSessionRequest,
+    Session,
+    SessionStep,
+    TextInput,
+    TrackSessionStepRequest,
+)
+from ondewo.qa import (
+    qa_pb2,
+    qa_pb2_grpc,
+)
+from ondewo.qa.qa_pb2 import (
+    GetAnswerResponse,
+    UrlFilter,
+)
 
 from ondewo_bpi.config import SENTENCE_TRUNCATION
 from ondewo_bpi_qa.bpi_qa_base_server import BpiQABaseServer
 from ondewo_bpi_qa.config import (
-    QA_LANG,
     QA_ACTIVE,
+    QA_HOST,
+    QA_LANG,
     QA_MAX_ANSWERS,
+    QA_PORT,
     QA_THRESHOLD_READER,
     QA_THRESHOLD_RETRIEVER,
-    QA_HOST,
-    QA_PORT,
     SESSION_TIMEOUT_MINUTES,
 )
-from ondewo_bpi_qa.constants import QA_URL_FILTER_CONTEXT_NAME, QA_URL_FILTER_BASE_PARAM_NAME, \
-    QA_URL_FILTER_PROVISIONAL_PARAM_NAME, QA_URL_DEFAULT_FILTER, QA_RESPONSE_NAME, CAI_RESPONSE_NAME, \
-    QA_PUBLIC_IMAGE_URI_LINK
+from ondewo_bpi_qa.constants import (
+    CAI_RESPONSE_NAME,
+    QA_PUBLIC_IMAGE_URI_LINK,
+    QA_RESPONSE_NAME,
+    QA_URL_DEFAULT_FILTER,
+    QA_URL_FILTER_BASE_PARAM_NAME,
+    QA_URL_FILTER_CONTEXT_NAME,
+    QA_URL_FILTER_PROVISIONAL_PARAM_NAME,
+)
 from ondewo_bpi_qa.helper import ContextHelper
 
 
@@ -55,14 +87,18 @@ class QAServer(BpiQABaseServer):
         super().serve()
 
     @Timer(log_arguments=False, logger=logger_console.debug)
-    def DetectIntent(self,
-                     request: DetectIntentRequest,
-                     context: grpc.ServicerContext) -> DetectIntentResponse:
+    def DetectIntent(
+        self,
+        request: DetectIntentRequest,
+        context: grpc.ServicerContext
+        ) -> DetectIntentResponse:
         self.check_session_id(request)
 
         if len(request.query_input.text.text) > SENTENCE_TRUNCATION:
-            logger_console.info(f'The received text is too long, it will be truncated '
-                                f'to {SENTENCE_TRUNCATION} characters!')
+            logger_console.info(
+                f'The received text is too long, it will be truncated '
+                f'to {SENTENCE_TRUNCATION} characters!'
+                )
         truncated_text: TextInput = TextInput(text=request.query_input.text.text[:SENTENCE_TRUNCATION])
         request.query_input.text.CopyFrom(truncated_text)
 
@@ -300,9 +336,9 @@ class QAServer(BpiQABaseServer):
 
     # noinspection PyMethodMayBeStatic
     def _fill_in_qa_response_with_cai_response(
-            self,
-            qa_response: GetAnswerResponse,
-            cai_response: DetectIntentResponse
+        self,
+        qa_response: GetAnswerResponse,
+        cai_response: DetectIntentResponse
     ) -> GetAnswerResponse:
         """
         This function updates the QA response with information from the CAI response.
@@ -332,7 +368,8 @@ class QAServer(BpiQABaseServer):
         )
 
         current_messages: List[Intent.Message] = list(
-            modified_qa_response.query_result.query_result.fulfillment_messages)
+            modified_qa_response.query_result.query_result.fulfillment_messages
+        )
         del modified_qa_response.query_result.query_result.fulfillment_messages[:]
 
         for p in Intent.Message.Platform.keys():

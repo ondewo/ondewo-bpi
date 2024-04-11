@@ -1,0 +1,11 @@
+flake8>=7.0.0
+mypy>=1.9.0
+
+#mypy types
+types-mock
+types-protobuf
+types-python-dateutil
+types-pytz
+types-requests
+types-setuptools
+types-toml

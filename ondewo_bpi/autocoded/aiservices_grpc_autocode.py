@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 from abc import ABCMeta, abstractmethod
 
 import grpc
-from ondewo.logging.logger import logger
 from ondewo.nlu import aiservices_pb2
-from ondewo.nlu.aiservices_pb2_grpc import AiServicesServicer
 from ondewo.nlu.client import Client
+from ondewo.nlu.aiservices_pb2_grpc import AiServicesServicer
+from ondewo.logging.logger import logger
 
 
 class AutoAiServicesServicer(AiServicesServicer):
@@ -59,7 +59,8 @@ class AutoAiServicesServicer(AiServicesServicer):
     def GenerateUserSays(self, request: aiservices_pb2.GenerateUserSaysRequest, context: grpc.ServicerContext) -> aiservices_pb2.GenerateUserSaysResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Generates a list of training phrases
+
         """
         logger.info("relaying GenerateUserSays() to nlu-client...")
         response = self.client.services.aiservices.generate_user_says(request=request)
@@ -68,7 +69,8 @@ class AutoAiServicesServicer(AiServicesServicer):
     def GenerateResponses(self, request: aiservices_pb2.GenerateResponsesRequest, context: grpc.ServicerContext) -> aiservices_pb2.GenerateResponsesResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Generate responses from all intents using synonyms
+
         """
         logger.info("relaying GenerateResponses() to nlu-client...")
         response = self.client.services.aiservices.generate_responses(request=request)
@@ -77,7 +79,8 @@ class AutoAiServicesServicer(AiServicesServicer):
     def GetAlternativeSentences(self, request: aiservices_pb2.GetAlternativeSentencesRequest, context: grpc.ServicerContext) -> aiservices_pb2.GetAlternativeSentencesResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Generates alternative phrase based on original phrase
+
         """
         logger.info("relaying GetAlternativeSentences() to nlu-client...")
         response = self.client.services.aiservices.get_alternative_sentences(request=request)
@@ -86,34 +89,34 @@ class AutoAiServicesServicer(AiServicesServicer):
     def GetAlternativeTrainingPhrases(self, request: aiservices_pb2.GetAlternativeTrainingPhrasesRequest, context: grpc.ServicerContext) -> aiservices_pb2.GetAlternativeTrainingPhrasesResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Generates alternative training phrase based on original training phrase
+
         """
         logger.info("relaying GetAlternativeTrainingPhrases() to nlu-client...")
         response = self.client.services.aiservices.get_alternative_training_phrases(request=request)
         return response
 
-    def GetSynonyms(self, request: aiservices_pb2.GetSynonymsRequest,
-                    context: grpc.ServicerContext) -> aiservices_pb2.GetSynonymsResponse:
+    def GetSynonyms(self, request: aiservices_pb2.GetSynonymsRequest, context: grpc.ServicerContext) -> aiservices_pb2.GetSynonymsResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Generates synonyms for a certain word
+
         """
         logger.info("relaying GetSynonyms() to nlu-client...")
         response = self.client.services.aiservices.get_synonyms(request=request)
         return response
 
-    def ClassifyIntents(self, request: aiservices_pb2.ClassifyIntentsRequest,
-                        context: grpc.ServicerContext) -> aiservices_pb2.ClassifyIntentsResponse:
+    def ClassifyIntents(self, request: aiservices_pb2.ClassifyIntentsRequest, context: grpc.ServicerContext) -> aiservices_pb2.ClassifyIntentsResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Preprocess text and detects intents in a sentence
+
         """
         logger.info("relaying ClassifyIntents() to nlu-client...")
         response = self.client.services.aiservices.classify_intents(request=request)
         return response
 
-    def ExtractEntitiesFuzzy(self, request: aiservices_pb2.ExtractEntitiesFuzzyRequest,
-                             context: grpc.ServicerContext) -> aiservices_pb2.ExtractEntitiesResponse:
+    def ExtractEntitiesFuzzy(self, request: aiservices_pb2.ExtractEntitiesFuzzyRequest, context: grpc.ServicerContext) -> aiservices_pb2.ExtractEntitiesResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Processes a natural language query and returns detected entities

@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -14,13 +14,31 @@
 
 import datetime
 import re
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
 
 from google.protobuf.json_format import MessageToJson
-from ondewo.nlu import context_pb2, intent_pb2, session_pb2
 from ondewo.logging.logger import logger_console
+from ondewo.nlu import (
+    context_pb2,
+    intent_pb2,
+    session_pb2,
+)
 
-from ondewo_bpi.constants import DATE_FORMAT, DATE_FORMAT_BACK, EnglishDays, GermanDays, QueryTriggers, SipTriggers
+from ondewo_bpi.constants import (
+    DATE_FORMAT,
+    DATE_FORMAT_BACK,
+    EnglishDays,
+    GermanDays,
+    QueryTriggers,
+    SipTriggers,
+)
 
 
 def create_parameter_dict(my_dict: Dict) -> Optional[Dict[str, context_pb2.Context.Parameter]]:
@@ -59,11 +77,17 @@ class MessageHandler:
                 content = SingleMessageHandler.get_pattern_from_message(message, qtrigger.value)
                 found_triggers[qtrigger.value] = content
         if len(found_triggers):
-            logger_console.info({"message": f"Found triggers: {found_triggers}", "found_triggers": found_triggers, "session_id": session_id})
+            logger_console.info(
+                {
+                    "message": f"Found triggers: {found_triggers}",
+                    "found_triggers": found_triggers,
+                    "session_id": session_id
+                }
+                )
         return found_triggers
 
     @staticmethod
-    def check_for_pattern(pattern: str, response: session_pb2.DetectIntentResponse,) -> bool:
+    def check_for_pattern(pattern: str, response: session_pb2.DetectIntentResponse, ) -> bool:
         for message in response.query_result.fulfillment_messages:
             if not len(message.text.text):
                 continue
@@ -81,7 +105,7 @@ class MessageHandler:
         return response
 
     @staticmethod
-    def reformat_date(response: session_pb2.DetectIntentResponse,) -> session_pb2.DetectIntentResponse:
+    def reformat_date(response: session_pb2.DetectIntentResponse, ) -> session_pb2.DetectIntentResponse:
         logger_console.info("reformatting date in response")
         for message in response.query_result.fulfillment_messages:
             if not len(message.text.text):
@@ -90,7 +114,7 @@ class MessageHandler:
         return response
 
     @staticmethod
-    def strip_seconds(response: session_pb2.DetectIntentResponse,) -> session_pb2.DetectIntentResponse:
+    def strip_seconds(response: session_pb2.DetectIntentResponse, ) -> session_pb2.DetectIntentResponse:
         logger_console.info("strip seconds from text in response")
         for message in response.query_result.fulfillment_messages:
             if not len(message.text.text):
@@ -99,7 +123,9 @@ class MessageHandler:
         return response
 
     @staticmethod
-    def add_weekday(response: session_pb2.DetectIntentResponse, days: Union[EnglishDays, GermanDays] = GermanDays) -> session_pb2.DetectIntentResponse:
+    def add_weekday(
+        response: session_pb2.DetectIntentResponse, days: Union[EnglishDays, GermanDays] = GermanDays
+        ) -> session_pb2.DetectIntentResponse:
         logger_console.info("add weekday to date in response")
         for message in response.query_result.fulfillment_messages:
             if not len(message.text.text):
@@ -108,7 +134,7 @@ class MessageHandler:
         return response
 
     @staticmethod
-    def check_for_triggers(response: session_pb2.DetectIntentResponse,) -> Tuple[List[str], List[str]]:
+    def check_for_triggers(response: session_pb2.DetectIntentResponse, ) -> Tuple[List[str], List[str]]:
         found_triggers: List[str] = []
         trigger_content: List[str] = []
         for j, message in enumerate(response.query_result.fulfillment_messages):
@@ -121,7 +147,7 @@ class MessageHandler:
         return found_triggers, trigger_content  # type: ignore
 
     @staticmethod
-    def remove_triggers_from_reponse(response: session_pb2.DetectIntentResponse,) -> session_pb2.DetectIntentResponse:
+    def remove_triggers_from_reponse(response: session_pb2.DetectIntentResponse, ) -> session_pb2.DetectIntentResponse:
         for j, message in enumerate(response.query_result.fulfillment_messages):
             if not len(message.text.text):
                 continue
@@ -141,7 +167,7 @@ class ParameterMethods:
         return context[0] if len(context) else None
 
     @staticmethod
-    def get_param(response: session_pb2.DetectIntentResponse, param_name: str, context_name: str,) -> Any:
+    def get_param(response: session_pb2.DetectIntentResponse, param_name: str, context_name: str, ) -> Any:
         logger_console.info({"message": "getting param", "content": context_name, "tags": ["parameters"]})
         context = ParameterMethods.get_context(response=response, context_name=context_name)
         if context is None:
@@ -206,11 +232,11 @@ class SingleMessageHandler:
 
     @staticmethod
     def _pattern_match_text(message: intent_pb2.Intent.Message, pattern: str) -> bool:
-        return not not re.findall(pattern, "".join(message.text.text),)
+        return not not re.findall(pattern, "".join(message.text.text), )
 
     @staticmethod
     def _pattern_match_card(message: intent_pb2.Intent.Message, pattern: str) -> bool:
-        return not not re.findall(pattern, "".join(message.card.subtitle),)
+        return not not re.findall(pattern, "".join(message.card.subtitle), )
 
     # TODO: this needs to be improved for more general cases
     @staticmethod
@@ -345,7 +371,9 @@ class SingleMessageHandler:
         return message
 
     @staticmethod
-    def add_weekday_in_message(message: intent_pb2.Intent.Message, days: Union[EnglishDays, GermanDays]) -> intent_pb2.Intent.Message:
+    def add_weekday_in_message(
+        message: intent_pb2.Intent.Message, days: Union[EnglishDays, GermanDays]
+        ) -> intent_pb2.Intent.Message:
         if message.HasField("text"):
             message = SingleMessageHandler._add_weekday_text(message, days)
         if message.HasField("card"):
@@ -353,7 +381,9 @@ class SingleMessageHandler:
         return message
 
     @staticmethod
-    def _add_weekday_card(message: intent_pb2.Intent.Message, days: Union[EnglishDays, GermanDays]) -> intent_pb2.Intent.Message:
+    def _add_weekday_card(
+        message: intent_pb2.Intent.Message, days: Union[EnglishDays, GermanDays]
+        ) -> intent_pb2.Intent.Message:
         date_regex = r"\d\d\D\d\d\D\d\d\d\d"
         matches = len(re.findall(date_regex, message.card.subtitle))
         if matches > 1:
@@ -371,7 +401,9 @@ class SingleMessageHandler:
         return message
 
     @staticmethod
-    def _add_weekday_text(message: intent_pb2.Intent.Message, days: Union[EnglishDays, GermanDays]) -> intent_pb2.Intent.Message:
+    def _add_weekday_text(
+        message: intent_pb2.Intent.Message, days: Union[EnglishDays, GermanDays]
+        ) -> intent_pb2.Intent.Message:
         date_regex = r"\d\d\D\d\d\D\d\d\d\d"
         matches = len(re.findall(date_regex, message.text.text[0]))
         if matches > 1:

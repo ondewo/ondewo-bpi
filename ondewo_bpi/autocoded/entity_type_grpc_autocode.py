@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ from abc import ABCMeta, abstractmethod
 import grpc
 from google.longrunning.operations_grpc_pb2 import Operation
 from google.protobuf.empty_pb2 import Empty
-from ondewo.logging.logger import logger
 from ondewo.nlu import entity_type_pb2
 from ondewo.nlu.client import Client
 from ondewo.nlu.entity_type_pb2_grpc import EntityTypesServicer
+from ondewo.logging.logger import logger
 
 
 class AutoEntityTypesServicer(EntityTypesServicer):
@@ -118,8 +118,47 @@ class AutoEntityTypesServicer(EntityTypesServicer):
         response = self.client.services.entity_types.batch_delete_entity_types(request=request)
         return response
 
-    def BatchCreateEntities(self, request: entity_type_pb2.BatchCreateEntitiesRequest,
-                            context: grpc.ServicerContext) -> entity_type_pb2.BatchEntitiesResponse:
+    def GetEntity(self, request: entity_type_pb2.GetEntityRequest, context: grpc.ServicerContext) -> entity_type_pb2.EntityType.Entity:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Retrieves the specified entity .
+
+        """
+        logger.info("relaying GetEntity() to nlu-client...")
+        response = self.client.services.entity_types.get_entity(request=request)
+        return response
+
+    def CreateEntity(self, request: entity_type_pb2.CreateEntityRequest, context: grpc.ServicerContext) -> entity_type_pb2.EntityType.Entity:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Creates an entity  in the specified agent.
+
+        """
+        logger.info("relaying CreateEntity() to nlu-client...")
+        response = self.client.services.entity_types.create_entity(request=request)
+        return response
+
+    def UpdateEntity(self, request: entity_type_pb2.UpdateEntityRequest, context: grpc.ServicerContext) -> entity_type_pb2.EntityType.Entity:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Updates the specified entity .
+
+        """
+        logger.info("relaying UpdateEntity() to nlu-client...")
+        response = self.client.services.entity_types.update_entity(request=request)
+        return response
+
+    def DeleteEntity(self, request: entity_type_pb2.DeleteEntityRequest, context: grpc.ServicerContext) -> entity_type_pb2.DeleteEntityStatus:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Deletes the specified entity .
+
+        """
+        logger.info("relaying DeleteEntity() to nlu-client...")
+        response = self.client.services.entity_types.delete_entity(request=request)
+        return response
+
+    def BatchCreateEntities(self, request: entity_type_pb2.BatchCreateEntitiesRequest, context: grpc.ServicerContext) -> entity_type_pb2.BatchEntitiesResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Creates an entity value in an entity type.
@@ -129,8 +168,7 @@ class AutoEntityTypesServicer(EntityTypesServicer):
         response = self.client.services.entity_types.batch_create_entities(request=request)
         return response
 
-    def BatchUpdateEntities(self, request: entity_type_pb2.BatchUpdateEntitiesRequest,
-                            context: grpc.ServicerContext) -> entity_type_pb2.BatchEntitiesResponse:
+    def BatchUpdateEntities(self, request: entity_type_pb2.BatchUpdateEntitiesRequest, context: grpc.ServicerContext) -> entity_type_pb2.BatchEntitiesResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Updates a specific entity value.
@@ -140,8 +178,7 @@ class AutoEntityTypesServicer(EntityTypesServicer):
         response = self.client.services.entity_types.batch_update_entities(request=request)
         return response
 
-    def BatchGetEntities(self, request: entity_type_pb2.BatchGetEntitiesRequest,
-                         context: grpc.ServicerContext) -> entity_type_pb2.BatchEntitiesResponse:
+    def BatchGetEntities(self, request: entity_type_pb2.BatchGetEntitiesRequest, context: grpc.ServicerContext) -> entity_type_pb2.BatchEntitiesResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Gets a specific entity value.
@@ -151,8 +188,7 @@ class AutoEntityTypesServicer(EntityTypesServicer):
         response = self.client.services.entity_types.batch_get_entities(request=request)
         return response
 
-    def BatchDeleteEntities(self, request: entity_type_pb2.BatchDeleteEntitiesRequest,
-                            context: grpc.ServicerContext) -> entity_type_pb2.BatchDeleteEntitiesResponse:
+    def BatchDeleteEntities(self, request: entity_type_pb2.BatchDeleteEntitiesRequest, context: grpc.ServicerContext) -> entity_type_pb2.BatchDeleteEntitiesResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Deletes the specified entity value.
@@ -160,6 +196,16 @@ class AutoEntityTypesServicer(EntityTypesServicer):
         """
         logger.info("relaying BatchDeleteEntities() to nlu-client...")
         response = self.client.services.entity_types.batch_delete_entities(request=request)
+        return response
+
+    def ListEntities(self, request: entity_type_pb2.ListEntitiesRequest, context: grpc.ServicerContext) -> entity_type_pb2.ListEntitiesResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        List entities of an entity type
+
+        """
+        logger.info("relaying ListEntities() to nlu-client...")
+        response = self.client.services.entity_types.list_entities(request=request)
         return response
 
 # [make flake8 shut up]

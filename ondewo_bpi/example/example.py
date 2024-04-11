@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,10 @@ from ondewo.nlu.client import Client
 
 from ondewo_bpi.bpi_server import BpiServer
 from ondewo_bpi.config import CAI_PORT
-from ondewo_bpi.example.login_mock import MockUserLoginServer, PortChecker
+from ondewo_bpi.example.login_mock import (
+    MockUserLoginServer,
+    PortChecker,
+)
 from ondewo_bpi.intent_max_trigger_handler import IntentMaxTriggerHandler
 from ondewo_bpi.message_handler import MessageHandler
 
@@ -33,7 +36,7 @@ class MyServer(BpiServer):
     """
 
     def __init__(self) -> None:
-        os.environ["MODULE_NAME"] = "bpi_example_server"  # update module name for logger
+        os.environ["MODULE_NAME"] = "bpi_server"  # update module name for logger
         port_in_use = PortChecker.check_client_users_stub(port=CAI_PORT)
         if not port_in_use:
             self.mock_login_server = MockUserLoginServer()
@@ -45,53 +48,64 @@ class MyServer(BpiServer):
 
     def register_handlers(self) -> None:
         self.register_intent_handler(
-            intent_pattern="Default Fallback Intent", handlers=[self.handle_default_fallback],
+            intent_pattern="Default Fallback Intent",
+            handlers=[
+                self.handle_default_fallback,
+            ],
         )
         self.register_intent_handler(
             intent_pattern="Default Exit Intent",
-            handlers=[self.handle_default_exit],
+            handlers=[
+                self.handle_default_exit,
+            ],
         )
         self.register_intent_handler(
-            intent_pattern=r"i.my_\.*", handlers=[self.reformat_text_in_intent],
+            intent_pattern=r"i.my_\.*",
+            handlers=[
+                self.reformat_text_in_intent,
+            ],
         )
         self.register_intent_handler(
             intent_pattern="i.my_handled_intent",
-            handlers=[self.reformat_text_in_intent,
-                      IntentMaxTriggerHandler.handle_if_intent_reached_number_triggers_max],
+            handlers=[
+                self.reformat_text_in_intent,
+                IntentMaxTriggerHandler.handle_if_intent_reached_number_triggers_max
+            ],
         )
 
     @staticmethod
-    def reformat_text_in_intent(response: session_pb2.DetectIntentResponse,
-                                nlu_client: Client) -> session_pb2.DetectIntentResponse:
+    def reformat_text_in_intent(
+        response: session_pb2.DetectIntentResponse,
+        nlu_client: Client
+    ) -> session_pb2.DetectIntentResponse:
         return MessageHandler.substitute_pattern(
             pattern="<REPLACE:REPLACE_THIS_TEXT>", replace="new text", response=response
         )
 
     @staticmethod
     def handle_default_fallback(
-            response: session_pb2.DetectIntentResponse,
-            nlu_client: Client) -> session_pb2.DetectIntentResponse:
+        response: session_pb2.DetectIntentResponse,
+        nlu_client: Client
+    ) -> session_pb2.DetectIntentResponse:
         logger_console.info("Default fallback was triggered!")
         return response
 
     @staticmethod
-    def handle_default_exit(response: session_pb2.DetectIntentResponse,
-                            nlu_client: Client) -> session_pb2.DetectIntentResponse:
+    def handle_default_exit(
+        response: session_pb2.DetectIntentResponse,
+        nlu_client: Client
+    ) -> session_pb2.DetectIntentResponse:
         logger_console.warning("Default exit was triggered!")
         return response
 
     @staticmethod
-    def handle_if_intent_reached_number_triggers_max(response: session_pb2.DetectIntentResponse,
-                                                     nlu_client: Client) -> session_pb2.DetectIntentResponse:
+    def handle_if_intent_reached_number_triggers_max(
+        response: session_pb2.DetectIntentResponse,
+        nlu_client: Client
+    ) -> session_pb2.DetectIntentResponse:
         logger_console.warning("Intent was triggered a maximum amount of times!")
-        IntentMaxTriggerHandler.handle_if_intent_reached_number_triggers_max(response, nlu_client)
+        response = IntentMaxTriggerHandler.handle_if_intent_reached_number_triggers_max(response, nlu_client)
         return response
-
-    @staticmethod
-    def handle_if_intent_reached_number_triggers_max(response: session_pb2.DetectIntentResponse,
-                                                     nlu_client: Client) -> session_pb2.DetectIntentResponse:
-        logger_console.warning("Intent was triggered a maximum amount of times!")
-        IntentMaxTriggerHandler.handle_if_intent_reached_number_triggers_max(response, nlu_client)
 
     def serve(self) -> None:
         super().serve()

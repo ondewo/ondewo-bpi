@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -13,11 +13,17 @@
 # limitations under the License.
 
 import os
-from typing import Tuple, Optional
+from typing import (
+    Optional,
+    Tuple,
+)
 
+from ondewo.logging.logger import (
+    logger,
+    logger_console,
+)
 from ondewo.qa.client import Client
 from ondewo.qa.client_config import ClientConfig
-from ondewo.logging.logger import logger_console, logger
 
 QA_HOST: str = os.getenv("QA_HOST", "172.17.0.1")
 QA_PORT: str = os.getenv("QA_PORT", "50052")
@@ -64,7 +70,7 @@ class QAClientProvider:
             logger.warning("Using insecure connection instead...")
 
         logger.info("configuring INSECURE connection")
-        config = ClientConfig(host=QA_HOST, port=qa_port,)
+        config = ClientConfig(host=QA_HOST, port=qa_port, )
         client = Client(config=config, use_secure_channel=False)
         return config, client
 

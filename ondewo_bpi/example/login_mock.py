@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -19,8 +19,11 @@ from concurrent import futures
 import grpc
 from grpc._channel import _InactiveRpcError
 from grpc_reflection.v1alpha import reflection
-from ondewo.nlu import user_pb2_grpc, user_pb2
 from ondewo.logging.logger import logger
+from ondewo.nlu import (
+    user_pb2,
+    user_pb2_grpc,
+)
 
 
 class MockUserLoginServer(user_pb2_grpc.UsersServicer):
@@ -36,7 +39,7 @@ class MockUserLoginServer(user_pb2_grpc.UsersServicer):
         self.lock = threading.Lock()
 
     def Login(self, request: user_pb2.LoginRequest, context: grpc.ServicerContext) -> user_pb2.LoginResponse:
-        response = user_pb2.LoginResponse(auth_token="mocked",)
+        response = user_pb2.LoginResponse(auth_token="mocked", )
         return response
 
     def setup_reflection(self) -> None:

@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -78,6 +78,9 @@ class FunctionCoder:
                 self._args_inp += f"{arg_name}: {arg_type}, "
         if len(self._args_inp) > 0:
             self._args_inp = self._args_inp[:-2]
+
+        # clean up double commas
+        self._args_inp = self._args_inp.replace(",,", ",")
 
     def build_argument_fct_string(self) -> None:
         for arg_name, _ in self.arguments.items():

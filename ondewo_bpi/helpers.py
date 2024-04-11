@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -12,12 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Dict, Optional, List
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+)
 
 from grpc._channel import _InactiveRpcError
-from ondewo.nlu import context_pb2, session_pb2
-from ondewo.nlu.client import Client
 from ondewo.logging.logger import logger_console
+from ondewo.nlu import (
+    context_pb2,
+    session_pb2,
+)
+from ondewo.nlu.client import Client
 
 
 def add_params_to_cai_context(
@@ -114,7 +122,7 @@ def detect_intent(
     text: str
 ) -> session_pb2.DetectIntentResponse:
     logger_console.info({"message": "detect intent triggered in bpi helpers", "tags": ["timing"]})
-    request = get_detect_intent_request(text=text, session=get_session_from_response(response=response),)
+    request = get_detect_intent_request(text=text, session=get_session_from_response(response=response), )
     logger_console.info({"message": "detect intent returned in bpi helpers", "tags": ["timing"]})
     result = client.services.sessions.detect_intent(request)
     logger_console.info(f"wrote {text}, received {result.query_result.fulfillment_messages}")
@@ -129,7 +137,7 @@ def get_detect_intent_request(
 ) -> session_pb2.DetectIntentRequest:
     request = session_pb2.DetectIntentRequest(
         session=session,
-        query_input=session_pb2.QueryInput(text=session_pb2.TextInput(text=text, language_code=language),),
+        query_input=session_pb2.QueryInput(text=session_pb2.TextInput(text=text, language_code=language), ),
         query_params=query_params,
     )
     return request
@@ -190,7 +198,9 @@ def trigger_intent(
     return result
 
 
-def create_context_struct(context: str, parameters: Optional[Dict[str, context_pb2.Context.Parameter]], lifespan_count: int = 5) -> context_pb2.Context:
+def create_context_struct(
+    context: str, parameters: Optional[Dict[str, context_pb2.Context.Parameter]], lifespan_count: int = 5
+    ) -> context_pb2.Context:
     context_struct: context_pb2.Context = context_pb2.Context(
         name=f"{context}", lifespan_count=lifespan_count, parameters=parameters
     )
@@ -198,11 +208,11 @@ def create_context_struct(context: str, parameters: Optional[Dict[str, context_p
 
 
 # This function deletes periods from the text in a request
-def strip_final_periods_from_request(request: session_pb2.DetectIntentRequest,) -> session_pb2.DetectIntentRequest:
+def strip_final_periods_from_request(request: session_pb2.DetectIntentRequest, ) -> session_pb2.DetectIntentRequest:
     stripped = request.query_input.text.text.strip(".")
     request.query_input.text.text = stripped
     return request
 
 
 def get_session_from_response(response: session_pb2.DetectIntentResponse) -> str:
-    return response.query_result.diagnostic_info["sessionId"]   # type: ignore
+    return response.query_result.diagnostic_info["sessionId"]  # type: ignore

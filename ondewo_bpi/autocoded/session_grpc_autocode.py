@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,14 +15,15 @@
 # [AUTO-GENERATED FILE]
 
 from abc import ABCMeta, abstractmethod
+
 from typing import Iterator
 
 import grpc
 from google.protobuf.empty_pb2 import Empty
-from ondewo.logging.logger import logger
 from ondewo.nlu import session_pb2
 from ondewo.nlu.client import Client
 from ondewo.nlu.session_pb2_grpc import SessionsServicer
+from ondewo.logging.logger import logger
 
 
 class AutoSessionsServicer(SessionsServicer):
@@ -78,8 +79,7 @@ class AutoSessionsServicer(SessionsServicer):
         response = self.client.services.sessions.list_sessions(request=request)
         return response
 
-    def GetSession(self, request: session_pb2.GetSessionRequest,
-                   context: grpc.ServicerContext) -> session_pb2.Session:
+    def GetSession(self, request: session_pb2.GetSessionRequest, context: grpc.ServicerContext) -> session_pb2.Session:
         """
         [AUTO-GENERATED FUNCTION]
         GetSession: returns a session(=conversation) from ondewo-kb
@@ -89,8 +89,7 @@ class AutoSessionsServicer(SessionsServicer):
         response = self.client.services.sessions.get_session(request=request)
         return response
 
-    def CreateSession(self, request: session_pb2.CreateSessionRequest,
-                      context: grpc.ServicerContext) -> session_pb2.Session:
+    def CreateSession(self, request: session_pb2.CreateSessionRequest, context: grpc.ServicerContext) -> session_pb2.Session:
         """
         [AUTO-GENERATED FUNCTION]
         CreateSession: creates and returns a session(=conversation) from ondewo-kb
@@ -100,8 +99,7 @@ class AutoSessionsServicer(SessionsServicer):
         response = self.client.services.sessions.create_session(request=request)
         return response
 
-    def TrackSessionStep(self, request: session_pb2.TrackSessionStepRequest,
-                         context: grpc.ServicerContext) -> session_pb2.Session:
+    def TrackSessionStep(self, request: session_pb2.TrackSessionStepRequest, context: grpc.ServicerContext) -> session_pb2.Session:
         """
         [AUTO-GENERATED FUNCTION]
         TrackSessionStep: append to an existing session; creates it if not existing
@@ -131,6 +129,132 @@ class AutoSessionsServicer(SessionsServicer):
         response = self.client.services.sessions.list_session_labels(request=request)
         return response
 
+    def ListSessionLabelsOfAllSessions(self, request: session_pb2.ListSessionLabelsOfAllSessionsRequest, context: grpc.ServicerContext) -> session_pb2.ListSessionLabelsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying ListSessionLabelsOfAllSessions() to nlu-client...")
+        response = self.client.services.sessions.list_session_labels_of_all_sessions(request=request)
+        return response
+
+    def ListLanguageCodesOfAllSessions(self, request: session_pb2.ListLanguageCodesOfAllSessionsRequest, context: grpc.ServicerContext) -> session_pb2.ListLanguageCodesResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying ListLanguageCodesOfAllSessions() to nlu-client...")
+        response = self.client.services.sessions.list_language_codes_of_all_sessions(request=request)
+        return response
+
+    def ListMatchedIntentsOfAllSessions(self, request: session_pb2.ListMatchedIntentsOfAllSessionsRequest, context: grpc.ServicerContext) -> session_pb2.ListMatchedIntentsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying ListMatchedIntentsOfAllSessions() to nlu-client...")
+        response = self.client.services.sessions.list_matched_intents_of_all_sessions(request=request)
+        return response
+
+    def ListMatchedEntityTypesOfAllSessions(self, request: session_pb2.ListMatchedEntityTypesOfAllSessionsRequest, context: grpc.ServicerContext) -> session_pb2.ListMatchedEntityTypesResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying ListMatchedEntityTypesOfAllSessions() to nlu-client...")
+        response = self.client.services.sessions.list_matched_entity_types_of_all_sessions(request=request)
+        return response
+
+    def ListUserIdsOfAllSessions(self, request: session_pb2.ListUserIdsOfAllSessionsRequest, context: grpc.ServicerContext) -> session_pb2.ListUserIdsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying ListUserIdsOfAllSessions() to nlu-client...")
+        response = self.client.services.sessions.list_user_ids_of_all_sessions(request=request)
+        return response
+
+    def ListIdentifiedUserIdsOfAllSessions(self, request: session_pb2.ListIdentifiedUserIdsOfAllSessionsRequest, context: grpc.ServicerContext) -> session_pb2.ListIdentifiedUserIdsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying ListIdentifiedUserIdsOfAllSessions() to nlu-client...")
+        response = self.client.services.sessions.list_identified_user_ids_of_all_sessions(request=request)
+        return response
+
+    def ListTagsOfAllSessions(self, request: session_pb2.ListTagsOfAllSessionsRequest, context: grpc.ServicerContext) -> session_pb2.ListTagsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying ListTagsOfAllSessions() to nlu-client...")
+        response = self.client.services.sessions.list_tags_of_all_sessions(request=request)
+        return response
+
+    def ListInputContextsOfAllSessions(self, request: session_pb2.ListInputContextsOfAllSessionsRequest, context: grpc.ServicerContext) -> session_pb2.ListInputContextsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying ListInputContextsOfAllSessions() to nlu-client...")
+        response = self.client.services.sessions.list_input_contexts_of_all_sessions(request=request)
+        return response
+
+    def ListOutputContextsOfAllSessions(self, request: session_pb2.ListOutputContextsOfAllSessionsRequest, context: grpc.ServicerContext) -> session_pb2.ListOutputContextsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying ListOutputContextsOfAllSessions() to nlu-client...")
+        response = self.client.services.sessions.list_output_contexts_of_all_sessions(request=request)
+        return response
+
+    def ListPlatformsOfAllSessions(self, request: session_pb2.ListPlatformsOfAllSessionsRequest, context: grpc.ServicerContext) -> session_pb2.ListPlatformsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying ListPlatformsOfAllSessions() to nlu-client...")
+        response = self.client.services.sessions.list_platforms_of_all_sessions(request=request)
+        return response
+
+    def ListAccountIdsOfAllSessions(self, request: session_pb2.ListAccountIdsOfAllSessionsRequest, context: grpc.ServicerContext) -> session_pb2.ListAccountIdsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying ListAccountIdsOfAllSessions() to nlu-client...")
+        response = self.client.services.sessions.list_account_ids_of_all_sessions(request=request)
+        return response
+
+    def ListPropertyIdsOfAllSessions(self, request: session_pb2.ListPropertyIdsOfAllSessionsRequest, context: grpc.ServicerContext) -> session_pb2.ListPropertyIdsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying ListPropertyIdsOfAllSessions() to nlu-client...")
+        response = self.client.services.sessions.list_property_ids_of_all_sessions(request=request)
+        return response
+
+    def ListDatastreamIdsOfAllSessions(self, request: session_pb2.ListDatastreamIdsOfAllSessionsRequest, context: grpc.ServicerContext) -> session_pb2.ListDatastreamIdsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying ListDatastreamIdsOfAllSessions() to nlu-client...")
+        response = self.client.services.sessions.list_datastream_ids_of_all_sessions(request=request)
+        return response
+
+    def ListOriginIdsOfAllSessions(self, request: session_pb2.ListOriginIdsOfAllSessionsRequest, context: grpc.ServicerContext) -> session_pb2.ListOriginIdsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying ListOriginIdsOfAllSessions() to nlu-client...")
+        response = self.client.services.sessions.list_origin_ids_of_all_sessions(request=request)
+        return response
+
     def AddSessionLabels(self, request: session_pb2.AddSessionLabelsRequest, context: grpc.ServicerContext) -> session_pb2.Session:
         """
         [AUTO-GENERATED FUNCTION]
@@ -140,13 +264,49 @@ class AutoSessionsServicer(SessionsServicer):
         response = self.client.services.sessions.add_session_labels(request=request)
         return response
 
-    def RemoveSessionLabels(self, request: session_pb2.RemoveSessionLabelsRequest, context: grpc.ServicerContext) -> session_pb2.Session:
+    def DeleteSessionLabels(self, request: session_pb2.DeleteSessionLabelsRequest, context: grpc.ServicerContext) -> session_pb2.Session:
         """
         [AUTO-GENERATED FUNCTION]
         Missing associated documentation comment in .proto file.
         """
-        logger.info("relaying RemoveSessionLabels() to nlu-client...")
-        response = self.client.services.sessions.remove_session_labels(request=request)
+        logger.info("relaying DeleteSessionLabels() to nlu-client...")
+        response = self.client.services.sessions.delete_session_labels(request=request)
+        return response
+
+    def AddSessionComment(self, request: session_pb2.AddSessionCommentRequest, context: grpc.ServicerContext) -> session_pb2.Comment:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying AddSessionComment() to nlu-client...")
+        response = self.client.services.sessions.add_session_comment(request=request)
+        return response
+
+    def DeleteSessionComments(self, request: session_pb2.DeleteSessionCommentsRequest, context: grpc.ServicerContext) -> session_pb2.Session:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying DeleteSessionComments() to nlu-client...")
+        response = self.client.services.sessions.delete_session_comments(request=request)
+        return response
+
+    def UpdateSessionComments(self, request: session_pb2.UpdateSessionCommentsRequest, context: grpc.ServicerContext) -> session_pb2.Session:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying UpdateSessionComments() to nlu-client...")
+        response = self.client.services.sessions.update_session_comments(request=request)
+        return response
+
+    def ListSessionComments(self, request: session_pb2.ListSessionCommentsRequest, context: grpc.ServicerContext) -> session_pb2.ListSessionCommentsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying ListSessionComments() to nlu-client...")
+        response = self.client.services.sessions.list_session_comments(request=request)
         return response
 
     def ListSessionReviews(self, request: session_pb2.ListSessionReviewsRequest, context: grpc.ServicerContext) -> session_pb2.ListSessionReviewsResponse:
@@ -187,6 +347,56 @@ class AutoSessionsServicer(SessionsServicer):
         """
         logger.info("relaying CreateSessionReview() to nlu-client...")
         response = self.client.services.sessions.create_session_review(request=request)
+        return response
+
+    def GetAudioFiles(self, request: session_pb2.GetAudioFilesRequest, context: grpc.ServicerContext) -> session_pb2.GetAudioFilesResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        RPC to get audio files based on specified criteria.
+
+        """
+        logger.info("relaying GetAudioFiles() to nlu-client...")
+        response = self.client.services.sessions.get_audio_files(request=request)
+        return response
+
+    def AddAudioFiles(self, request: session_pb2.AddAudioFilesRequest, context: grpc.ServicerContext) -> session_pb2.AddAudioFilesResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        RPC to add audio files to a session.
+
+        """
+        logger.info("relaying AddAudioFiles() to nlu-client...")
+        response = self.client.services.sessions.add_audio_files(request=request)
+        return response
+
+    def DeleteAudioFiles(self, request: session_pb2.DeleteAudioFilesRequest, context: grpc.ServicerContext) -> session_pb2.DeleteAudioFilesResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        RPC to delete specified audio files.
+
+        """
+        logger.info("relaying DeleteAudioFiles() to nlu-client...")
+        response = self.client.services.sessions.delete_audio_files(request=request)
+        return response
+
+    def GetAudioFileOfSession(self, request: session_pb2.GetAudioFileOfSessionRequest, context: grpc.ServicerContext) -> session_pb2.AudioFileResource:
+        """
+        [AUTO-GENERATED FUNCTION]
+        RPC to get a consolidated audio file for a specific session.
+
+        """
+        logger.info("relaying GetAudioFileOfSession() to nlu-client...")
+        response = self.client.services.sessions.get_audio_file_of_session(request=request)
+        return response
+
+    def ListAudioFiles(self, request: session_pb2.ListAudioFilesRequest, context: grpc.ServicerContext) -> session_pb2.ListAudioFilesResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        RPC to get a list audio files for a specific session.
+
+        """
+        logger.info("relaying ListAudioFiles() to nlu-client...")
+        response = self.client.services.sessions.list_audio_files(request=request)
         return response
 
 # [make flake8 shut up]

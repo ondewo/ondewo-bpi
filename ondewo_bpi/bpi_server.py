@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -14,35 +14,51 @@
 
 import time
 from concurrent import futures
-from typing import List, Optional
+from typing import (
+    List,
+    Optional,
+)
 
 import grpc
 from grpc_reflection.v1alpha import reflection
-from ondewo.logging.logger import logger, logger_console
+from ondewo.logging.logger import (
+    logger,
+    logger_console,
+)
 from ondewo.nlu import (
     agent_pb2,
-    entity_type_pb2,
+    agent_pb2_grpc,
     aiservices_pb2,
-    project_role_pb2,
+    aiservices_pb2_grpc,
+    context_pb2,
+    context_pb2_grpc,
+    entity_type_pb2,
+    entity_type_pb2_grpc,
     intent_pb2,
+    intent_pb2_grpc,
+    project_role_pb2,
+    project_role_pb2_grpc,
     session_pb2,
     session_pb2_grpc,
     user_pb2,
     user_pb2_grpc,
-    context_pb2,
-    context_pb2_grpc,
-    agent_pb2_grpc,
-    entity_type_pb2_grpc,
-    intent_pb2_grpc,
-    aiservices_pb2_grpc,
-    project_role_pb2_grpc,
 )
 from ondewo.nlu.client import Client as NLUClient
 
-from ondewo_bpi.bpi_services import BpiSessionsServices, BpiUsersServices, BpiContextServices, \
-    BpiAgentsServices, BpiEntityTypeServices, BpiAiServicesServices, BpiIntentsServices, \
-    BpiProjectRolesServices
-from ondewo_bpi.config import PORT, CentralClientProvider
+from ondewo_bpi.bpi_services import (
+    BpiAgentsServices,
+    BpiAiServicesServices,
+    BpiContextServices,
+    BpiEntityTypeServices,
+    BpiIntentsServices,
+    BpiProjectRolesServices,
+    BpiSessionsServices,
+    BpiUsersServices,
+)
+from ondewo_bpi.config import (
+    CentralClientProvider,
+    PORT,
+)
 
 
 class BpiServer(

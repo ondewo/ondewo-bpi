@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +37,8 @@ class AutoProjectRolesServicer(ProjectRolesServicer):
     override functions if other functionality than a client call is needed
 
     [original docstring]
-    Missing associated documentation comment in .proto file.
+    Project roles
+
     """
     __metaclass__ = ABCMeta
 
@@ -49,7 +50,8 @@ class AutoProjectRolesServicer(ProjectRolesServicer):
     def CreateProjectRole(self, request: project_role_pb2.CreateProjectRoleRequest, context: grpc.ServicerContext) -> project_role_pb2.ProjectRole:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Creates a project role by creating the knowledge base master
+
         """
         logger.info("relaying CreateProjectRole() to nlu-client...")
         response = self.client.services.project_roles.create_project_role(request=request)
@@ -58,7 +60,8 @@ class AutoProjectRolesServicer(ProjectRolesServicer):
     def GetProjectRole(self, request: project_role_pb2.GetProjectRoleRequest, context: grpc.ServicerContext) -> project_role_pb2.ProjectRole:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Creates a project role by getting the knowledge base master
+
         """
         logger.info("relaying GetProjectRole() to nlu-client...")
         response = self.client.services.project_roles.get_project_role(request=request)
@@ -67,7 +70,8 @@ class AutoProjectRolesServicer(ProjectRolesServicer):
     def DeleteProjectRole(self, request: project_role_pb2.DeleteProjectRoleRequest, context: grpc.ServicerContext) -> Empty:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Deletes project role
+
         """
         logger.info("relaying DeleteProjectRole() to nlu-client...")
         response = self.client.services.project_roles.delete_project_role(request=request)
@@ -76,7 +80,8 @@ class AutoProjectRolesServicer(ProjectRolesServicer):
     def UpdateProjectRole(self, request: project_role_pb2.UpdateProjectRoleRequest, context: grpc.ServicerContext) -> project_role_pb2.ProjectRole:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Updates project role
+
         """
         logger.info("relaying UpdateProjectRole() to nlu-client...")
         response = self.client.services.project_roles.update_project_role(request=request)
@@ -85,7 +90,8 @@ class AutoProjectRolesServicer(ProjectRolesServicer):
     def ListProjectRoles(self, request: project_role_pb2.ListProjectRolesRequest, context: grpc.ServicerContext) -> project_role_pb2.ListProjectRolesResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        List project roles
+
         """
         logger.info("relaying ListProjectRoles() to nlu-client...")
         response = self.client.services.project_roles.list_project_roles(request=request)

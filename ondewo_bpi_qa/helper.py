@@ -1,5 +1,8 @@
 import re
-from re import Pattern, Match
+from re import (
+    Match,
+    Pattern,
+)
 from typing import Optional
 
 
@@ -18,8 +21,10 @@ class ContextHelper:
         """
         match: Optional[Match] = cls.AGENT_PATTERN.search(path)
         if match is None:
-            raise ValueError(f'Given agent name "{path}" has invalid format. '
-                             f'Required format: "projects/<Project ID>/agent/...".')
+            raise ValueError(
+                f'Given agent name "{path}" has invalid format. '
+                f'Required format: "projects/<Project ID>/agent/...".'
+                )
         agent_path: str = match.group()
         return agent_path
 
@@ -41,8 +46,16 @@ class ContextHelper:
 
 
 if __name__ == '__main__':
-    print(f'should match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2/agent/sessions/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2")}')
-    print(f'should match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2/agent/sessions/")}')
-    print(f'should match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2/agent")}')
-    print(f'should NOT match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2")}')
+    print(
+        f'should match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2/agent/sessions/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2")}'
+        )
+    print(
+        f'should match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2/agent/sessions/")}'
+        )
+    print(
+        f'should match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2/agent")}'
+        )
+    print(
+        f'should NOT match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2")}'
+        )
     print(f'should NOT match: {ContextHelper.get_agent_path_from_path("9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2")}')

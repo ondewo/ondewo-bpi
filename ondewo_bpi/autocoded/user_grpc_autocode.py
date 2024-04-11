@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +37,8 @@ class AutoUsersServicer(UsersServicer):
     override functions if other functionality than a client call is needed
 
     [original docstring]
-    Missing associated documentation comment in .proto file.
+    gRPC service for managing users and server roles.
+
     """
     __metaclass__ = ABCMeta
 
@@ -49,7 +50,8 @@ class AutoUsersServicer(UsersServicer):
     def CreateUser(self, request: user_pb2.CreateUserRequest, context: grpc.ServicerContext) -> user_pb2.User:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Creates a user.
+
         """
         logger.info("relaying CreateUser() to nlu-client...")
         response = self.client.services.users.create_user(request=request)
@@ -58,7 +60,8 @@ class AutoUsersServicer(UsersServicer):
     def GetUser(self, request: user_pb2.GetUserRequest, context: grpc.ServicerContext) -> user_pb2.User:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Retrieves a user by identifier.
+
         """
         logger.info("relaying GetUser() to nlu-client...")
         response = self.client.services.users.get_user(request=request)
@@ -67,7 +70,8 @@ class AutoUsersServicer(UsersServicer):
     def GetUserInfo(self, request: user_pb2.GetUserRequest, context: grpc.ServicerContext) -> user_pb2.UserInfo:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Retrieves user information by identifier.
+
         """
         logger.info("relaying GetUserInfo() to nlu-client...")
         response = self.client.services.users.get_user_info(request=request)
@@ -76,7 +80,8 @@ class AutoUsersServicer(UsersServicer):
     def DeleteUser(self, request: user_pb2.GetUserRequest, context: grpc.ServicerContext) -> Empty:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Deletes a user by identifier.
+
         """
         logger.info("relaying DeleteUser() to nlu-client...")
         response = self.client.services.users.delete_user(request=request)
@@ -85,7 +90,8 @@ class AutoUsersServicer(UsersServicer):
     def UpdateUser(self, request: user_pb2.UpdateUserRequest, context: grpc.ServicerContext) -> user_pb2.User:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Updates a user.
+
         """
         logger.info("relaying UpdateUser() to nlu-client...")
         response = self.client.services.users.update_user(request=request)
@@ -94,7 +100,8 @@ class AutoUsersServicer(UsersServicer):
     def ListUsers(self, request: user_pb2.ListUsersRequest, context: grpc.ServicerContext) -> user_pb2.ListUsersResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Lists users.
+
         """
         logger.info("relaying ListUsers() to nlu-client...")
         response = self.client.services.users.list_users(request=request)
@@ -103,7 +110,8 @@ class AutoUsersServicer(UsersServicer):
     def ListUserInfos(self, request: user_pb2.ListUsersRequest, context: grpc.ServicerContext) -> user_pb2.ListUserInfosResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Lists user information.
+
         """
         logger.info("relaying ListUserInfos() to nlu-client...")
         response = self.client.services.users.list_user_infos(request=request)
@@ -112,7 +120,8 @@ class AutoUsersServicer(UsersServicer):
     def CreateServerRole(self, request: user_pb2.CreateServerRoleRequest, context: grpc.ServicerContext) -> user_pb2.ServerRole:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Creates a server role.
+
         """
         logger.info("relaying CreateServerRole() to nlu-client...")
         response = self.client.services.users.create_server_role(request=request)
@@ -121,7 +130,8 @@ class AutoUsersServicer(UsersServicer):
     def GetServerRole(self, request: user_pb2.GetServerRoleRequest, context: grpc.ServicerContext) -> user_pb2.ServerRole:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Retrieves a server role by ID.
+
         """
         logger.info("relaying GetServerRole() to nlu-client...")
         response = self.client.services.users.get_server_role(request=request)
@@ -130,7 +140,8 @@ class AutoUsersServicer(UsersServicer):
     def DeleteServerRole(self, request: user_pb2.DeleteServerRoleRequest, context: grpc.ServicerContext) -> Empty:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Deletes a server role by ID.
+
         """
         logger.info("relaying DeleteServerRole() to nlu-client...")
         response = self.client.services.users.delete_server_role(request=request)
@@ -139,7 +150,8 @@ class AutoUsersServicer(UsersServicer):
     def UpdateServerRole(self, request: user_pb2.UpdateServerRoleRequest, context: grpc.ServicerContext) -> user_pb2.ServerRole:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Updates a server role.
+
         """
         logger.info("relaying UpdateServerRole() to nlu-client...")
         response = self.client.services.users.update_server_role(request=request)
@@ -148,7 +160,8 @@ class AutoUsersServicer(UsersServicer):
     def ListServerRoles(self, request: user_pb2.ListServerRolesRequest, context: grpc.ServicerContext) -> user_pb2.ListServerRolesResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Lists server roles.
+
         """
         logger.info("relaying ListServerRoles() to nlu-client...")
         response = self.client.services.users.list_server_roles(request=request)
@@ -157,7 +170,8 @@ class AutoUsersServicer(UsersServicer):
     def ListServerPermissions(self, request: user_pb2.ListServerPermissionsRequest, context: grpc.ServicerContext) -> user_pb2.ListServerPermissionsResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Lists server permissions.
+
         """
         logger.info("relaying ListServerPermissions() to nlu-client...")
         response = self.client.services.users.list_server_permissions(request=request)
@@ -166,7 +180,8 @@ class AutoUsersServicer(UsersServicer):
     def Login(self, request: user_pb2.LoginRequest, context: grpc.ServicerContext) -> user_pb2.LoginResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Requests login.
+
         """
         logger.info("relaying Login() to nlu-client...")
         response = self.client.services.users.login(request=request)
@@ -175,10 +190,81 @@ class AutoUsersServicer(UsersServicer):
     def CheckLogin(self, request: Empty, context: grpc.ServicerContext) -> Empty:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Checks login.
+
         """
         logger.info("relaying CheckLogin() to nlu-client...")
         response = self.client.services.users.check_login()
+        return response
+
+    def ListNotifications(self, request: user_pb2.ListNotificationsRequest, context: grpc.ServicerContext) -> user_pb2.ListNotificationsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Lists notifications based on specified filters.
+
+        """
+        logger.info("relaying ListNotifications() to nlu-client...")
+        response = self.client.services.users.list_notifications(request=request)
+        return response
+
+    def SetNotificationsFlaggedStatus(self, request: user_pb2.SetNotificationsFlaggedStatusRequest, context: grpc.ServicerContext) -> user_pb2.ListNotificationsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Sets the flagged status for multiple notifications.
+
+        """
+        logger.info("relaying SetNotificationsFlaggedStatus() to nlu-client...")
+        response = self.client.services.users.set_notifications_flagged_status(request=request)
+        return response
+
+    def SetNotificationsReadStatus(self, request: user_pb2.SetNotificationsReadStatusRequest, context: grpc.ServicerContext) -> user_pb2.ListNotificationsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Sets the read status for multiple notifications.
+
+        """
+        logger.info("relaying SetNotificationsReadStatus() to nlu-client...")
+        response = self.client.services.users.set_notifications_read_status(request=request)
+        return response
+
+    def GetUserPreferences(self, request: user_pb2.GetUserPreferencesRequest, context: grpc.ServicerContext) -> user_pb2.GetUserPreferencesResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Retrieves user preferences based on the provided request.
+
+        """
+        logger.info("relaying GetUserPreferences() to nlu-client...")
+        response = self.client.services.users.get_user_preferences(request=request)
+        return response
+
+    def SetUserPreferences(self, request: user_pb2.SetUserPreferencesRequest, context: grpc.ServicerContext) -> user_pb2.SetUserPreferencesResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Sets or updates user preferences based on the provided request.
+
+        """
+        logger.info("relaying SetUserPreferences() to nlu-client...")
+        response = self.client.services.users.set_user_preferences(request=request)
+        return response
+
+    def DeleteUserPreferences(self, request: user_pb2.DeleteUserPreferencesRequest, context: grpc.ServicerContext) -> user_pb2.DeleteUserPreferencesResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Deletes specific user preferences based on the provided request.
+
+        """
+        logger.info("relaying DeleteUserPreferences() to nlu-client...")
+        response = self.client.services.users.delete_user_preferences(request=request)
+        return response
+
+    def DeleteAllUserPreferences(self, request: user_pb2.DeleteAllUserPreferencesRequest, context: grpc.ServicerContext) -> user_pb2.DeleteUserPreferencesResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Deletes all user preferences for a specific user, optionally filtered by a substring.
+
+        """
+        logger.info("relaying DeleteAllUserPreferences() to nlu-client...")
+        response = self.client.services.users.delete_all_user_preferences(request=request)
         return response
 
 # [make flake8 shut up]

@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -14,10 +14,16 @@
 
 import json
 import os
-from typing import Dict, Optional
+from typing import (
+    Dict,
+    Optional,
+)
 
 from dotenv import load_dotenv
-from ondewo.logging.logger import logger, logger_console
+from ondewo.logging.logger import (
+    logger,
+    logger_console,
+)
 from ondewo.nlu.client import Client
 from ondewo.nlu.client_config import ClientConfig
 
@@ -86,12 +92,12 @@ class CentralClientProvider:
 
     def _log_default_config(self) -> None:
         client_configuration_str = (
-                "\nnlu-client configuration:\n"
-                + f"   Secure: {SECURE}\n"
-                + f"   Host: {CAI_HOST}\n"
-                + f"   Port: {CAI_PORT}\n"
-                + f"   Http_token: {HTTP_AUTH_TOKEN}\n"
-                + f"   User_name: {USER_NAME}\n"
-                + f"   Password: {USER_PASS}\n"
+            "\nnlu-client configuration:\n"
+            + f"   Secure: {SECURE}\n"
+            + f"   Host: {CAI_HOST}\n"
+            + f"   Port: {CAI_PORT}\n"
+            + f"   Http_token: {HTTP_AUTH_TOKEN}\n"
+            + f"   User_name: {USER_NAME}\n"
+            + f"   Password: {USER_PASS}\n"
         )
         logger_console.info(client_configuration_str)

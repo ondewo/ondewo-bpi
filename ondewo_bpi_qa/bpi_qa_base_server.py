@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,10 @@
 # limitations under the License.
 
 from ondewo.nlu.client import Client as NLUClient
-from ondewo.qa import qa_pb2, qa_pb2_grpc
+from ondewo.qa import (
+    qa_pb2,
+    qa_pb2_grpc,
+)
 from ondewo.qa.client import Client as QAClient
 
 from ondewo_bpi.bpi_server import BpiServer

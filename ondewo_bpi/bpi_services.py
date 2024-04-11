@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -11,16 +11,31 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import functools
-from abc import ABCMeta, abstractmethod
-from dataclasses import dataclass, field
-from typing import Dict, Callable, List, Optional
+from abc import (
+    ABCMeta,
+    abstractmethod,
+)
+from dataclasses import (
+    dataclass,
+    field,
+)
+from typing import (
+    Callable,
+    Dict,
+    List,
+    Optional,
+)
 
 import grpc
 import regex as re
 from ondewo.logging.decorators import Timer
 from ondewo.logging.logger import logger_console
-from ondewo.nlu import session_pb2, intent_pb2, user_pb2, context_pb2
+from ondewo.nlu import (
+    context_pb2,
+    intent_pb2,
+    session_pb2,
+    user_pb2,
+)
 from ondewo.nlu.client import Client as NLUClient
 from ondewo.nlu.session_pb2 import TextInput
 
@@ -33,9 +48,15 @@ from ondewo_bpi.autocoded.project_role_grpc_autocode import AutoProjectRolesServ
 from ondewo_bpi.autocoded.session_grpc_autocode import AutoSessionsServicer
 from ondewo_bpi.autocoded.user_grpc_autocode import AutoUsersServicer
 from ondewo_bpi.config import SENTENCE_TRUNCATION
-from ondewo_bpi.constants import SipTriggers, QueryTriggers
+from ondewo_bpi.constants import (
+    QueryTriggers,
+    SipTriggers,
+)
 from ondewo_bpi.helpers import get_session_from_response
-from ondewo_bpi.message_handler import MessageHandler, SingleMessageHandler
+from ondewo_bpi.message_handler import (
+    MessageHandler,
+    SingleMessageHandler,
+)
 
 
 @dataclass()
@@ -70,8 +91,10 @@ class BpiSessionsServices(AutoSessionsServicer):
         }
 
     def register_intent_handler(self, intent_pattern: str, handlers: List[Callable]) -> None:
-        intent_handler: IntentCallbackAssignor = IntentCallbackAssignor(intent_pattern=intent_pattern,
-                                                                        handlers=handlers)
+        intent_handler: IntentCallbackAssignor = IntentCallbackAssignor(
+            intent_pattern=intent_pattern,
+            handlers=handlers
+            )
         self.intent_handlers.append(intent_handler)
         self.intent_handlers = sorted(self.intent_handlers, reverse=True)
 
@@ -79,11 +102,11 @@ class BpiSessionsServices(AutoSessionsServicer):
         self.trigger_handlers[trigger] = handler
 
     def trigger_function_not_implemented(
-            self,
-            response: session_pb2.DetectIntentResponse,
-            message: intent_pb2.Intent.Message,
-            trigger: str,
-            found_triggers: Dict[str, List[str]],
+        self,
+        response: session_pb2.DetectIntentResponse,
+        message: intent_pb2.Intent.Message,
+        trigger: str,
+        found_triggers: Dict[str, List[str]],
     ) -> None:
         logger_console.warning(
             {
@@ -94,19 +117,23 @@ class BpiSessionsServices(AutoSessionsServicer):
         )
 
     def DetectIntent(
-            self, request: session_pb2.DetectIntentRequest, context: grpc.ServicerContext
+        self, request: session_pb2.DetectIntentRequest, context: grpc.ServicerContext
     ) -> session_pb2.DetectIntentResponse:
         try:
             if len(request.query_input.text.text) > SENTENCE_TRUNCATION:
-                logger_console.warning(f'The received text is too long, it will be truncated '
-                                       f'to {SENTENCE_TRUNCATION} characters!')
+                logger_console.warning(
+                    f'The received text is too long, it will be truncated '
+                    f'to {SENTENCE_TRUNCATION} characters!'
+                    )
             truncated_text: TextInput = TextInput(text=request.query_input.text.text[:SENTENCE_TRUNCATION])
             request.query_input.text.CopyFrom(truncated_text)
             text = request.query_input.text.text
         except Exception as e:
-            logger_console.exception(f"An issue was encountered in BPI:\n"
-                                     f"\tSeems like the request query_input data was not properly formatted\n"
-                                     f"\tDetails: {e}")
+            logger_console.exception(
+                f"An issue was encountered in BPI:\n"
+                f"\tSeems like the request query_input data was not properly formatted\n"
+                f"\tDetails: {e}"
+                )
             text = "error"
         logger_console.debug(
             {
@@ -132,13 +159,15 @@ class BpiSessionsServices(AutoSessionsServicer):
         return self.process_intent_handler(cai_response)
 
     @Timer(log_arguments=False, recursive=True)
-    def perform_detect_intent(self,
-                              request: session_pb2.DetectIntentRequest, ) -> session_pb2.DetectIntentResponse:
+    def perform_detect_intent(
+        self,
+        request: session_pb2.DetectIntentRequest, ) -> session_pb2.DetectIntentResponse:
         return self.client.services.sessions.detect_intent(request)
 
     @Timer(log_arguments=False, recursive=True)
-    def process_messages(self,
-                         response: session_pb2.DetectIntentResponse, ) -> session_pb2.DetectIntentResponse:
+    def process_messages(
+        self,
+        response: session_pb2.DetectIntentResponse, ) -> session_pb2.DetectIntentResponse:
         for j, message in enumerate(response.query_result.fulfillment_messages):
             found_triggers = MessageHandler.get_triggers(message, get_session_from_response(response))
 
@@ -159,14 +188,14 @@ class BpiSessionsServices(AutoSessionsServicer):
         return response
 
     def quicksend_to_api(
-            self, response: session_pb2.DetectIntentResponse, message: Optional[intent_pb2.Intent.Message],
-            count: int
+        self, response: session_pb2.DetectIntentResponse, message: Optional[intent_pb2.Intent.Message],
+        count: int
     ) -> None:
         logger_console.warning({"message": "quicksend_to_api not written, please subclass and implement"})
 
     @Timer(log_arguments=False, recursive=True)
     def process_intent_handler(
-            self, cai_response: session_pb2.DetectIntentResponse
+        self, cai_response: session_pb2.DetectIntentResponse
     ) -> session_pb2.DetectIntentResponse:
         # Create an ordered dictionary by key value length
         intent_name = cai_response.query_result.intent.display_name
@@ -184,8 +213,10 @@ class BpiSessionsServices(AutoSessionsServicer):
             )
         return cai_response
 
-    def _get_handlers_for_intent(self, intent_name: str,
-                                 assignors: List[IntentCallbackAssignor]) -> List[Callable]:
+    def _get_handlers_for_intent(
+        self, intent_name: str,
+        assignors: List[IntentCallbackAssignor]
+        ) -> List[Callable]:
         for assignor in assignors:
             if re.match(assignor.intent_pattern, intent_name):
                 return assignor.handlers
@@ -201,8 +232,10 @@ class BpiUsersServices(AutoUsersServicer):
         pass
 
     def Login(self, request: user_pb2.LoginRequest, context: grpc.ServicerContext) -> user_pb2.LoginResponse:
-        logger_console.info(f'Login request handled by bpi\n'
-                            f'Login user: {request.user_email}')
+        logger_console.info(
+            f'Login request handled by bpi\n'
+            f'Login user: {request.user_email}'
+            )
         return super().Login(request, context)
 
 
@@ -215,7 +248,7 @@ class BpiContextServices(AutoContextsServicer):
         pass
 
     def CreateContext(
-            self, request: context_pb2.CreateContextRequest, context: grpc.ServicerContext
+        self, request: context_pb2.CreateContextRequest, context: grpc.ServicerContext
     ) -> context_pb2.Context:
         logger_console.info("passing create context request on to CAI")
         return self.client.services.contexts.create_context(request=request)

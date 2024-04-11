@@ -1,4 +1,4 @@
-# Copyright 2021 ONDEWO GmbH
+# Copyright 2021-2024 ONDEWO GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,15 +14,18 @@
 #
 # [AUTO-GENERATED FILE]
 
-from abc import ABCMeta, abstractmethod
+from abc import (
+    ABCMeta,
+    abstractmethod,
+)
 
 import grpc
 from google.longrunning.operations_grpc_pb2 import Operation
 from google.protobuf.empty_pb2 import Empty
-from ondewo.logging.logger import logger
 from ondewo.nlu import agent_pb2
-from ondewo.nlu.agent_pb2_grpc import AgentsServicer
 from ondewo.nlu.client import Client
+from ondewo.nlu.agent_pb2_grpc import AgentsServicer
+from ondewo.logging.logger import logger
 
 
 class AutoAgentsServicer(AgentsServicer):
@@ -38,9 +41,7 @@ class AutoAgentsServicer(AgentsServicer):
     override functions if other functionality than a client call is needed
 
     [original docstring]
-    Agents are best described as Natural Language Understanding (NLU) modules that transform user requests
-        into actionable data. You can include agents in your app, product, or service to determine user intent
-        and respond to the user in a natural way.
+    Agents are best described as Natural Language Understanding (NLU) modules that transform user requests into actionable data. You can include agents in your app, product, or service to determine user intent and respond to the user in a natural way.
 
     """
     __metaclass__ = ABCMeta
@@ -50,8 +51,7 @@ class AutoAgentsServicer(AgentsServicer):
     def client(self) -> Client:
         pass
 
-    def CreateAgent(self, request: agent_pb2.CreateAgentRequest,
-                    context: grpc.ServicerContext) -> agent_pb2.Agent:
+    def CreateAgent(self, request: agent_pb2.CreateAgentRequest, context: grpc.ServicerContext) -> agent_pb2.Agent:
         """
         [AUTO-GENERATED FUNCTION]
         Creates the specified agent.
@@ -61,8 +61,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.create_agent(request=request)
         return response
 
-    def UpdateAgent(self, request: agent_pb2.UpdateAgentRequest,
-                    context: grpc.ServicerContext) -> agent_pb2.Agent:
+    def UpdateAgent(self, request: agent_pb2.UpdateAgentRequest, context: grpc.ServicerContext) -> agent_pb2.Agent:
         """
         [AUTO-GENERATED FUNCTION]
         Updates the specified agent.
@@ -102,8 +101,9 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.delete_all_agents()
         return response
 
-    def ListAgents(self, request: agent_pb2.ListAgentsRequest,
-                   context: grpc.ServicerContext) -> agent_pb2.ListAgentsResponse:
+    def ListAgents(
+        self, request: agent_pb2.ListAgentsRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.ListAgentsResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Lists agents in the server associated to the current user
@@ -113,8 +113,9 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.list_agents(request=request)
         return response
 
-    def ListAgentsOfUser(self, request: agent_pb2.ListAgentsRequest,
-                         context: grpc.ServicerContext) -> agent_pb2.ListAgentsOfUserResponse:
+    def ListAgentsOfUser(
+        self, request: agent_pb2.ListAgentsRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.ListAgentsOfUserResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Lists agents in the server associated to the given user
@@ -124,8 +125,9 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.list_agents_of_user(request=request)
         return response
 
-    def ListAllAgents(self, request: agent_pb2.ListAgentsRequest,
-                      context: grpc.ServicerContext) -> agent_pb2.ListAgentsResponse:
+    def ListAllAgents(
+        self, request: agent_pb2.ListAgentsRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.ListAgentsResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Lists all agents in the server
@@ -135,8 +137,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.list_agents(request=request)
         return response
 
-    def AddUserToProject(self, request: agent_pb2.AddUserToProjectRequest,
-                         context: grpc.ServicerContext) -> Empty:
+    def AddUserToProject(self, request: agent_pb2.AddUserToProjectRequest, context: grpc.ServicerContext) -> Empty:
         """
         [AUTO-GENERATED FUNCTION]
         Adds a user with specified id to the project (agent)
@@ -146,8 +147,9 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.add_user_to_project(request=request)
         return response
 
-    def RemoveUserFromProject(self, request: agent_pb2.RemoveUserFromProjectRequest,
-                              context: grpc.ServicerContext) -> Empty:
+    def RemoveUserFromProject(
+        self, request: agent_pb2.RemoveUserFromProjectRequest, context: grpc.ServicerContext
+        ) -> Empty:
         """
         [AUTO-GENERATED FUNCTION]
         Removes a user with specified id from the project (agent)
@@ -157,31 +159,35 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.remove_user_from_project(request=request)
         return response
 
-    def ListUsersInProject(self, request: agent_pb2.ListUsersInProjectRequest,
-                           context: grpc.ServicerContext) -> agent_pb2.ListUsersInProjectResponse:
+    def ListUsersInProject(
+        self, request: agent_pb2.ListUsersInProjectRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.ListUsersInProjectResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Lists users in the project (agent)
+
         """
         logger.info("relaying ListUsersInProject() to nlu-client...")
         response = self.client.services.agents.list_users_in_project(request=request)
         return response
 
-    def GetPlatformInfo(self, request: Empty,
-                        context: grpc.ServicerContext) -> agent_pb2.GetPlatformInfoResponse:
+    def GetPlatformInfo(self, request: Empty, context: grpc.ServicerContext) -> agent_pb2.GetPlatformInfoResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Gets information from the platform
+
         """
         logger.info("relaying GetPlatformInfo() to nlu-client...")
         response = self.client.services.agents.get_platform_info()
         return response
 
-    def ListProjectPermissions(self, request: agent_pb2.ListProjectPermissionsRequest,
-                               context: grpc.ServicerContext) -> agent_pb2.ListProjectPermissionsResponse:
+    def ListProjectPermissions(
+        self, request: agent_pb2.ListProjectPermissionsRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.ListProjectPermissionsResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        List permissions from the project (agent)
+
         """
         logger.info("relaying ListProjectPermissions() to nlu-client...")
         response = self.client.services.agents.list_project_permissions(request=request)
@@ -217,8 +223,9 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.export_agent(request=request)
         return response
 
-    def ExportBenchmarkAgent(self, request: agent_pb2.ExportBenchmarkAgentRequest,
-                             context: grpc.ServicerContext) -> Operation:
+    def ExportBenchmarkAgent(
+        self, request: agent_pb2.ExportBenchmarkAgentRequest, context: grpc.ServicerContext
+        ) -> Operation:
         """
         [AUTO-GENERATED FUNCTION]
         Exports the specified train agent to a ZIP file after train-test split, returns the test TrainingPhrase list.
@@ -238,18 +245,19 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.import_agent(request=request)
         return response
 
-    def OptimizeRankingMatch(self, request: agent_pb2.OptimizeRankingMatchRequest,
-                             context: grpc.ServicerContext) -> Operation:
+    def OptimizeRankingMatch(
+        self, request: agent_pb2.OptimizeRankingMatchRequest, context: grpc.ServicerContext
+        ) -> Operation:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Runs optimize ranking match
+
         """
         logger.info("relaying OptimizeRankingMatch() to nlu-client...")
         response = self.client.services.agents.optimize_ranking_match(request=request)
         return response
 
-    def RestoreAgent(self, request: agent_pb2.RestoreAgentRequest,
-                     context: grpc.ServicerContext) -> Operation:
+    def RestoreAgent(self, request: agent_pb2.RestoreAgentRequest, context: grpc.ServicerContext) -> Operation:
         """
         [AUTO-GENERATED FUNCTION]
         Restores the specified agent from a ZIP file.
@@ -259,21 +267,36 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.restore_agent(request=request)
         return response
 
-    def GetAgentStatistics(self, request: agent_pb2.GetAgentStatisticsRequest,
-                           context: grpc.ServicerContext) -> agent_pb2.GetAgentStatisticsResponse:
+    def GetAgentStatistics(
+        self, request: agent_pb2.GetAgentStatisticsRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.GetAgentStatisticsResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Gets statistics for the agent
+
         """
         logger.info("relaying GetAgentStatistics() to nlu-client...")
         response = self.client.services.agents.get_agent_statistics(request=request)
         return response
 
-    def SetAgentStatus(self, request: agent_pb2.SetAgentStatusRequest,
-                       context: grpc.ServicerContext) -> agent_pb2.Agent:
+    def GetSessionsStatistics(
+        self, request: agent_pb2.GetSessionsStatisticsRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.GetSessionsStatisticsResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Missing associated documentation comment in .proto file.
+        """
+        logger.info("relaying GetSessionsStatistics() to nlu-client...")
+        response = self.client.services.agents.get_sessions_statistics(request=request)
+        return response
+
+    def SetAgentStatus(
+        self, request: agent_pb2.SetAgentStatusRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.Agent:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Sets status for the agent
+
         """
         logger.info("relaying SetAgentStatus() to nlu-client...")
         response = self.client.services.agents.set_agent_status(request=request)
@@ -282,34 +305,38 @@ class AutoAgentsServicer(AgentsServicer):
     def SetResources(self, request: agent_pb2.SetResourcesRequest, context: grpc.ServicerContext) -> Empty:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Sets resources
+
         """
         logger.info("relaying SetResources() to nlu-client...")
         response = self.client.services.agents.set_resources(request=request)
         return response
 
-    def DeleteResources(self, request: agent_pb2.DeleteResourcesRequest,
-                        context: grpc.ServicerContext) -> Empty:
+    def DeleteResources(self, request: agent_pb2.DeleteResourcesRequest, context: grpc.ServicerContext) -> Empty:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Deletes resources
+
         """
         logger.info("relaying DeleteResources() to nlu-client...")
         response = self.client.services.agents.delete_resources(request=request)
         return response
 
-    def ExportResources(self, request: agent_pb2.ExportResourcesRequest,
-                        context: grpc.ServicerContext) -> agent_pb2.ExportResourcesResponse:
+    def ExportResources(
+        self, request: agent_pb2.ExportResourcesRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.ExportResourcesResponse:
         """
         [AUTO-GENERATED FUNCTION]
-        Missing associated documentation comment in .proto file.
+        Exports resources
+
         """
         logger.info("relaying ExportResources() to nlu-client...")
         response = self.client.services.agents.export_resources(request=request)
         return response
 
-    def GetModelStatuses(self, request: agent_pb2.GetModelStatusesRequest,
-                         context: grpc.ServicerContext) -> agent_pb2.GetModelStatusesResponse:
+    def GetModelStatuses(
+        self, request: agent_pb2.GetModelStatusesRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.GetModelStatusesResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Get statuses of models related to project
@@ -319,8 +346,9 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_model_statuses(request=request)
         return response
 
-    def GetPlatformMapping(self, request: agent_pb2.GetPlatformMappingRequest,
-                           context: grpc.ServicerContext) -> agent_pb2.PlatformMapping:
+    def GetPlatformMapping(
+        self, request: agent_pb2.GetPlatformMappingRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.PlatformMapping:
         """
         [AUTO-GENERATED FUNCTION]
         Get all set platform name mappings for an Agent
@@ -330,8 +358,9 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_platform_mapping(request=request)
         return response
 
-    def SetPlatformMapping(self, request: agent_pb2.PlatformMapping,
-                           context: grpc.ServicerContext) -> agent_pb2.PlatformMapping:
+    def SetPlatformMapping(
+        self, request: agent_pb2.PlatformMapping, context: grpc.ServicerContext
+        ) -> agent_pb2.PlatformMapping:
         """
         [AUTO-GENERATED FUNCTION]
         Set platform name mappings for an Agent
@@ -339,6 +368,196 @@ class AutoAgentsServicer(AgentsServicer):
         """
         logger.info("relaying SetPlatformMapping() to nlu-client...")
         response = self.client.services.agents.set_platform_mapping(request=request)
+        return response
+
+    def GetFullTextSearchEntityType(
+        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.FullTextSearchResponseEntityType:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Full text search endpoint in entity types
+
+        """
+        logger.info("relaying GetFullTextSearchEntityType() to nlu-client...")
+        response = self.client.services.agents.get_full_text_search_entity_type(request=request)
+        return response
+
+    def GetFullTextSearchEntity(
+        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.FullTextSearchResponseEntity:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Full text search endpoint in entities
+
+        """
+        logger.info("relaying GetFullTextSearchEntity() to nlu-client...")
+        response = self.client.services.agents.get_full_text_search_entity(request=request)
+        return response
+
+    def GetFullTextSearchEntitySynonym(
+        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.FullTextSearchResponseEntitySynonym:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Full text search endpoint in entity synonyms
+
+        """
+        logger.info("relaying GetFullTextSearchEntitySynonym() to nlu-client...")
+        response = self.client.services.agents.get_full_text_search_entity_synonym(request=request)
+        return response
+
+    def GetFullTextSearchIntent(
+        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.FullTextSearchResponseIntent:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Full text search endpoint in intents
+
+        """
+        logger.info("relaying GetFullTextSearchIntent() to nlu-client...")
+        response = self.client.services.agents.get_full_text_search_intent(request=request)
+        return response
+
+    def GetFullTextSearchIntentContextIn(
+        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.FullTextSearchResponseIntentContextIn:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Full text search endpoint in context ins of intents
+
+        """
+        logger.info("relaying GetFullTextSearchIntentContextIn() to nlu-client...")
+        response = self.client.services.agents.get_full_text_search_intent_context_in(request=request)
+        return response
+
+    def GetFullTextSearchIntentContextOut(
+        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.FullTextSearchResponseIntentContextOut:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Full text search endpoint in context outs of intents
+
+        """
+        logger.info("relaying GetFullTextSearchIntentContextOut() to nlu-client...")
+        response = self.client.services.agents.get_full_text_search_intent_context_out(request=request)
+        return response
+
+    def GetFullTextSearchIntentUsersays(
+        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.FullTextSearchResponseIntentUsersays:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Full text search endpoint in user says of intents
+
+        """
+        logger.info("relaying GetFullTextSearchIntentUsersays() to nlu-client...")
+        response = self.client.services.agents.get_full_text_search_intent_usersays(request=request)
+        return response
+
+    def GetFullTextSearchIntentTags(
+        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.FullTextSearchResponseIntentTags:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Full text search endpoint in tags of intents
+
+        """
+        logger.info("relaying GetFullTextSearchIntentTags() to nlu-client...")
+        response = self.client.services.agents.get_full_text_search_intent_tags(request=request)
+        return response
+
+    def GetFullTextSearchIntentResponse(
+        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.FullTextSearchResponseIntentResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Full text search endpoint in responses of intents
+
+        """
+        logger.info("relaying GetFullTextSearchIntentResponse() to nlu-client...")
+        response = self.client.services.agents.get_full_text_search_intent_response(request=request)
+        return response
+
+    def GetFullTextSearchIntentParameters(
+        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.FullTextSearchResponseIntentParameters:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Full text search endpoint in parameters of intents
+
+        """
+        logger.info("relaying GetFullTextSearchIntentParameters() to nlu-client...")
+        response = self.client.services.agents.get_full_text_search_intent_parameters(request=request)
+        return response
+
+    def ReindexAgent(self, request: agent_pb2.ReindexAgentRequest, context: grpc.ServicerContext) -> Operation:
+        """
+        [AUTO-GENERATED FUNCTION]
+        Force reindexing Intent and Entity data of Agent
+
+        """
+        logger.info("relaying ReindexAgent() to nlu-client...")
+        response = self.client.services.agents.reindex_agent(request=request)
+        return response
+
+    def CreateCcaiProject(
+        self, request: agent_pb2.CreateCcaiProjectRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.CreateCcaiProjectResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        RPC to create a new CCAI project
+
+        """
+        logger.info("relaying CreateCcaiProject() to nlu-client...")
+        response = self.client.services.agents.create_ccai_project(request=request)
+        return response
+
+    def DeleteCcaiProject(
+        self, request: agent_pb2.DeleteCcaiProjectRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.DeleteCcaiProjectResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        RPC to delete an existing CCAI project
+
+        """
+        logger.info("relaying DeleteCcaiProject() to nlu-client...")
+        response = self.client.services.agents.delete_ccai_project(request=request)
+        return response
+
+    def GetCcaiProject(
+        self, request: agent_pb2.GetCcaiProjectRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.CcaiProject:
+        """
+        [AUTO-GENERATED FUNCTION]
+        RPC to get details of an existing CCAI project
+
+        """
+        logger.info("relaying GetCcaiProject() to nlu-client...")
+        response = self.client.services.agents.get_ccai_project(request=request)
+        return response
+
+    def ListCcaiProjects(
+        self, request: agent_pb2.ListCcaiProjectsRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.ListCcaiProjectsResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        RPC to list all available CCAI projects
+
+        """
+        logger.info("relaying ListCcaiProjects() to nlu-client...")
+        response = self.client.services.agents.list_ccai_projects(request=request)
+        return response
+
+    def UpdateCcaiProject(
+        self, request: agent_pb2.UpdateCcaiProjectRequest, context: grpc.ServicerContext
+        ) -> agent_pb2.UpdateCcaiProjectResponse:
+        """
+        [AUTO-GENERATED FUNCTION]
+        RPC to update an existing CCAI project
+
+        """
+        logger.info("relaying UpdateCcaiProject() to nlu-client...")
+        response = self.client.services.agents.update_ccai_project(request=request)
         return response
 
 # [make flake8 shut up]

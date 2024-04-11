@@ -1,27 +1,134 @@
-version: '3'
+version: '3.8'
+
 services:
 
-  bpi:
-    # change this to the image from your specific use case, built with the dockerfile
-    image: registry-dev.ondewo.com:5000/ondewo/bpi-example-image:4.1.1
-    restart: "no"
-    env_file:
-    - "ondewo_bpi/example/example.env"
+  # ----------------------------------------------------------------------
+  # Service: ondewo-ingress-envoy
+  # ----------------------------------------------------------------------
+  ondewo-ingress-envoy:
+    image: envoyproxy/envoy:v1.29-latest
     volumes:
-    - "./logging.yaml:/home/ondewo/logging.yaml"
-    - "./config.json:/home/ondewo/config.json"
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
     ports:
-      - "50051:50051"
-    # network_mode: host
+      # WEB GRPC
+      - ${ONDEWO_INGRESS_ENVOY_WEBGRPC_PORT_ONDEWO_BPI}:${ONDEWO_INGRESS_ENVOY_WEBGRPC_PORT_ONDEWO_BPI}
+      - ${ONDEWO_INGRESS_ENVOY_WEBGRPC_PORT_ONDEWO_BPI_QA}:${ONDEWO_INGRESS_ENVOY_WEBGRPC_PORT_ONDEWO_BPI_QA}
+      # GRPC
+      - ${ONDEWO_INGRESS_ENVOY_GRPC_PORT_ONDEWO_BPI}:${ONDEWO_INGRESS_ENVOY_GRPC_PORT_ONDEWO_BPI}
+      - ${ONDEWO_INGRESS_ENVOY_GRPC_PORT_ONDEWO_BPI_QA}:${ONDEWO_INGRESS_ENVOY_GRPC_PORT_ONDEWO_BPI_QA}
+    networks:
+      - ondewo-bpi-network
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD-SHELL", "test -n 'ps aux | grep envoy'" ]
+      interval: 10s
+      timeout: 30s
+      retries: 3
 
-  bpi_qa:
-    image: registry-dev.ondewo.com:5000/ondewo/bpi-qa-example-image:4.1.1
-    restart: "no"
-    env_file:
-    - "ondewo_bpi_qa/example/example.env"
+  # ----------------------------------------------------------------------
+  # Service: ondewo-bpi
+  # ----------------------------------------------------------------------
+  ondewo-bpi:
+    # change this to the image from your specific use case, built with the dockerfile
+    image: registry-dev.ondewo.com:5000/ondewo/ondewo-bpi:latest
+    build:
+      dockerfile: dockerfiles/ondewo-bpi.Dockerfile
+      context: .
+    environment:
+      # BPI related variable
+      - PORT=${ONDEWO_BPI_PORT}
+      # CAI related variables
+      - SECURE=${ONDEWO_BPI_SECURE}
+      - CAI_HOST=${ONDEWO_BPI_CAI_HOST}
+      - CAI_PORT=${ONDEWO_BPI_CAI_PORT}
+      - CAI_TOKEN=${ONDEWO_BPI_CAI_TOKEN}
+      - HTTP_BASIC_AUTH=${ONDEWO_BPI_HTTP_BASIC_AUTH}
+      - USER_NAME=${ONDEWO_BPI_USER_NAME}
+      - USER_PASS=${ONDEWO_BPI_USER_PASS}
+      - SENTENCE_TRUNCATION=${ONDEWO_BPI_SENTENCE_TRUNCATION}
+      # SIP related variables
+      - SIP_HOST=${ONDEWO_BPI_SIP_HOST}
+      - SIP_PORT=${ONDEWO_BPI_SIP_PORT}
+      - SIP_NAME=${ONDEWO_BPI_SIP_NAME}
+      - PROVIDER_STT=${ONDEWO_BPI_PROVIDER_STT}
+      - PROVIDER_TTS=${ONDEWO_BPI_PROVIDER_TTS}
+      - SIP_LANG=${ONDEWO_BPI_SIP_LANG}
+      # Logging related variables
+      - MODULE_NAME=${ONDEWO_BPI_MODULE_NAME}
     volumes:
-    - "./logging.yaml:/home/ondewo/logging.yaml"
-    - "./config.json:/home/ondewo/config.json"
-    ports:
-      - "50051:50051"
-    network_mode: host
+      - "./logging.yaml:/home/ondewo/logging.yaml"
+    networks:
+      - ondewo-bpi-network
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD-SHELL","grpcurl --plaintext 0.0.0.0:${ONDEWO_BPI_PORT} list" ]
+      interval: 1s
+      timeout: 30s
+      retries: 120
+
+  # ----------------------------------------------------------------------
+  # Service: ondewo-bpi-qa
+  # ----------------------------------------------------------------------
+  ondewo-bpi-qa:
+    image: registry-dev.ondewo.com:5000/ondewo/ondewo-bpi-qa:latest
+    build:
+      dockerfile: dockerfiles/ondewo-bpi.Dockerfile
+      context: .
+    environment:
+      # BPI related variable
+      - PORT=${ONDEWO_BPI_QA_PORT}
+      # CAI related variables
+      - SECURE=${ONDEWO_BPI_QA_SECURE}
+      - CAI_HOST=${ONDEWO_BPI_QA_CAI_HOST}
+      - CAI_PORT=${ONDEWO_BPI_QA_CAI_PORT}
+      - CAI_TOKEN=${ONDEWO_BPI_QA_CAI_TOKEN}
+      - HTTP_BASIC_AUTH=${ONDEWO_BPI_QA_HTTP_BASIC_AUTH}
+      - USER_NAME=${ONDEWO_BPI_QA_USER_NAME}
+      - USER_PASS=${ONDEWO_BPI_QA_USER_PASS}
+      - SENTENCE_TRUNCATION=${ONDEWO_BPI_QA_SENTENCE_TRUNCATION}
+      # QA related variables
+      - QA_SECURE=${ONDEWO_BPI_QA_QA_SECURE}
+      - QA_HOST=${ONDEWO_BPI_QA_QA_HOST}
+      - QA_PORT=${ONDEWO_BPI_QA_QA_PORT}
+      - QA_LANG=${ONDEWO_BPI_QA_QA_LANG}
+      - QA_MAX_ANSWERS=${ONDEWO_BPI_QA_QA_MAX_ANSWERS}
+      - QA_THRESHOLD_READER=${ONDEWO_BPI_QA_QA_THRESHOLD_READER}
+      - QA_THRESHOLD_RETRIEVER=${ONDEWO_BPI_QA_QA_THRESHOLD_RETRIEVER}
+      - QA_ACTIVE=${ONDEWO_BPI_QA_QA_ACTIVE}
+      # SIP related variables
+      - SIP_HOST=${ONDEWO_BPI_QA_SIP_HOST}
+      - SIP_PORT=${ONDEWO_BPI_QA_SIP_PORT}
+      - SIP_NAME=${ONDEWO_BPI_QA_SIP_NAME}
+      - PROVIDER_STT=${ONDEWO_BPI_QA_PROVIDER_STT}
+      - PROVIDER_TTS=${ONDEWO_BPI_QA_PROVIDER_TTS}
+      - SIP_LANG=${ONDEWO_BPI_QA_SIP_LANG}
+      # Logging related variables
+      - MODULE_NAME=${ONDEWO_BPI_QA_MODULE_NAME}
+    volumes:
+      - "./logging.yaml:/home/ondewo/logging.yaml"
+    networks:
+      - ondewo-bpi-network
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD-SHELL","grpcurl --plaintext 0.0.0.0:${ONDEWO_BPI_QA_PORT} list" ]
+      interval: 1s
+      timeout: 30s
+      retries: 120
+
+############################################################
+# Networks
+############################################################
+
+networks:
+
+  # ----------------------------------------------------------
+  # Network: ondewo-ccai-platform-swarm-network
+  # ----------------------------------------------------------
+  ondewo-bpi-network:
+    external: False
+
+############################################################
+# Volumes
+############################################################
+
+# Note: no volumes needed for the ondewo-bpi and ondewo-bpi-qa

@@ -6,7 +6,7 @@ from sip.utils.custom_docker_comm import CustomDockerClient
 
 
 @pytest.fixture(scope="function")
-def bpi_example_server() -> Generator:
+def bpi_server() -> Generator:
     custom_docker_client = CustomDockerClient()
     compose_file = "docker-compose.yaml"
     env_file = None

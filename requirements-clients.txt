@@ -1,0 +1,2 @@
+git+https://github.com/ondewo/ondewo-nlu-client-python.git@master#egg=ondewo-nlu-client
+# ondewo-nlu-client>=5.0.0

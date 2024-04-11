@@ -1,10 +1,14 @@
-FROM registry-dev.ondewo.com:5000/python/python:3.10-slim
+FROM python:3.10-slim
 
 RUN apt update && apt install make
-RUN pip install flake8 mypy
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY requirements-static-code-checks.txt .
+RUN pip install -r requirements-static-code-checks.txt
 
 RUN mkdir code_to_test
-
 WORKDIR code_to_test
 
 COPY ondewo_bpi ondewo_bpi

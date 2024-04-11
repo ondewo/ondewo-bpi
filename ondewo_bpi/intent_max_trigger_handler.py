@@ -1,11 +1,22 @@
 from collections import Counter
-from typing import Dict, List, Optional
+from typing import (
+    Dict,
+    List,
+    Optional,
+)
 
 from google.protobuf.json_format import MessageToDict
 from ondewo.nlu import context_pb2
 from ondewo.nlu.client import Client
-from ondewo.nlu.session_pb2 import DetectIntentResponse, DetectIntentRequest, QueryInput, TextInput, GetSessionRequest, \
-    Session, QueryParameters
+from ondewo.nlu.session_pb2 import (
+    DetectIntentRequest,
+    DetectIntentResponse,
+    GetSessionRequest,
+    QueryInput,
+    QueryParameters,
+    Session,
+    TextInput,
+)
 
 
 class IntentMaxTriggerHandler:
@@ -13,8 +24,10 @@ class IntentMaxTriggerHandler:
 
     @classmethod
     def _get_session(cls, nlu_client: Client, session_id: str) -> Session:
-        get_session_request: GetSessionRequest = GetSessionRequest(session_id=session_id,
-                                                                   session_view=Session.View.VIEW_SPARSE)
+        get_session_request: GetSessionRequest = GetSessionRequest(
+            session_id=session_id,
+            session_view=Session.View.VIEW_SPARSE
+        )
         nlu_session: Session = nlu_client.services.sessions.get_session(request=get_session_request)
         return nlu_session
 
@@ -88,7 +101,11 @@ class IntentMaxTriggerHandler:
         return context
 
     @classmethod
-    def handle_if_intent_reached_number_triggers_max(cls, nlu_response: DetectIntentResponse, nlu_client: Client) -> DetectIntentResponse:
+    def handle_if_intent_reached_number_triggers_max(
+        cls,
+        nlu_response: DetectIntentResponse,
+        nlu_client: Client,
+    ) -> DetectIntentResponse:
         nlu_response_dict: Dict = MessageToDict(nlu_response)
         intent_name: str = nlu_response_dict['queryResult']['intent']['displayName']
         language_code: str = nlu_response_dict['queryResult']["languageCode"]
@@ -96,8 +113,6 @@ class IntentMaxTriggerHandler:
 
         if cls._check_if_intent_reached_number_triggers_max(intent_name, nlu_client, session_id):
             nlu_request: DetectIntentRequest = cls._get_default_exit_detect_intent_request(session_id, language_code)
-            nlu_response: DetectIntentResponse = nlu_client.services.sessions.detect_intent(
-                request=nlu_request,
-            )
-                
+            nlu_response: DetectIntentResponse = nlu_client.services.sessions.detect_intent(request=nlu_request)
+
         return nlu_response
