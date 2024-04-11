@@ -12,7 +12,7 @@ FROM python:3.10-slim AS python_test_runner
 
 
 # choose either the python one or the ubuntu one.
-FROM <choice (ubuntu_test_runner or python_test_runner)>
+#FROM <choice (ubuntu_test_runner or python_test_runner)>
 
 # Delete all this if you dont want a pypi mirror
 ENV HOST_IP=172.17.0.1
