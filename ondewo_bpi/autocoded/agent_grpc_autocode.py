@@ -14,10 +14,7 @@
 #
 # [AUTO-GENERATED FILE]
 
-from abc import (
-    ABCMeta,
-    abstractmethod,
-)
+from abc import ABCMeta, abstractmethod
 
 import grpc
 from google.longrunning.operations_grpc_pb2 import Operation
@@ -101,9 +98,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.delete_all_agents()
         return response
 
-    def ListAgents(
-        self, request: agent_pb2.ListAgentsRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.ListAgentsResponse:
+    def ListAgents(self, request: agent_pb2.ListAgentsRequest, context: grpc.ServicerContext) -> agent_pb2.ListAgentsResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Lists agents in the server associated to the current user
@@ -113,9 +108,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.list_agents(request=request)
         return response
 
-    def ListAgentsOfUser(
-        self, request: agent_pb2.ListAgentsRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.ListAgentsOfUserResponse:
+    def ListAgentsOfUser(self, request: agent_pb2.ListAgentsRequest, context: grpc.ServicerContext) -> agent_pb2.ListAgentsOfUserResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Lists agents in the server associated to the given user
@@ -125,9 +118,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.list_agents_of_user(request=request)
         return response
 
-    def ListAllAgents(
-        self, request: agent_pb2.ListAgentsRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.ListAgentsResponse:
+    def ListAllAgents(self, request: agent_pb2.ListAgentsRequest, context: grpc.ServicerContext) -> agent_pb2.ListAgentsResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Lists all agents in the server
@@ -147,9 +138,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.add_user_to_project(request=request)
         return response
 
-    def RemoveUserFromProject(
-        self, request: agent_pb2.RemoveUserFromProjectRequest, context: grpc.ServicerContext
-        ) -> Empty:
+    def RemoveUserFromProject(self, request: agent_pb2.RemoveUserFromProjectRequest, context: grpc.ServicerContext) -> Empty:
         """
         [AUTO-GENERATED FUNCTION]
         Removes a user with specified id from the project (agent)
@@ -159,9 +148,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.remove_user_from_project(request=request)
         return response
 
-    def ListUsersInProject(
-        self, request: agent_pb2.ListUsersInProjectRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.ListUsersInProjectResponse:
+    def ListUsersInProject(self, request: agent_pb2.ListUsersInProjectRequest, context: grpc.ServicerContext) -> agent_pb2.ListUsersInProjectResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Lists users in the project (agent)
@@ -181,9 +168,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_platform_info()
         return response
 
-    def ListProjectPermissions(
-        self, request: agent_pb2.ListProjectPermissionsRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.ListProjectPermissionsResponse:
+    def ListProjectPermissions(self, request: agent_pb2.ListProjectPermissionsRequest, context: grpc.ServicerContext) -> agent_pb2.ListProjectPermissionsResponse:
         """
         [AUTO-GENERATED FUNCTION]
         List permissions from the project (agent)
@@ -223,9 +208,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.export_agent(request=request)
         return response
 
-    def ExportBenchmarkAgent(
-        self, request: agent_pb2.ExportBenchmarkAgentRequest, context: grpc.ServicerContext
-        ) -> Operation:
+    def ExportBenchmarkAgent(self, request: agent_pb2.ExportBenchmarkAgentRequest, context: grpc.ServicerContext) -> Operation:
         """
         [AUTO-GENERATED FUNCTION]
         Exports the specified train agent to a ZIP file after train-test split, returns the test TrainingPhrase list.
@@ -245,9 +228,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.import_agent(request=request)
         return response
 
-    def OptimizeRankingMatch(
-        self, request: agent_pb2.OptimizeRankingMatchRequest, context: grpc.ServicerContext
-        ) -> Operation:
+    def OptimizeRankingMatch(self, request: agent_pb2.OptimizeRankingMatchRequest, context: grpc.ServicerContext) -> Operation:
         """
         [AUTO-GENERATED FUNCTION]
         Runs optimize ranking match
@@ -267,9 +248,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.restore_agent(request=request)
         return response
 
-    def GetAgentStatistics(
-        self, request: agent_pb2.GetAgentStatisticsRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.GetAgentStatisticsResponse:
+    def GetAgentStatistics(self, request: agent_pb2.GetAgentStatisticsRequest, context: grpc.ServicerContext) -> agent_pb2.GetAgentStatisticsResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Gets statistics for the agent
@@ -279,9 +258,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_agent_statistics(request=request)
         return response
 
-    def GetSessionsStatistics(
-        self, request: agent_pb2.GetSessionsStatisticsRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.GetSessionsStatisticsResponse:
+    def GetSessionsStatistics(self, request: agent_pb2.GetSessionsStatisticsRequest, context: grpc.ServicerContext) -> agent_pb2.GetSessionsStatisticsResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Missing associated documentation comment in .proto file.
@@ -290,9 +267,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_sessions_statistics(request=request)
         return response
 
-    def SetAgentStatus(
-        self, request: agent_pb2.SetAgentStatusRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.Agent:
+    def SetAgentStatus(self, request: agent_pb2.SetAgentStatusRequest, context: grpc.ServicerContext) -> agent_pb2.Agent:
         """
         [AUTO-GENERATED FUNCTION]
         Sets status for the agent
@@ -322,9 +297,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.delete_resources(request=request)
         return response
 
-    def ExportResources(
-        self, request: agent_pb2.ExportResourcesRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.ExportResourcesResponse:
+    def ExportResources(self, request: agent_pb2.ExportResourcesRequest, context: grpc.ServicerContext) -> agent_pb2.ExportResourcesResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Exports resources
@@ -334,9 +307,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.export_resources(request=request)
         return response
 
-    def GetModelStatuses(
-        self, request: agent_pb2.GetModelStatusesRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.GetModelStatusesResponse:
+    def GetModelStatuses(self, request: agent_pb2.GetModelStatusesRequest, context: grpc.ServicerContext) -> agent_pb2.GetModelStatusesResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Get statuses of models related to project
@@ -346,9 +317,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_model_statuses(request=request)
         return response
 
-    def GetPlatformMapping(
-        self, request: agent_pb2.GetPlatformMappingRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.PlatformMapping:
+    def GetPlatformMapping(self, request: agent_pb2.GetPlatformMappingRequest, context: grpc.ServicerContext) -> agent_pb2.PlatformMapping:
         """
         [AUTO-GENERATED FUNCTION]
         Get all set platform name mappings for an Agent
@@ -358,9 +327,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_platform_mapping(request=request)
         return response
 
-    def SetPlatformMapping(
-        self, request: agent_pb2.PlatformMapping, context: grpc.ServicerContext
-        ) -> agent_pb2.PlatformMapping:
+    def SetPlatformMapping(self, request: agent_pb2.PlatformMapping, context: grpc.ServicerContext) -> agent_pb2.PlatformMapping:
         """
         [AUTO-GENERATED FUNCTION]
         Set platform name mappings for an Agent
@@ -370,9 +337,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.set_platform_mapping(request=request)
         return response
 
-    def GetFullTextSearchEntityType(
-        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.FullTextSearchResponseEntityType:
+    def GetFullTextSearchEntityType(self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext) -> agent_pb2.FullTextSearchResponseEntityType:
         """
         [AUTO-GENERATED FUNCTION]
         Full text search endpoint in entity types
@@ -382,9 +347,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_full_text_search_entity_type(request=request)
         return response
 
-    def GetFullTextSearchEntity(
-        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.FullTextSearchResponseEntity:
+    def GetFullTextSearchEntity(self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext) -> agent_pb2.FullTextSearchResponseEntity:
         """
         [AUTO-GENERATED FUNCTION]
         Full text search endpoint in entities
@@ -394,9 +357,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_full_text_search_entity(request=request)
         return response
 
-    def GetFullTextSearchEntitySynonym(
-        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.FullTextSearchResponseEntitySynonym:
+    def GetFullTextSearchEntitySynonym(self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext) -> agent_pb2.FullTextSearchResponseEntitySynonym:
         """
         [AUTO-GENERATED FUNCTION]
         Full text search endpoint in entity synonyms
@@ -406,9 +367,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_full_text_search_entity_synonym(request=request)
         return response
 
-    def GetFullTextSearchIntent(
-        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.FullTextSearchResponseIntent:
+    def GetFullTextSearchIntent(self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext) -> agent_pb2.FullTextSearchResponseIntent:
         """
         [AUTO-GENERATED FUNCTION]
         Full text search endpoint in intents
@@ -418,9 +377,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_full_text_search_intent(request=request)
         return response
 
-    def GetFullTextSearchIntentContextIn(
-        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.FullTextSearchResponseIntentContextIn:
+    def GetFullTextSearchIntentContextIn(self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext) -> agent_pb2.FullTextSearchResponseIntentContextIn:
         """
         [AUTO-GENERATED FUNCTION]
         Full text search endpoint in context ins of intents
@@ -430,9 +387,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_full_text_search_intent_context_in(request=request)
         return response
 
-    def GetFullTextSearchIntentContextOut(
-        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.FullTextSearchResponseIntentContextOut:
+    def GetFullTextSearchIntentContextOut(self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext) -> agent_pb2.FullTextSearchResponseIntentContextOut:
         """
         [AUTO-GENERATED FUNCTION]
         Full text search endpoint in context outs of intents
@@ -442,9 +397,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_full_text_search_intent_context_out(request=request)
         return response
 
-    def GetFullTextSearchIntentUsersays(
-        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.FullTextSearchResponseIntentUsersays:
+    def GetFullTextSearchIntentUsersays(self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext) -> agent_pb2.FullTextSearchResponseIntentUsersays:
         """
         [AUTO-GENERATED FUNCTION]
         Full text search endpoint in user says of intents
@@ -454,9 +407,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_full_text_search_intent_usersays(request=request)
         return response
 
-    def GetFullTextSearchIntentTags(
-        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.FullTextSearchResponseIntentTags:
+    def GetFullTextSearchIntentTags(self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext) -> agent_pb2.FullTextSearchResponseIntentTags:
         """
         [AUTO-GENERATED FUNCTION]
         Full text search endpoint in tags of intents
@@ -466,9 +417,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_full_text_search_intent_tags(request=request)
         return response
 
-    def GetFullTextSearchIntentResponse(
-        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.FullTextSearchResponseIntentResponse:
+    def GetFullTextSearchIntentResponse(self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext) -> agent_pb2.FullTextSearchResponseIntentResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Full text search endpoint in responses of intents
@@ -478,9 +427,7 @@ class AutoAgentsServicer(AgentsServicer):
         response = self.client.services.agents.get_full_text_search_intent_response(request=request)
         return response
 
-    def GetFullTextSearchIntentParameters(
-        self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.FullTextSearchResponseIntentParameters:
+    def GetFullTextSearchIntentParameters(self, request: agent_pb2.FullTextSearchRequest, context: grpc.ServicerContext) -> agent_pb2.FullTextSearchResponseIntentParameters:
         """
         [AUTO-GENERATED FUNCTION]
         Full text search endpoint in parameters of intents
@@ -498,66 +445,6 @@ class AutoAgentsServicer(AgentsServicer):
         """
         logger.info("relaying ReindexAgent() to nlu-client...")
         response = self.client.services.agents.reindex_agent(request=request)
-        return response
-
-    def CreateCcaiProject(
-        self, request: agent_pb2.CreateCcaiProjectRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.CreateCcaiProjectResponse:
-        """
-        [AUTO-GENERATED FUNCTION]
-        RPC to create a new CCAI project
-
-        """
-        logger.info("relaying CreateCcaiProject() to nlu-client...")
-        response = self.client.services.agents.create_ccai_project(request=request)
-        return response
-
-    def DeleteCcaiProject(
-        self, request: agent_pb2.DeleteCcaiProjectRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.DeleteCcaiProjectResponse:
-        """
-        [AUTO-GENERATED FUNCTION]
-        RPC to delete an existing CCAI project
-
-        """
-        logger.info("relaying DeleteCcaiProject() to nlu-client...")
-        response = self.client.services.agents.delete_ccai_project(request=request)
-        return response
-
-    def GetCcaiProject(
-        self, request: agent_pb2.GetCcaiProjectRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.CcaiProject:
-        """
-        [AUTO-GENERATED FUNCTION]
-        RPC to get details of an existing CCAI project
-
-        """
-        logger.info("relaying GetCcaiProject() to nlu-client...")
-        response = self.client.services.agents.get_ccai_project(request=request)
-        return response
-
-    def ListCcaiProjects(
-        self, request: agent_pb2.ListCcaiProjectsRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.ListCcaiProjectsResponse:
-        """
-        [AUTO-GENERATED FUNCTION]
-        RPC to list all available CCAI projects
-
-        """
-        logger.info("relaying ListCcaiProjects() to nlu-client...")
-        response = self.client.services.agents.list_ccai_projects(request=request)
-        return response
-
-    def UpdateCcaiProject(
-        self, request: agent_pb2.UpdateCcaiProjectRequest, context: grpc.ServicerContext
-        ) -> agent_pb2.UpdateCcaiProjectResponse:
-        """
-        [AUTO-GENERATED FUNCTION]
-        RPC to update an existing CCAI project
-
-        """
-        logger.info("relaying UpdateCcaiProject() to nlu-client...")
-        response = self.client.services.agents.update_ccai_project(request=request)
         return response
 
 # [make flake8 shut up]

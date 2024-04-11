@@ -1,3 +1,8 @@
 -r requirements.txt
 -r requirements-clients.txt
 -r requirements-static-code-checks.txt
+
+jupyter
+jupyter-server
+pre-commit
+tqdm
