@@ -1,5 +1,5 @@
-FROM python:3.8-slim as pybase
-COPY --from=fullstorydev/grpcurl:latest /root/go/bin/ /usr/local/bin/
+FROM python:3.10-slim as pybase
+COPY --from=fullstorydev/grpcurl:latest /bin/grpcurl /usr/local/bin/
 ENV GIT_REPO_NAME=ondewo-bpi
 
 WORKDIR /home/ondewo/

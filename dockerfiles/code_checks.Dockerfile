@@ -1,4 +1,4 @@
-FROM registry-dev.ondewo.com:5000/python/python:3.7-slim
+FROM registry-dev.ondewo.com:5000/python/python:3.10-slim
 
 RUN apt update && apt install make
 RUN pip install flake8 mypy

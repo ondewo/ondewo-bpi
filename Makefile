@@ -16,6 +16,7 @@ install:
 	echo to install the bpi sip version, please contact office@ondewo.com for the submodule
 	pip install -r requirements.txt
 
+build_example: export image_suffix=master
 build_example:
 	docker build -t ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/bpi-example-image:$(image_suffix) -f dockerfiles/Dockerfile .
 
