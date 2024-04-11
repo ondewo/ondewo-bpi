@@ -11,11 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from os import (
+    getcwd,
+    listdir,
+    path,
+)
+from re import sub
 from typing import (
     Dict,
     List,
     Optional,
+    Set,
     Tuple,
 )
 
@@ -63,7 +69,7 @@ class GRPCAutoCoder:
         self.client_file = client_file
         self.client_type_call = "qa_client" if client_type == ClientType.QA else "client"
 
-    def generate_code(self):
+    def generate_code(self) -> None:
         """generate a python code string and write it to the given file"""
         self._generate_code(
             in_file=self.in_file,
@@ -80,7 +86,7 @@ class GRPCAutoCoder:
         return lines
 
     @staticmethod
-    def write_to_python_file(out_file: str, generated_code: str):
+    def write_to_python_file(out_file: str, generated_code: str) -> None:
         """write list to file"""
         with open(out_file, "wt") as f:
             f.write(generated_code)
@@ -242,6 +248,7 @@ class GRPCAutoCoder:
         """
         lines = self.read_file_lines(client_file)
         client_info = {}
+
         for k, line in enumerate(lines):
             if "def " in line:
                 kk = k
@@ -251,14 +258,19 @@ class GRPCAutoCoder:
                 function_name = line.split("def ")[1].split("(")[0]
                 if "request" in line:
                     request = (
-                        line.split(": ")[1].split(")")[0].replace("stream ", "").replace("\n", "").replace(" ", "")
+                        line.split(": ")[1].split(")")[0].replace("stream ", "")
+                        .replace("\n", "").replace(" ", "").replace(",", "")
                     )
+                    # handle the case if the module is in the request
+                    request = sub(r".*_pb2\.", "", request)
                 else:
                     request = "Empty"
                 if "->" in line:
                     response = (
-                        line.split("->")[1].split(":")[0].replace("stream ", "").replace("\n", "").replace(" ", "")
+                        line.split("->")[1].split(":")[0].replace("stream ", "")
+                        .replace("\n", "").replace(" ", "").replace(",", "")
                     )
+                    response = sub(r".*_pb2\.", "", response)
                     if "Operation" in response:
                         response = "Operation"
                     if "Empty" in request:
@@ -268,6 +280,7 @@ class GRPCAutoCoder:
                 else:
                     response = "Empty"
                 client_info[function_name] = (request, response)
+
         return client_info
 
     @staticmethod
@@ -301,8 +314,28 @@ class GRPCAutoCoder:
         endpoint_info: Dict[str, Tuple[str, str, Optional[str], Optional[str]]],
         client_info: Dict[str, Tuple[str, str]],
         client_service_name: str,
+        proto_file: str,
     ) -> Tuple[List[FunctionCoder], List[bool]]:
         functions = []
+
+        # region prepare lookup data structure for finding correct proto file names
+        proto_file_path: str = path.join(getcwd(), proto_file[2:])
+        proto_dir_path: str = path.dirname(proto_file_path)
+        proto_dir_files: List[str] = [path.join(proto_dir_path, f) for f in listdir(proto_dir_path)]
+        # Initialize an empty dictionary
+        proot_files_contents: Dict[str, str] = {}
+        # Loop over the list of file paths
+        for file_path in proto_dir_files:
+            # Check if it's a file
+            if path.isfile(file_path):
+                # Get the base name of the file
+                base_name = path.basename(file_path)
+                # Open the file and read its content
+                with open(file_path, 'r') as file:
+                    content = file.read()
+                # Add the content to the dictionary
+                proot_files_contents[base_name.replace(".proto", "_pb2")] = content
+        # endregion prepare lookup data structure for finding correct proto file names
 
         include_google_import, include_empty_import, include_operation_import, include_typing_import = (
             False, False, False, False
@@ -354,10 +387,25 @@ class GRPCAutoCoder:
                         include_empty_import = True
                         set_fct_input_empty = True
                     else:
-                        type_dict[arg] = f"{pb2_filename}.{request}"
+                        message_request_str: str = f"message {request.replace(',', '')}"
+                        enum_request_str: str = f"enum {request.replace(',', '')}"
+                        if (
+                            message_request_str in proot_files_contents[pb2_filename]
+                            or enum_request_str in proot_files_contents[pb2_filename]
+                        ):
+                            type_dict[arg] = f"{pb2_filename}.{request}"
+                        else:
+                            # iterate over all proto files in the proto directory to find the correct proto with request
+                            for file_name in proot_files_contents:
+                                if (
+                                    message_request_str in proot_files_contents[file_name]
+                                    or enum_request_str in proot_files_contents[file_name]
+                                ):
+                                    type_dict[arg] = f"{file_name}.{request}"
+                                    break
                 if arg == "request_iterator":
-                    request = re.findall(r"\[(.*)\]", request)
-                    type_dict[arg] = (f"Iterator[{pb2_filename}.{request[0]}]")
+                    request_list: List[str] = re.findall(r"\[(.*)\]", request)
+                    type_dict[arg] = f"Iterator[{pb2_filename}.{request_list[0]}]"
                     request_str = "request_iterator"
                 if arg == "context":
                     type_dict[arg] = "grpc.ServicerContext"
@@ -376,11 +424,43 @@ class GRPCAutoCoder:
                 else:
                     if "Iterator" in response:
                         include_typing_import = True
-                        response = re.findall(r"\[(.*)\]", response)
-                        response = f"Iterator[{pb2_filename}.{response[0]}]"
-                        returns = {"response": response}
+                        response_list: List[str] = re.findall(r"\[(.*)\]", response)
+                        message_response_iterator_str: str = f"message {response_list[0].replace(',', '')}"
+                        enum_response_iterator_str: str = f"enum {response_list[0].replace(',', '')}"
+                        if (
+                            message_response_iterator_str in proot_files_contents[pb2_filename]
+                            or enum_response_iterator_str in proot_files_contents[pb2_filename]
+                        ):
+                            response = f"Iterator[{pb2_filename}.{response_list[0]}]"
+                            returns = {"response": response}
+                        else:
+                            # iterate over all proto files in the proto directory to find the correct proto
+                            for file_name in proot_files_contents:
+                                if (
+                                    message_response_iterator_str in proot_files_contents[file_name]
+                                    or enum_response_iterator_str in proot_files_contents[file_name]
+                                ):
+                                    response = f"Iterator[{file_name}.{response_list[0]}]"
+                                    returns = {"response": response}
+                                    break
+
                     else:
-                        returns = {"response": f"{pb2_filename}.{response}"}
+                        message_response_str: str = f"message {response.replace(',', '')}"
+                        enum_response_str: str = f"enum {response.replace(',', '')}"
+                        if (
+                            message_response_str in proot_files_contents[pb2_filename]
+                            or enum_response_str in proot_files_contents[pb2_filename]
+                        ):
+                            returns = {"response": f"{pb2_filename}.{response}"}
+                        else:
+                            # iterate over all proto files in the proto directory to find the correct proto
+                            for file_name in proot_files_contents:
+                                if (
+                                    message_response_str in proot_files_contents[file_name]
+                                    or enum_response_str in proot_files_contents[file_name]
+                                ):
+                                    returns = {"response": f"{file_name}.{response}"}
+                                    break
             else:
                 returns = {}
 
@@ -470,6 +550,7 @@ class GRPCAutoCoder:
                 endpoint_info=endpoint_info,
                 client_info=client_info,
                 client_service_name=client_service_name,
+                proto_file=proto_file,
         )
 
         # create header
@@ -501,6 +582,7 @@ class GRPCAutoCoder:
             empty_import = "from google.protobuf.empty_pb2 import Empty\n"
         if include_operation_import:
             operation_import = "from google.longrunning.operations_grpc_pb2 import Operation\n"
+
         imports = (
             "from abc import ABCMeta, abstractmethod\n"
             + "\n"
@@ -557,5 +639,14 @@ class GRPCAutoCoder:
         generated_code = header + imports + coder_class.get_code_string()
         generated_code = self.clean_up_code(generated_code)
 
+        # add additional imports
+        all_import_path_imports: Set[str] = {t[:-1] for t in set(re.findall(r"[_a-zA-Z]+_pb2\.", generated_code))}
+        all_import_path_imports_str: str = ", ".join(sorted(all_import_path_imports))
+
+        generated_code = generated_code.replace(
+            f"from {import_path} import {pb2_filename}\n",
+            f"from {import_path} import {all_import_path_imports_str}\n"
+
+        )
         # write to file
         self.write_to_python_file(out_file=out_file, generated_code=generated_code)
