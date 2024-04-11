@@ -7,7 +7,7 @@ from typing import Optional
 
 
 class ContextHelper:
-    AGENT_PATTERN: Pattern = re.compile(rf'projects/([a-zA-Z\d_.-]+)/agent')
+    AGENT_PATTERN: Pattern = re.compile(r'projects/([a-zA-Z\d_.-]+)/agent')
 
     @classmethod
     def get_agent_path_from_path(cls, path: str) -> str:
@@ -23,8 +23,8 @@ class ContextHelper:
         if match is None:
             raise ValueError(
                 f'Given agent name "{path}" has invalid format. '
-                f'Required format: "projects/<Project ID>/agent/...".'
-                )
+                'Required format: "projects/<Project ID>/agent/...".'
+            )
         agent_path: str = match.group()
         return agent_path
 
@@ -48,14 +48,14 @@ class ContextHelper:
 if __name__ == '__main__':
     print(
         f'should match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2/agent/sessions/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2")}'
-        )
+    )
     print(
         f'should match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2/agent/sessions/")}'
-        )
+    )
     print(
         f'should match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2/agent")}'
-        )
+    )
     print(
         f'should NOT match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2")}'
-        )
+    )
     print(f'should NOT match: {ContextHelper.get_agent_path_from_path("9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2")}')

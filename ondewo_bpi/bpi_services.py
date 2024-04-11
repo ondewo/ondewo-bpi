@@ -93,8 +93,8 @@ class BpiSessionsServices(AutoSessionsServicer):
     def register_intent_handler(self, intent_pattern: str, handlers: List[Callable]) -> None:
         intent_handler: IntentCallbackAssignor = IntentCallbackAssignor(
             intent_pattern=intent_pattern,
-            handlers=handlers
-            )
+            handlers=handlers,
+        )
         self.intent_handlers.append(intent_handler)
         self.intent_handlers = sorted(self.intent_handlers, reverse=True)
 
@@ -124,7 +124,7 @@ class BpiSessionsServices(AutoSessionsServicer):
                 logger_console.warning(
                     f'The received text is too long, it will be truncated '
                     f'to {SENTENCE_TRUNCATION} characters!'
-                    )
+                )
             truncated_text: TextInput = TextInput(text=request.query_input.text.text[:SENTENCE_TRUNCATION])
             request.query_input.text.CopyFrom(truncated_text)
             text = request.query_input.text.text
@@ -133,7 +133,7 @@ class BpiSessionsServices(AutoSessionsServicer):
                 f"An issue was encountered in BPI:\n"
                 f"\tSeems like the request query_input data was not properly formatted\n"
                 f"\tDetails: {e}"
-                )
+            )
             text = "error"
         logger_console.debug(
             {
@@ -160,14 +160,14 @@ class BpiSessionsServices(AutoSessionsServicer):
 
     @Timer(log_arguments=False, recursive=True)
     def perform_detect_intent(
-        self,
-        request: session_pb2.DetectIntentRequest, ) -> session_pb2.DetectIntentResponse:
+            self,
+            request: session_pb2.DetectIntentRequest, ) -> session_pb2.DetectIntentResponse:
         return self.client.services.sessions.detect_intent(request)
 
     @Timer(log_arguments=False, recursive=True)
     def process_messages(
-        self,
-        response: session_pb2.DetectIntentResponse, ) -> session_pb2.DetectIntentResponse:
+            self,
+            response: session_pb2.DetectIntentResponse, ) -> session_pb2.DetectIntentResponse:
         for j, message in enumerate(response.query_result.fulfillment_messages):
             found_triggers = MessageHandler.get_triggers(message, get_session_from_response(response))
 
@@ -216,7 +216,7 @@ class BpiSessionsServices(AutoSessionsServicer):
     def _get_handlers_for_intent(
         self, intent_name: str,
         assignors: List[IntentCallbackAssignor]
-        ) -> List[Callable]:
+    ) -> List[Callable]:
         for assignor in assignors:
             if re.match(assignor.intent_pattern, intent_name):
                 return assignor.handlers
@@ -235,7 +235,7 @@ class BpiUsersServices(AutoUsersServicer):
         logger_console.info(
             f'Login request handled by bpi\n'
             f'Login user: {request.user_email}'
-            )
+        )
         return super().Login(request, context)
 
 

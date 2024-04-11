@@ -46,6 +46,10 @@ install_precommit_hooks: ## Installs pre-commit hooks and sets them up for the o
 precommit_hooks_run_all_files: ## Runs all pre-commit hooks on all files and not just the changed ones
 	pre-commit run --all-files
 
+clean_pycache:
+	rm -rf .pytest_cache
+	find . -name '__pycache__' -exec rm -r {} +
+
 run_client_tests: ## Build a little image for running some tests
 	docker build -t ${TEST_IMAGE} -f  ondewo-nlu-client-python/dockerfiles/python-test.Dockerfile ./ondewo-nlu-client-python
 	docker run --rm ${TEST_IMAGE}

@@ -208,7 +208,7 @@ class GRPCAutoCoder:
         # get rpc definition lines with request/response message information
         rpc_lines = []
         for line in lines:
-            if re.findall("^\s*rpc", line):
+            if re.findall(r"^\s*rpc", line):
                 rpc_lines.append(line)
 
         # parse request/response messages for rpc endpoint from rpc definition lines
@@ -356,7 +356,7 @@ class GRPCAutoCoder:
                     else:
                         type_dict[arg] = f"{pb2_filename}.{request}"
                 if arg == "request_iterator":
-                    request = re.findall("\[(.*)\]", request)
+                    request = re.findall(r"\[(.*)\]", request)
                     type_dict[arg] = (f"Iterator[{pb2_filename}.{request[0]}]")
                     request_str = "request_iterator"
                 if arg == "context":
@@ -376,7 +376,7 @@ class GRPCAutoCoder:
                 else:
                     if "Iterator" in response:
                         include_typing_import = True
-                        response = re.findall("\[(.*)\]", response)
+                        response = re.findall(r"\[(.*)\]", response)
                         response = f"Iterator[{pb2_filename}.{response[0]}]"
                         returns = {"response": response}
                     else:
@@ -470,25 +470,25 @@ class GRPCAutoCoder:
                 endpoint_info=endpoint_info,
                 client_info=client_info,
                 client_service_name=client_service_name,
-            )
+        )
 
         # create header
         header = (
-            "# Copyright 2021-2024 ONDEWO GmbH\n" +
-            "#\n" +
-            "# Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
-            "# you may not use this file except in compliance with the License.\n" +
-            "# You may obtain a copy of the License at\n" +
-            "#\n" +
-            "#     http://www.apache.org/licenses/LICENSE-2.0\n" +
-            "#\n" +
-            "# Unless required by applicable law or agreed to in writing, software\n" +
-            "# distributed under the License is distributed on an \"AS IS\" BASIS,\n" +
-            "# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
-            "# See the License for the specific language governing permissions and\n" +
-            "# limitations under the License.\n" +
-            "#\n" +
-            "# [AUTO-GENERATED FILE]\n\n"
+            "# Copyright 2021-2024 ONDEWO GmbH\n"
+            + "#\n"
+            + "# Licensed under the Apache License, Version 2.0 (the \"License\");\n"
+            + "# you may not use this file except in compliance with the License.\n"
+            + "# You may obtain a copy of the License at\n"
+            + "#\n"
+            + "#     http://www.apache.org/licenses/LICENSE-2.0\n"
+            + "#\n"
+            + "# Unless required by applicable law or agreed to in writing, software\n"
+            + "# distributed under the License is distributed on an \"AS IS\" BASIS,\n"
+            + "# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n"
+            + "# See the License for the specific language governing permissions and\n"
+            + "# limitations under the License.\n"
+            + "#\n"
+            + "# [AUTO-GENERATED FILE]\n\n"
         )
 
         # create imports

@@ -91,14 +91,14 @@ class QAServer(BpiQABaseServer):
         self,
         request: DetectIntentRequest,
         context: grpc.ServicerContext
-        ) -> DetectIntentResponse:
+    ) -> DetectIntentResponse:
         self.check_session_id(request)
 
         if len(request.query_input.text.text) > SENTENCE_TRUNCATION:
             logger_console.info(
                 f'The received text is too long, it will be truncated '
                 f'to {SENTENCE_TRUNCATION} characters!'
-                )
+            )
         truncated_text: TextInput = TextInput(text=request.query_input.text.text[:SENTENCE_TRUNCATION])
         request.query_input.text.CopyFrom(truncated_text)
 
@@ -264,10 +264,10 @@ class QAServer(BpiQABaseServer):
                 active_filter = provisional_filter.value
 
         except Exception as e:
-            logger_console.info(f'No context: {QA_URL_FILTER_CONTEXT_NAME} found.')
+            logger_console.info(f'No context: {QA_URL_FILTER_CONTEXT_NAME} found. {e}')
         finally:
             if active_filter == QA_URL_DEFAULT_FILTER:
-                logger_console.info(f'No URL filters found')
+                logger_console.info('No URL filters found')
 
         qa_request = qa_pb2.GetAnswerRequest(
             session_id=request.session,

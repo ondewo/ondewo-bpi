@@ -55,7 +55,7 @@ class MockUserLoginServer(user_pb2_grpc.UsersServicer):
         self.setup_reflection()
         self.server.add_insecure_port(f"[::]:{port}")  # type: ignore
 
-        ## CODE FOR SECURE GRPC REQUEST
+        # CODE FOR SECURE GRPC REQUEST
         # private_key = open("./ondewo_bpi/example/server.key", 'rb').read()
         # certificate_chain = open("./ondewo_bpi/example/server.crt", 'rb').read()
         # server_credentials = grpc.ssl_server_credentials(

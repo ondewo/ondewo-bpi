@@ -200,7 +200,7 @@ def trigger_intent(
 
 def create_context_struct(
     context: str, parameters: Optional[Dict[str, context_pb2.Context.Parameter]], lifespan_count: int = 5
-    ) -> context_pb2.Context:
+) -> context_pb2.Context:
     context_struct: context_pb2.Context = context_pb2.Context(
         name=f"{context}", lifespan_count=lifespan_count, parameters=parameters
     )

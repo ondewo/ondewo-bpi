@@ -83,7 +83,7 @@ class MessageHandler:
                     "found_triggers": found_triggers,
                     "session_id": session_id
                 }
-                )
+            )
         return found_triggers
 
     @staticmethod
@@ -125,7 +125,7 @@ class MessageHandler:
     @staticmethod
     def add_weekday(
         response: session_pb2.DetectIntentResponse, days: Union[EnglishDays, GermanDays] = GermanDays
-        ) -> session_pb2.DetectIntentResponse:
+    ) -> session_pb2.DetectIntentResponse:
         logger_console.info("add weekday to date in response")
         for message in response.query_result.fulfillment_messages:
             if not len(message.text.text):
@@ -373,7 +373,7 @@ class SingleMessageHandler:
     @staticmethod
     def add_weekday_in_message(
         message: intent_pb2.Intent.Message, days: Union[EnglishDays, GermanDays]
-        ) -> intent_pb2.Intent.Message:
+    ) -> intent_pb2.Intent.Message:
         if message.HasField("text"):
             message = SingleMessageHandler._add_weekday_text(message, days)
         if message.HasField("card"):
@@ -383,7 +383,7 @@ class SingleMessageHandler:
     @staticmethod
     def _add_weekday_card(
         message: intent_pb2.Intent.Message, days: Union[EnglishDays, GermanDays]
-        ) -> intent_pb2.Intent.Message:
+    ) -> intent_pb2.Intent.Message:
         date_regex = r"\d\d\D\d\d\D\d\d\d\d"
         matches = len(re.findall(date_regex, message.card.subtitle))
         if matches > 1:
@@ -403,7 +403,7 @@ class SingleMessageHandler:
     @staticmethod
     def _add_weekday_text(
         message: intent_pb2.Intent.Message, days: Union[EnglishDays, GermanDays]
-        ) -> intent_pb2.Intent.Message:
+    ) -> intent_pb2.Intent.Message:
         date_regex = r"\d\d\D\d\d\D\d\d\d\d"
         matches = len(re.findall(date_regex, message.text.text[0]))
         if matches > 1:
