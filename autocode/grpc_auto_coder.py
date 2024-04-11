@@ -446,7 +446,9 @@ class GRPCAutoCoder:
 
                     else:
                         message_response_str: str = f"message {response.replace(',', '')}"
+                        message_response_str = sub(r" [a-zA-Z]*\.", " ", message_response_str)
                         enum_response_str: str = f"enum {response.replace(',', '')}"
+                        enum_response_str = sub(r" [a-zA-Z]*\.", " ", enum_response_str)
                         if (
                             message_response_str in proot_files_contents[pb2_filename]
                             or enum_response_str in proot_files_contents[pb2_filename]
