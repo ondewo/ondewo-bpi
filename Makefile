@@ -93,10 +93,10 @@ run_ondewo_bpi_qa_example: ## ondewo-bpi-qa: Runs the ondewo bpi qa example imag
 kill_ondewo_bpi_qa_example: ## ondewo-bpi-qa: Kills a running ondewo bpi qa example image
 	docker compose kill ondewo-bpi-qa
 
-
 # GRPC autocoder targets
 generate_grpc_endpoint_relays: ## Autocode: generate python service files based on protobuf definition of the APIs
-	 python -m autocode.generate_endpoint_relays
+	python -m autocode.generate_endpoint_relays
+	pre-commit run --files ondewo_bpi/autocoded/*
 
 build_and_push_to_pypi: build_package upload_package clear_package_data  ## Release: build and push to pypi
 	echo 'pushed to pypi :)'

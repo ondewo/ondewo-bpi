@@ -18,7 +18,7 @@ from abc import ABCMeta, abstractmethod
 
 import grpc
 from google.protobuf.empty_pb2 import Empty
-from ondewo.nlu import user_pb2
+from ondewo.nlu import common_pb2, user_pb2
 from ondewo.nlu.client import Client
 from ondewo.nlu.user_pb2_grpc import UsersServicer
 from ondewo.logging.logger import logger
@@ -197,7 +197,7 @@ class AutoUsersServicer(UsersServicer):
         response = self.client.services.users.check_login()
         return response
 
-    def ListNotifications(self, request: user_pb2.ListNotificationsRequest, context: grpc.ServicerContext) -> user_pb2.ListNotificationsResponse:
+    def ListNotifications(self, request: common_pb2.ListNotificationsRequest, context: grpc.ServicerContext) -> common_pb2.ListNotificationsResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Lists notifications based on specified filters.
@@ -207,7 +207,7 @@ class AutoUsersServicer(UsersServicer):
         response = self.client.services.users.list_notifications(request=request)
         return response
 
-    def SetNotificationsFlaggedStatus(self, request: user_pb2.SetNotificationsFlaggedStatusRequest, context: grpc.ServicerContext) -> user_pb2.ListNotificationsResponse:
+    def SetNotificationsFlaggedStatus(self, request: common_pb2.SetNotificationsFlaggedStatusRequest, context: grpc.ServicerContext) -> common_pb2.ListNotificationsResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Sets the flagged status for multiple notifications.
@@ -217,7 +217,7 @@ class AutoUsersServicer(UsersServicer):
         response = self.client.services.users.set_notifications_flagged_status(request=request)
         return response
 
-    def SetNotificationsReadStatus(self, request: user_pb2.SetNotificationsReadStatusRequest, context: grpc.ServicerContext) -> user_pb2.ListNotificationsResponse:
+    def SetNotificationsReadStatus(self, request: common_pb2.SetNotificationsReadStatusRequest, context: grpc.ServicerContext) -> common_pb2.ListNotificationsResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Sets the read status for multiple notifications.

@@ -98,7 +98,7 @@ class AutoIntentsServicer(IntentsServicer):
         response = self.client.services.intents.delete_intent(request=request)
         return response
 
-    def BatchUpdateIntents(self, request: intent_pb2.intent_pb2.BatchUpdateIntentsRequest, context: grpc.ServicerContext) -> Operation:
+    def BatchUpdateIntents(self, request: intent_pb2.BatchUpdateIntentsRequest, context: grpc.ServicerContext) -> Operation:
         """
         [AUTO-GENERATED FUNCTION]
         Updates/Creates multiple intents in the specified agent.

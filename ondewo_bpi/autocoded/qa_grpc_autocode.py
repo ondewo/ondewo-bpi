@@ -57,7 +57,7 @@ class AutoQAServicer(QAServicer):
         response = self.qa_client.services.qa.get_answer(request=request)
         return response
 
-    def RunScraper(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.qa_pb2.RunScraperResponse:
+    def RunScraper(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.RunScraperResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Runs a web scraper job for specified project IDs.
@@ -67,7 +67,7 @@ class AutoQAServicer(QAServicer):
         response = self.qa_client.services.qa.run_scraper()
         return response
 
-    def UpdateDatabase(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.qa_pb2.UpdateDatabaseResponse:
+    def UpdateDatabase(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.UpdateDatabaseResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Updates the database for specified project IDs.
@@ -107,7 +107,7 @@ class AutoQAServicer(QAServicer):
         response = self.qa_client.services.qa.list_project_ids()
         return response
 
-    def GetProjectConfig(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.qa_pb2.GetProjectConfigResponse:
+    def GetProjectConfig(self, request: Empty, context: grpc.ServicerContext) -> qa_pb2.GetProjectConfigResponse:
         """
         [AUTO-GENERATED FUNCTION]
         Retrieves the configuration of a specific project.

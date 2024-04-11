@@ -20,7 +20,7 @@ from typing import Iterator
 
 import grpc
 from google.protobuf.empty_pb2 import Empty
-from ondewo.nlu import session_pb2
+from ondewo.nlu import common_pb2, session_pb2
 from ondewo.nlu.client import Client
 from ondewo.nlu.session_pb2_grpc import SessionsServicer
 from ondewo.logging.logger import logger
@@ -273,7 +273,7 @@ class AutoSessionsServicer(SessionsServicer):
         response = self.client.services.sessions.delete_session_labels(request=request)
         return response
 
-    def AddSessionComment(self, request: session_pb2.AddSessionCommentRequest, context: grpc.ServicerContext) -> session_pb2.Comment:
+    def AddSessionComment(self, request: session_pb2.AddSessionCommentRequest, context: grpc.ServicerContext) -> common_pb2.Comment:
         """
         [AUTO-GENERATED FUNCTION]
         Missing associated documentation comment in .proto file.
