@@ -51,7 +51,7 @@ clean_pycache:
 	find . -name '__pycache__' -exec rm -r {} +
 
 run_client_tests: ## Build a little image for running some tests
-	docker build -t ${TEST_IMAGE} -f  ondewo-nlu-client-python/dockerfiles/python-test.Dockerfile ./ondewo-nlu-client-python
+	docker build -t ${TEST_IMAGE} -f  ondewo-nlu-client-python/dockerfiles/ondewo-bpi-pytest.Dockerfile ./ondewo-nlu-client-python
 	docker run --rm ${TEST_IMAGE}
 
 build_ondewo_bpi_example: export image_suffix=$(RELEASE_VERSION)
@@ -82,16 +82,16 @@ push_image_with_tag:
 	docker push ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi-$(image):latest
 
 run_ondewo_bpi_example: ## ondewo-bpi: Runs the ondewo bpi example image
-	docker compose up ondewo-bpi
+	docker compose up ondewo-bpi ondewo-ingress-envoy
 
 kill_ondewo_bpi_example: ## ondewo-bpi: Kills a running ondewo bpi example image
-	docker compose kill ondewo-bpi
+	docker compose kill ondewo-bpi ondewo-ingress-envoy
 
 run_ondewo_bpi_qa_example: ## ondewo-bpi-qa: Runs the ondewo bpi qa example image
-	docker compose up ondewo-bpi-qa
+	docker compose up ondewo-bpi-qa ondewo-ingress-envoy
 
 kill_ondewo_bpi_qa_example: ## ondewo-bpi-qa: Kills a running ondewo bpi qa example image
-	docker compose kill ondewo-bpi-qa
+	docker compose kill ondewo-bpi-qa ondewo-ingress-envoy
 
 # GRPC autocoder targets
 generate_grpc_endpoint_relays: ## Autocode: generate python service files based on protobuf definition of the APIs
