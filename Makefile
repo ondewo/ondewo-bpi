@@ -54,8 +54,8 @@ run_client_tests: ## Build a little image for running some tests
 	docker build -t ${TEST_IMAGE} -f  ondewo-nlu-client-python/dockerfiles/ondewo-bpi-pytest.Dockerfile ./ondewo-nlu-client-python
 	docker run --rm ${TEST_IMAGE}
 
-build_ondewo_bpi_example: export image_suffix=$(RELEASE_VERSION)
-build_ondewo_bpi_example: ## ondewo-bpi: Builds the ondewo bpi example image
+build_ondewo_bpi: export image_suffix=$(RELEASE_VERSION)
+build_ondewo_bpi: ## ondewo-bpi: Builds the ondewo bpi example image
 	docker build -t ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi:$(image_suffix) -f dockerfiles/ondewo-bpi.Dockerfile .
 	docker tag ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi:$(image_suffix) ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi:latest
 
@@ -63,6 +63,16 @@ push_ondewo_bpi_example: ## ondewo-bpi: Pushes the ondewo bpi example image
 	docker push ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi:$(image_suffix)
 	docker tag ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi:$(image_suffix) ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi:latest
 	docker push ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi:latest
+
+build_ondewo_bpi_example: export image_suffix=$(RELEASE_VERSION)
+build_ondewo_bpi_example: ## ondewo-bpi: Builds the ondewo bpi example image
+	docker build -t ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi-example:$(image_suffix) -f dockerfiles/ondewo-bpi-example.Dockerfile .
+	docker tag ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi-example:$(image_suffix) ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi-example:latest
+
+push_ondewo_bpi_example: ## ondewo-bpi: Pushes the ondewo bpi example image
+	docker push ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi-example:$(image_suffix)
+	docker tag ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi-example:$(image_suffix) ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi-example:latest
+	docker push ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi-example:latest
 
 build_ondewo_bpi_qa_example: export image_suffix=$(RELEASE_VERSION)
 build_ondewo_bpi_qa_example: export image=qa
@@ -81,11 +91,21 @@ push_image_with_tag:
 	docker tag ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi-$(image):$(image_suffix) ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi-$(image):latest
 	docker push ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi-$(image):latest
 
-run_ondewo_bpi_example: ## ondewo-bpi: Runs the ondewo bpi example image
+
+run_ondewo_bpi_: ## ondewo-bpi: Runs the ondewo bpi  image
 	docker compose up ondewo-bpi ondewo-ingress-envoy
 
-kill_ondewo_bpi_example: ## ondewo-bpi: Kills a running ondewo bpi example image
+kill_ondewo_bpi_: ## ondewo-bpi: Kills a running ondewo bpi  image
 	docker compose kill ondewo-bpi ondewo-ingress-envoy
+
+run_ondewo_bpi_qa_: ## ondewo-bpi-qa: Runs the ondewo bpi qa  image
+	docker compose up ondewo-bpi-qa ondewo-ingress-envoy
+
+run_ondewo_bpi_example: ## ondewo-bpi-example: Runs the ondewo bpi example image
+	docker compose up ondewo-bpi-example ondewo-ingress-envoy
+
+kill_ondewo_bpi_example: ## ondewo-bpi-example: Kills a running ondewo bpi example image
+	docker compose kill ondewo-bpi-example ondewo-ingress-envoy
 
 run_ondewo_bpi_qa_example: ## ondewo-bpi-qa: Runs the ondewo bpi qa example image
 	docker compose up ondewo-bpi-qa ondewo-ingress-envoy

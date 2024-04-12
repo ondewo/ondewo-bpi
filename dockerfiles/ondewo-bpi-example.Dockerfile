@@ -37,4 +37,4 @@ COPY ondewo_bpi ondewo_bpi
 
 COPY logging.yaml .
 
-CMD python -m ondewo_bpi.bpi_server
+CMD python -m ondewo_bpi.example.example

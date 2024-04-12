@@ -13,9 +13,11 @@ services:
       # WEB GRPC
       - ${ONDEWO_INGRESS_ENVOY_WEBGRPC_PORT_ONDEWO_BPI}:9080
       - ${ONDEWO_INGRESS_ENVOY_WEBGRPC_PORT_ONDEWO_BPI_QA}:9081
+      - ${ONDEWO_INGRESS_ENVOY_WEBGRPC_PORT_ONDEWO_BPI_EXAMPLE}:9082
       # GRPC
       - ${ONDEWO_INGRESS_ENVOY_GRPC_PORT_ONDEWO_BPI}:${ONDEWO_INGRESS_ENVOY_GRPC_PORT_ONDEWO_BPI}
       - ${ONDEWO_INGRESS_ENVOY_GRPC_PORT_ONDEWO_BPI_QA}:${ONDEWO_INGRESS_ENVOY_GRPC_PORT_ONDEWO_BPI_QA}
+      - ${ONDEWO_INGRESS_ENVOY_GRPC_PORT_ONDEWO_BPI_EXAMPLE}:${ONDEWO_INGRESS_ENVOY_GRPC_PORT_ONDEWO_BPI_EXAMPLE}
     networks:
       - ondewo-bpi-network
     restart: on-failure
@@ -111,6 +113,47 @@ services:
     restart: on-failure
     healthcheck:
       test: [ "CMD-SHELL","grpcurl --plaintext 0.0.0.0:${ONDEWO_BPI_QA_PORT} list" ]
+      interval: 1s
+      timeout: 30s
+      retries: 120
+
+  # ----------------------------------------------------------------------
+  # Service: ondewo-bpi-example
+  # ----------------------------------------------------------------------
+  ondewo-bpi-example:
+    # change this to the image from your specific use case, built with the dockerfile
+    image: registry-dev.ondewo.com:5000/ondewo/ondewo-bpi-example:latest
+    build:
+      dockerfile: dockerfiles/ondewo-bpi-example.Dockerfile
+      context: .
+    environment:
+      # BPI related variable
+      - PORT=${ONDEWO_BPI_EXAMPLE_PORT}
+      # CAI related variables
+      - SECURE=${ONDEWO_BPI_EXAMPLE_SECURE}
+      - CAI_HOST=${ONDEWO_BPI_EXAMPLE_CAI_HOST}
+      - CAI_PORT=${ONDEWO_BPI_EXAMPLE_CAI_PORT}
+      - CAI_TOKEN=${ONDEWO_BPI_EXAMPLE_CAI_TOKEN}
+      - HTTP_BASIC_AUTH=${ONDEWO_BPI_EXAMPLE_HTTP_BASIC_AUTH}
+      - USER_NAME=${ONDEWO_BPI_EXAMPLE_USER_NAME}
+      - USER_PASS=${ONDEWO_BPI_EXAMPLE_USER_PASS}
+      - SENTENCE_TRUNCATION=${ONDEWO_BPI_EXAMPLE_SENTENCE_TRUNCATION}
+      # SIP related variables
+      - SIP_HOST=${ONDEWO_BPI_EXAMPLE_SIP_HOST}
+      - SIP_PORT=${ONDEWO_BPI_EXAMPLE_SIP_PORT}
+      - SIP_NAME=${ONDEWO_BPI_EXAMPLE_SIP_NAME}
+      - PROVIDER_STT=${ONDEWO_BPI_EXAMPLE_PROVIDER_STT}
+      - PROVIDER_TTS=${ONDEWO_BPI_EXAMPLE_PROVIDER_TTS}
+      - SIP_LANG=${ONDEWO_BPI_EXAMPLE_SIP_LANG}
+      # Logging related variables
+      - MODULE_NAME=${ONDEWO_BPI_MODULE_NAME}
+    volumes:
+      - "./logging.yaml:/home/ondewo/logging.yaml"
+    networks:
+      - ondewo-bpi-network
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD-SHELL","grpcurl --plaintext 0.0.0.0:${ONDEWO_BPI_EXAMPLE_PORT} list" ]
       interval: 1s
       timeout: 30s
       retries: 120

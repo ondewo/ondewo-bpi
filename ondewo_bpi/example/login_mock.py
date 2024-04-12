@@ -49,7 +49,7 @@ class MockUserLoginServer(user_pb2_grpc.UsersServicer):
 
     @Timer(
         logger=log.debug,
-        log_arguments=False,
+        log_arguments=True,
         message='MockUserLoginServer: Login: Elapsed time: {}'
     )
     def Login(self, request: user_pb2.LoginRequest, context: grpc.ServicerContext) -> user_pb2.LoginResponse:
@@ -70,7 +70,7 @@ class MockUserLoginServer(user_pb2_grpc.UsersServicer):
 
     @Timer(
         logger=log.debug,
-        log_arguments=False,
+        log_arguments=True,
         message='MockUserLoginServer: serve: Elapsed time: {}'
     )
     def serve(self, port: str = "50055") -> None:
