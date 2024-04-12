@@ -29,7 +29,7 @@ from typing import (
 import grpc
 import regex as re
 from ondewo.logging.decorators import Timer
-from ondewo.logging.logger import logger_console
+from ondewo.logging.logger import logger_console as log
 from ondewo.nlu import (
     context_pb2,
     intent_pb2,
@@ -41,12 +41,17 @@ from ondewo.nlu.session_pb2 import TextInput
 
 from ondewo_bpi.autocoded.agent_grpc_autocode import AutoAgentsServicer
 from ondewo_bpi.autocoded.aiservices_grpc_autocode import AutoAiServicesServicer
+from ondewo_bpi.autocoded.ccai_project_grpc_autocode import AutoCcaiProjectsServicer
 from ondewo_bpi.autocoded.context_grpc_autocode import AutoContextsServicer
 from ondewo_bpi.autocoded.entity_type_grpc_autocode import AutoEntityTypesServicer
 from ondewo_bpi.autocoded.intent_grpc_autocode import AutoIntentsServicer
+from ondewo_bpi.autocoded.operations_grpc_autocode import AutoOperationsServicer
 from ondewo_bpi.autocoded.project_role_grpc_autocode import AutoProjectRolesServicer
+from ondewo_bpi.autocoded.project_statistics_grpc_autocode import AutoProjectStatisticsServicer
+from ondewo_bpi.autocoded.server_statistics_grpc_autocode import AutoServerStatisticsServicer
 from ondewo_bpi.autocoded.session_grpc_autocode import AutoSessionsServicer
 from ondewo_bpi.autocoded.user_grpc_autocode import AutoUsersServicer
+from ondewo_bpi.autocoded.utility_grpc_autocode import AutoUtilitiesServicer
 from ondewo_bpi.config import SENTENCE_TRUNCATION
 from ondewo_bpi.constants import (
     QueryTriggers,
@@ -84,12 +89,22 @@ class BpiSessionsServices(AutoSessionsServicer):
     def client(self) -> NLUClient:
         pass
 
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='BpiSessionsServices: __init__: Elapsed time: {}'
+    )
     def __init__(self) -> None:
         self.intent_handlers: List[IntentCallbackAssignor] = list()
         self.trigger_handlers: Dict[str, Callable] = {
             i.value: self.trigger_function_not_implemented for i in [*SipTriggers, *QueryTriggers]
         }
 
+    @Timer(
+        logger=log.debug,
+        log_arguments=True,
+        message='BpiSessionsServices: register_intent_handler: Elapsed time: {}'
+    )
     def register_intent_handler(self, intent_pattern: str, handlers: List[Callable]) -> None:
         intent_handler: IntentCallbackAssignor = IntentCallbackAssignor(
             intent_pattern=intent_pattern,
@@ -98,9 +113,19 @@ class BpiSessionsServices(AutoSessionsServicer):
         self.intent_handlers.append(intent_handler)
         self.intent_handlers = sorted(self.intent_handlers, reverse=True)
 
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='BpiSessionsServices: register_trigger_handler: Elapsed time: {}'
+    )
     def register_trigger_handler(self, trigger: str, handler: Callable) -> None:
         self.trigger_handlers[trigger] = handler
 
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='BpiSessionsServices: trigger_function_not_implemented: Elapsed time: {}'
+    )
     def trigger_function_not_implemented(
         self,
         response: session_pb2.DetectIntentResponse,
@@ -108,7 +133,7 @@ class BpiSessionsServices(AutoSessionsServicer):
         trigger: str,
         found_triggers: Dict[str, List[str]],
     ) -> None:
-        logger_console.warning(
+        log.warning(
             {
                 "message": f"no function for the trigger {trigger}, please subclass and implement",
                 "trigger": trigger,
@@ -116,12 +141,19 @@ class BpiSessionsServices(AutoSessionsServicer):
             }
         )
 
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='BpiSessionsServices: DetectIntent: Elapsed time: {}'
+    )
     def DetectIntent(
-        self, request: session_pb2.DetectIntentRequest, context: grpc.ServicerContext
+        self,
+        request: session_pb2.DetectIntentRequest,
+        context: grpc.ServicerContext,
     ) -> session_pb2.DetectIntentResponse:
         try:
             if len(request.query_input.text.text) > SENTENCE_TRUNCATION:
-                logger_console.warning(
+                log.warning(
                     f'The received text is too long, it will be truncated '
                     f'to {SENTENCE_TRUNCATION} characters!'
                 )
@@ -129,13 +161,13 @@ class BpiSessionsServices(AutoSessionsServicer):
             request.query_input.text.CopyFrom(truncated_text)
             text = request.query_input.text.text
         except Exception as e:
-            logger_console.exception(
+            log.exception(
                 f"An issue was encountered in BPI:\n"
                 f"\tSeems like the request query_input data was not properly formatted\n"
                 f"\tDetails: {e}"
             )
             text = "error"
-        logger_console.debug(
+        log.debug(
             {
                 "message": f"CAI-DetectIntentRequest to CAI, text input: {text}",
                 "content": text,
@@ -145,7 +177,7 @@ class BpiSessionsServices(AutoSessionsServicer):
         )
         cai_response = self.perform_detect_intent(request)
         intent_name = cai_response.query_result.intent.display_name
-        logger_console.debug(
+        log.debug(
             {
                 "message": f"CAI-DetectIntentResponse from CAI, intent_name: {intent_name}",
                 "content": intent_name,
@@ -191,7 +223,7 @@ class BpiSessionsServices(AutoSessionsServicer):
         self, response: session_pb2.DetectIntentResponse, message: Optional[intent_pb2.Intent.Message],
         count: int
     ) -> None:
-        logger_console.warning({"message": "quicksend_to_api not written, please subclass and implement"})
+        log.warning({"message": "quicksend_to_api not written, please subclass and implement"})
 
     @Timer(log_arguments=False, recursive=True)
     def process_intent_handler(
@@ -203,7 +235,7 @@ class BpiSessionsServices(AutoSessionsServicer):
         for handler in handlers:
             cai_response = handler(cai_response, self.client)
             text = [i.text.text for i in cai_response.query_result.fulfillment_messages]
-            logger_console.info(
+            log.info(
                 {
                     "message": f"BPI-DetectIntentResponse from BPI with text: {text}",
                     "content": text,
@@ -232,7 +264,7 @@ class BpiUsersServices(AutoUsersServicer):
         pass
 
     def Login(self, request: user_pb2.LoginRequest, context: grpc.ServicerContext) -> user_pb2.LoginResponse:
-        logger_console.info(
+        log.info(
             f'Login request handled by bpi\n'
             f'Login user: {request.user_email}'
         )
@@ -250,7 +282,7 @@ class BpiContextServices(AutoContextsServicer):
     def CreateContext(
         self, request: context_pb2.CreateContextRequest, context: grpc.ServicerContext
     ) -> context_pb2.Context:
-        logger_console.info("passing create context request on to CAI")
+        log.info("passing create context request on to CAI")
         return self.client.services.contexts.create_context(request=request)
 
 
@@ -291,6 +323,51 @@ class BpiIntentsServices(AutoIntentsServicer):
 
 
 class BpiProjectRolesServices(AutoProjectRolesServicer):
+    __metaclass__ = ABCMeta
+
+    @property
+    @abstractmethod
+    def client(self) -> NLUClient:
+        pass
+
+
+class BpiCcaiProjectsServices(AutoCcaiProjectsServicer):
+    __metaclass__ = ABCMeta
+
+    @property
+    @abstractmethod
+    def client(self) -> NLUClient:
+        pass
+
+
+class BpiProjectStatisticsServices(AutoProjectStatisticsServicer):
+    __metaclass__ = ABCMeta
+
+    @property
+    @abstractmethod
+    def client(self) -> NLUClient:
+        pass
+
+
+class BpiServerStatisticsServices(AutoServerStatisticsServicer):
+    __metaclass__ = ABCMeta
+
+    @property
+    @abstractmethod
+    def client(self) -> NLUClient:
+        pass
+
+
+class BpiOperationsServices(AutoOperationsServicer):
+    __metaclass__ = ABCMeta
+
+    @property
+    @abstractmethod
+    def client(self) -> NLUClient:
+        pass
+
+
+class BpiUtilitiesServices(AutoUtilitiesServicer):
     __metaclass__ = ABCMeta
 
     @property

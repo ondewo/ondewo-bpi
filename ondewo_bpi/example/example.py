@@ -14,7 +14,8 @@
 
 import os
 
-from ondewo.logging.logger import logger_console
+from ondewo.logging.decorators import Timer
+from ondewo.logging.logger import logger_console as log
 from ondewo.nlu import session_pb2
 from ondewo.nlu.client import Client
 
@@ -35,7 +36,13 @@ class MyServer(BpiServer):
     this means if the CAI_PORT (default 50055) is blocked, the example server cannot be started
     """
 
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='MyServer: __init__: Elapsed time: {}'
+    )
     def __init__(self) -> None:
+        log.debug("START: Initializing MyServer")
         os.environ["MODULE_NAME"] = "bpi_server"  # update module name for logger
         port_in_use = PortChecker.check_client_users_stub(port=CAI_PORT)
         if not port_in_use:
@@ -45,8 +52,15 @@ class MyServer(BpiServer):
         if not port_in_use:
             self.mock_login_server.kill_server()  # kill mock-login server
         self.register_handlers()
+        log.debug("DONE: Initializing MyServer")
 
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='MyServer: register_handlers: Elapsed time: {}'
+    )
     def register_handlers(self) -> None:
+        log.debug("START: register_handlers")
         self.register_intent_handler(
             intent_pattern="Default Fallback Intent",
             handlers=[
@@ -72,8 +86,14 @@ class MyServer(BpiServer):
                 IntentMaxTriggerHandler.handle_if_intent_reached_number_triggers_max
             ],
         )
+        log.debug("DONE: register_handlers")
 
     @staticmethod
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='MyServer: reformat_text_in_intent: Elapsed time: {}'
+    )
     def reformat_text_in_intent(
         response: session_pb2.DetectIntentResponse,
         nlu_client: Client
@@ -83,27 +103,42 @@ class MyServer(BpiServer):
         )
 
     @staticmethod
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='MyServer: handle_default_fallback: Elapsed time: {}'
+    )
     def handle_default_fallback(
         response: session_pb2.DetectIntentResponse,
         nlu_client: Client
     ) -> session_pb2.DetectIntentResponse:
-        logger_console.info("Default fallback was triggered!")
+        log.info("Default fallback was triggered!")
         return response
 
     @staticmethod
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='MyServer: handle_default_exit: Elapsed time: {}'
+    )
     def handle_default_exit(
         response: session_pb2.DetectIntentResponse,
         nlu_client: Client
     ) -> session_pb2.DetectIntentResponse:
-        logger_console.warning("Default exit was triggered!")
+        log.warning("Default exit was triggered!")
         return response
 
     @staticmethod
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='MyServer: handle_if_intent_reached_number_triggers_max: Elapsed time: {}'
+    )
     def handle_if_intent_reached_number_triggers_max(
         response: session_pb2.DetectIntentResponse,
         nlu_client: Client
     ) -> session_pb2.DetectIntentResponse:
-        logger_console.warning("Intent was triggered a maximum amount of times!")
+        log.warning("Intent was triggered a maximum amount of times!")
         response = IntentMaxTriggerHandler.handle_if_intent_reached_number_triggers_max(response, nlu_client)
         return response
 

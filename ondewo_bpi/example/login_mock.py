@@ -17,9 +17,13 @@ import traceback
 from concurrent import futures
 
 import grpc
-from grpc._channel import _InactiveRpcError
+from grpc._channel import _InactiveRpcError  # type:ignore
 from grpc_reflection.v1alpha import reflection
-from ondewo.logging.logger import logger
+from ondewo.logging.decorators import Timer
+from ondewo.logging.logger import (
+    logger,
+    logger_console as log,
+)
 from ondewo.nlu import (
     user_pb2,
     user_pb2_grpc,
@@ -33,15 +37,30 @@ class MockUserLoginServer(user_pb2_grpc.UsersServicer):
     yes, this is apparently the simplest way to get a grpc response
     """
 
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='MockUserLoginServer: __init__: Elapsed time: {}'
+    )
     def __init__(self) -> None:
         self.server = None
         self.kill = False
         self.lock = threading.Lock()
 
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='MockUserLoginServer: Login: Elapsed time: {}'
+    )
     def Login(self, request: user_pb2.LoginRequest, context: grpc.ServicerContext) -> user_pb2.LoginResponse:
         response = user_pb2.LoginResponse(auth_token="mocked", )
         return response
 
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='MockUserLoginServer: setup_reflection: Elapsed time: {}'
+    )
     def setup_reflection(self) -> None:
         service_names = [
             user_pb2.DESCRIPTOR.services_by_name["Users"].full_name,  # type: ignore
@@ -49,6 +68,11 @@ class MockUserLoginServer(user_pb2_grpc.UsersServicer):
 
         reflection.enable_server_reflection(service_names=service_names, server=self.server)
 
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='MockUserLoginServer: serve: Elapsed time: {}'
+    )
     def serve(self, port: str = "50055") -> None:
         self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         user_pb2_grpc.add_UsersServicer_to_server(self, self.server)
@@ -72,6 +96,11 @@ class MockUserLoginServer(user_pb2_grpc.UsersServicer):
         self.server.start()  # type: ignore
         logger.info("LoginMock served")
 
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='MockUserLoginServer: kill_server: Elapsed time: {}'
+    )
     def kill_server(self) -> None:
         self.kill = True
         self.server.stop(grace=0.4)  # type: ignore
@@ -80,6 +109,11 @@ class MockUserLoginServer(user_pb2_grpc.UsersServicer):
 
 class PortChecker:
     @staticmethod
+    @Timer(
+        logger=log.debug,
+        log_arguments=True,
+        message='MockUserLoginServer: check_client_users_stub: Elapsed time: {}'
+    )
     def check_client_users_stub(port: str) -> bool:
         """checks if a LoginRequest sent to the given port returns a response (e.g. if cai is reachable)"""
         insecure_channel = grpc.insecure_channel(target=f"localhost:{port}")
