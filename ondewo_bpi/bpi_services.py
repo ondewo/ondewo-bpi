@@ -60,7 +60,6 @@ from ondewo_bpi.constants import (
 from ondewo_bpi.helpers import get_session_from_response
 from ondewo_bpi.message_handler import (
     MessageHandler,
-    SingleMessageHandler,
 )
 
 
@@ -123,7 +122,7 @@ class BpiSessionsServices(AutoSessionsServicer):
 
     @Timer(
         logger=log.debug,
-        log_arguments=False,
+        log_arguments=True,
         message='BpiSessionsServices: trigger_function_not_implemented: Elapsed time: {}'
     )
     def trigger_function_not_implemented(
@@ -143,7 +142,7 @@ class BpiSessionsServices(AutoSessionsServicer):
 
     @Timer(
         logger=log.debug,
-        log_arguments=False,
+        log_arguments=True,
         message='BpiSessionsServices: DetectIntent: Elapsed time: {}'
     )
     def DetectIntent(
@@ -178,8 +177,8 @@ class BpiSessionsServices(AutoSessionsServicer):
                 "tags": ["text"],
             }
         )
-        cai_response = self.perform_detect_intent(request)
-        intent_name = cai_response.query_result.intent.display_name
+        cai_response: session_pb2.DetectIntentResponse = self.perform_detect_intent(request)
+        intent_name: str = cai_response.query_result.intent.display_name
         log.debug(
             {
                 "message": f"CAI-DetectIntentResponse from CAI, intent_name: {intent_name}",
@@ -189,9 +188,9 @@ class BpiSessionsServices(AutoSessionsServicer):
                 "tags": ["text"],
             }
         )
-
         cai_response = self.process_messages(cai_response)
-        return self.process_intent_handler(cai_response)
+        processed_cai_response: session_pb2.DetectIntentResponse = self.process_intent_handler(cai_response)
+        return processed_cai_response
 
     @Timer(
         logger=log.debug,
@@ -229,12 +228,16 @@ class BpiSessionsServices(AutoSessionsServicer):
                     if not new_response.response_id == response.response_id:
                         return new_response
 
-            for found_trigger in found_triggers:
-                SingleMessageHandler.substitute_pattern_in_message(message, found_trigger, "")
+            # FIXME: add if needed to remove special trigger commands from text in message:
+            # for found_trigger in found_triggers:
+            #     log.debug(f'BpiSessionsServices: process_messages: found_trigger: {found_trigger}')
+            #     SingleMessageHandler.substitute_pattern_in_message(message, found_trigger, "")
+            #     log.debug(f'BpiSessionsServices: process_messages: found_trigger: {found_trigger}')
 
             self.quicksend_to_api(response, message, j)
         if not len(response.query_result.fulfillment_messages):
             self.quicksend_to_api(response, None, 0)
+
         return response
 
     @Timer(
@@ -252,7 +255,7 @@ class BpiSessionsServices(AutoSessionsServicer):
 
     @Timer(
         logger=log.debug,
-        log_arguments=False,
+        log_arguments=True,
         recursive=True,
         message='BpiSessionsServices: process_intent_handler: Elapsed time: {}'
     )
