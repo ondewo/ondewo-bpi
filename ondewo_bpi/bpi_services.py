@@ -190,13 +190,24 @@ class BpiSessionsServices(AutoSessionsServicer):
         cai_response = self.process_messages(cai_response)
         return self.process_intent_handler(cai_response)
 
-    @Timer(log_arguments=False, recursive=True)
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        recursive=True,
+        message='BpiSessionsServices: perform_detect_intent: Elapsed time: {}'
+    )
     def perform_detect_intent(
-            self,
-            request: session_pb2.DetectIntentRequest, ) -> session_pb2.DetectIntentResponse:
+        self,
+        request: session_pb2.DetectIntentRequest,
+    ) -> session_pb2.DetectIntentResponse:
         return self.client.services.sessions.detect_intent(request)
 
-    @Timer(log_arguments=False, recursive=True)
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        recursive=True,
+        message='BpiSessionsServices: process_messages: Elapsed time: {}'
+    )
     def process_messages(
             self,
             response: session_pb2.DetectIntentResponse, ) -> session_pb2.DetectIntentResponse:
@@ -219,15 +230,28 @@ class BpiSessionsServices(AutoSessionsServicer):
             self.quicksend_to_api(response, None, 0)
         return response
 
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='BpiSessionsServices: quicksend_to_api: Elapsed time: {}'
+    )
     def quicksend_to_api(
-        self, response: session_pb2.DetectIntentResponse, message: Optional[intent_pb2.Intent.Message],
-        count: int
+        self,
+        response: session_pb2.DetectIntentResponse,
+        message: Optional[intent_pb2.Intent.Message],
+        count: int,
     ) -> None:
         log.warning({"message": "quicksend_to_api not written, please subclass and implement"})
 
-    @Timer(log_arguments=False, recursive=True)
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        recursive=True,
+        message='BpiSessionsServices: process_intent_handler: Elapsed time: {}'
+    )
     def process_intent_handler(
-        self, cai_response: session_pb2.DetectIntentResponse
+        self,
+        cai_response: session_pb2.DetectIntentResponse,
     ) -> session_pb2.DetectIntentResponse:
         # Create an ordered dictionary by key value length
         intent_name = cai_response.query_result.intent.display_name
@@ -245,9 +269,15 @@ class BpiSessionsServices(AutoSessionsServicer):
             )
         return cai_response
 
+    @Timer(
+        logger=log.debug,
+        log_arguments=False,
+        message='BpiSessionsServices: _get_handlers_for_intent: Elapsed time: {}'
+    )
     def _get_handlers_for_intent(
-        self, intent_name: str,
-        assignors: List[IntentCallbackAssignor]
+        self,
+        intent_name: str,
+        assignors: List[IntentCallbackAssignor],
     ) -> List[Callable]:
         for assignor in assignors:
             if re.match(assignor.intent_pattern, intent_name):
@@ -264,10 +294,7 @@ class BpiUsersServices(AutoUsersServicer):
         pass
 
     def Login(self, request: user_pb2.LoginRequest, context: grpc.ServicerContext) -> user_pb2.LoginResponse:
-        log.info(
-            f'Login request handled by bpi\n'
-            f'Login user: {request.user_email}'
-        )
+        log.info(f'Login request handled by bpi\n Login user: {request.user_email}')
         return super().Login(request, context)
 
 
