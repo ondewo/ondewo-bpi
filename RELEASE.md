@@ -2,15 +2,34 @@
 
 *****************
 
-## Release ONDEWO BPI v4.1.1
+## Release ONDEWO BPI 5.0.0
+
+### New Features
+
+* `Autocoder` now works with proto messages and enums referenced from other files
+* Added envoy proxy for `grpcweb` to `grpc` conversion
+* `ondewo-bpi` is now installable as a python package
+
+### Improvements
+
+* Upgraded to new ondewo-nlu-client-python and newest API from master branch of ondewo-nlu-api
+* Refactored git repo and improved coding style and typing
 
 ### Bug Fixes
 
-* QA Response. The original QA response is no longer overridden by the QA response to track in the CAI.
+* Several `Autocoder` bug fixes for convenience service code based on protos
 
 *****************
 
-## Release ONDEWO BPI v4.1.0
+## Release ONDEWO BPI 4.1.1
+
+### Bug Fixes
+
+* `QA Response`. The original QA response is no longer overridden by the QA response to track in the CAI.
+
+*****************
+
+## Release ONDEWO BPI 4.1.0
 
 ### Improvements
 
@@ -51,7 +70,7 @@ See below and example of a 'c-qa-url-filter' injection:
 
 *****************
 
-## Release ONDEWO BPI v4.0.1
+## Release ONDEWO BPI 4.0.1
 
 ### Bug Fixes
 
@@ -59,7 +78,7 @@ See below and example of a 'c-qa-url-filter' injection:
 
 *****************
 
-## Release ONDEWO BPI v4.0.0
+## Release ONDEWO BPI 4.0.0
 
 ### Improvements
 
@@ -77,14 +96,16 @@ Then in your BPI you can use the handler function right away and register handle
 
 ```python
     def register_handlers(self) -> None:
-        self.register_intent_handler(
-            intent_pattern="intent-A", handlers=[IntentMaxTriggerHandler.handle_if_intent_reached_number_triggers_max]
-        )
+
+
+self.register_intent_handler(
+    intent_pattern="intent-A", handlers=[IntentMaxTriggerHandler.handle_if_intent_reached_number_triggers_max]
+)
 ```
 
 *****************
 
-## Release ONDEWO BPI v3.0.1
+## Release ONDEWO BPI 3.0.1
 
 ### Improvements
 
@@ -92,7 +113,7 @@ Then in your BPI you can use the handler function right away and register handle
 
 *****************
 
-## Release ONDEWO BPI v3.0.0
+## Release ONDEWO BPI 3.0.0
 
 ### Improvements
 
@@ -118,17 +139,19 @@ Below an example of how it should look after the update:
 
 ```python
     def register_handlers(self) -> None:
-        self.register_intent_handler(
-            intent_pattern=r"i.my_\.*", handlers=[self.reformat_text_in_intent],
-        )
-        self.register_intent_handler(
-            intent_pattern="i.my_handled_intent", handlers=[self.reformat_text_in_intent],
-        )
+
+
+self.register_intent_handler(
+    intent_pattern=r"i.my_\.*", handlers=[self.reformat_text_in_intent],
+)
+self.register_intent_handler(
+    intent_pattern="i.my_handled_intent", handlers=[self.reformat_text_in_intent],
+)
 ```
 
 *****************
 
-## Release ONDEWO BPI v2.0.4
+## Release ONDEWO BPI 2.0.4
 
 ### New Features
 
@@ -140,7 +163,7 @@ Below an example of how it should look after the update:
 
 *****************
 
-## Release ONDEWO BPI v2.0.3
+## Release ONDEWO BPI 2.0.3
 
 ### New Features
 
@@ -148,7 +171,7 @@ Below an example of how it should look after the update:
 
 *****************
 
-## Release ONDEWO BPI v2.0.2
+## Release ONDEWO BPI 2.0.2
 
 ### Bug Fixes
 
@@ -157,7 +180,7 @@ Below an example of how it should look after the update:
 
 *****************
 
-## Release ONDEWO BPI v2.0.1
+## Release ONDEWO BPI 2.0.1
 
 ### Bug Fixes
 
@@ -166,7 +189,7 @@ Below an example of how it should look after the update:
 
 *****************
 
-## Release ONDEWO BPI v2.0.0
+## Release ONDEWO BPI 2.0.0
 
 ### New Features
 

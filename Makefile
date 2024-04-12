@@ -125,3 +125,55 @@ upload_package: ## Release: push to pypi
 
 clear_package_data: ## Release: clear package data directory for a clean build
 	rm -rf build dist ondewo_logging.egg-info
+
+########################################################
+# --- Release                                      --- #
+########################################################
+
+ondewo_release: spc create_release_branch create_release_tag ## Release and docker push
+
+create_release_branch: ## Create Release Branch and push it to origin
+# check if the branch does not exists and if it exists, delete it
+	@if git show-ref --verify --quiet "refs/heads/release/${RELEASE_VERSION}"; then \
+        git checkout master; \
+		git branch -D "release/${RELEASE_VERSION}"; \
+    fi
+	git checkout -b "release/${RELEASE_VERSION}"
+	git push -u origin "release/${RELEASE_VERSION}"
+
+create_release_tag: ## Create Release Tag and push it to origin
+# check if the tag does not exists and if it exists, delete it
+	@if git rev-parse -q --verify "refs/tags/$(RELEASE_VERSION)"; then \
+        git tag -d $(RELEASE_VERSION); \
+		git push origin ":refs/tags/$(RELEASE_VERSION)"; \
+    fi
+	git tag -a ${RELEASE_VERSION} -m "release/${RELEASE_VERSION}"
+	git push origin ${RELEASE_VERSION}
+
+spc: ## Checks if the Release Branch, Tag and Pypi version already exist
+	$(eval filtered_branches:= $(shell git branch --all | grep "release/${RELEASE_VERSION}"))
+	@if test "$(filtered_branches)" != ""; then \
+		echo "-- Test 1: Branch 'release/${RELEASE_VERSION}' exists!!"; \
+		read -p "Overwrite the branch? (y/n): " input; \
+		if [ "$$input" = "y" ]; then \
+			echo "Overwriting Branch 'release/${RELEASE_VERSION}'"; \
+		else \
+			echo "Branch creation aborted"; \
+			exit 1; \
+		fi \
+	else \
+		echo "-- Test 1: Branch 'release/${RELEASE_VERSION}' is free to use"; \
+	fi
+	$(eval filtered_tags:= $(shell git tag --list | grep "${RELEASE_VERSION}"))
+	@if test "$(filtered_tags)" != ""; then \
+		echo "-- Test 2: Tag '${RELEASE_VERSION}' exists!!"; \
+		read -p "Overwrite the tag? (y/n): " input; \
+		if [ "$$input" = "y" ]; then \
+			echo "Overwriting tag '${RELEASE_VERSION}'"; \
+		else \
+			echo "Tag creation aborted!"; \
+			exit 1; \
+		fi \
+	else \
+		echo "-- Test 2: Tag '${RELEASE_VERSION}' is free to use"; \
+	fi
