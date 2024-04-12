@@ -91,15 +91,11 @@ push_image_with_tag:
 	docker tag ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi-$(image):$(image_suffix) ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi-$(image):latest
 	docker push ${DOCKER_REGISTRY}/${ONDEWO_NAMESPACE}/ondewo-bpi-$(image):latest
 
-
-run_ondewo_bpi_: ## ondewo-bpi: Runs the ondewo bpi  image
+run_ondewo_bpi: ## ondewo-bpi: Runs the ondewo bpi  image
 	docker compose up ondewo-bpi ondewo-ingress-envoy
 
-kill_ondewo_bpi_: ## ondewo-bpi: Kills a running ondewo bpi  image
+kill_ondewo_bpi: ## ondewo-bpi: Kills a running ondewo bpi  image
 	docker compose kill ondewo-bpi ondewo-ingress-envoy
-
-run_ondewo_bpi_qa_: ## ondewo-bpi-qa: Runs the ondewo bpi qa  image
-	docker compose up ondewo-bpi-qa ondewo-ingress-envoy
 
 run_ondewo_bpi_example: ## ondewo-bpi-example: Runs the ondewo bpi example image
 	docker compose up ondewo-bpi-example ondewo-ingress-envoy
