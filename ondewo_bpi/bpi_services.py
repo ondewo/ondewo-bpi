@@ -157,7 +157,10 @@ class BpiSessionsServices(AutoSessionsServicer):
                     f'The received text is too long, it will be truncated '
                     f'to {SENTENCE_TRUNCATION} characters!'
                 )
+            log.debug(f'BpiSessionsServices: DetectIntent: request: \n{request}')
             truncated_text: TextInput = TextInput(text=request.query_input.text.text[:SENTENCE_TRUNCATION])
+            truncated_text.language_code = request.query_input.text.language_code
+            log.debug(f'BpiSessionsServices: DetectIntent: truncated_text: \n{truncated_text}')
             request.query_input.text.CopyFrom(truncated_text)
             text = request.query_input.text.text
         except Exception as e:
@@ -192,7 +195,7 @@ class BpiSessionsServices(AutoSessionsServicer):
 
     @Timer(
         logger=log.debug,
-        log_arguments=False,
+        log_arguments=True,
         recursive=True,
         message='BpiSessionsServices: perform_detect_intent: Elapsed time: {}'
     )
@@ -200,17 +203,21 @@ class BpiSessionsServices(AutoSessionsServicer):
         self,
         request: session_pb2.DetectIntentRequest,
     ) -> session_pb2.DetectIntentResponse:
-        return self.client.services.sessions.detect_intent(request)
+        log.debug(f'START: BpiSessionsServices: perform_detect_intent: request: \n{request}')
+        response: session_pb2.DetectIntentResponse = self.client.services.sessions.detect_intent(request)
+        log.debug(f'DONE: BpiSessionsServices: perform_detect_intent: response: \n{response}')
+        return response
 
     @Timer(
         logger=log.debug,
-        log_arguments=False,
+        log_arguments=True,
         recursive=True,
         message='BpiSessionsServices: process_messages: Elapsed time: {}'
     )
     def process_messages(
-            self,
-            response: session_pb2.DetectIntentResponse, ) -> session_pb2.DetectIntentResponse:
+        self,
+        response: session_pb2.DetectIntentResponse,
+    ) -> session_pb2.DetectIntentResponse:
         for j, message in enumerate(response.query_result.fulfillment_messages):
             found_triggers = MessageHandler.get_triggers(message, get_session_from_response(response))
 
