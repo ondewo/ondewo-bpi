@@ -124,7 +124,8 @@ class MessageHandler:
 
     @staticmethod
     def add_weekday(
-        response: session_pb2.DetectIntentResponse, days: Union[EnglishDays, GermanDays] = GermanDays
+        response: session_pb2.DetectIntentResponse,
+        days: Union[EnglishDays, GermanDays] = GermanDays,
     ) -> session_pb2.DetectIntentResponse:
         logger_console.info("add weekday to date in response")
         for message in response.query_result.fulfillment_messages:
@@ -144,6 +145,7 @@ class MessageHandler:
                 if SingleMessageHandler.check_message_for_pattern(message, trigger.value):
                     found_triggers.append(trigger.value)
                     trigger_content.extend(SingleMessageHandler.get_pattern_from_message(message, trigger.value))
+
         return found_triggers, trigger_content  # type: ignore
 
     @staticmethod

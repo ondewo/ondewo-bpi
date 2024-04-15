@@ -35,11 +35,11 @@ QA_MAX_ANSWERS: int = int(os.getenv("QA_MAX_ANSWERS", "3"))
 QA_THRESHOLD_READER: float = float(os.getenv("QA_THRESHOLD_READER", "0.5"))
 QA_THRESHOLD_RETRIEVER: float = float(os.getenv("QA_THRESHOLD_RETRIEVER", "0.5"))
 QA_ACTIVE: bool = True if os.getenv("QA_ACTIVE", "False") == "True" else False
-QA_SECURE: Optional[str] = os.getenv("QA_SECURE", "False")
+QA_GRPC_SECURE: Optional[str] = os.getenv("QA_GRPC_SECURE", "False")
 
 client_configuration_str = (
     "\nqa-client configuration:\n"
-    + f"   Secure: {QA_SECURE}\n"
+    + f"   Secure: {QA_GRPC_SECURE}\n"
     + f"   Host: {QA_HOST}\n"
     + f"   Port: {QA_PORT}\n"
     + f"   Language: {QA_LANG}\n"
@@ -65,11 +65,11 @@ class QAClientProvider:
         if qa_port == "":
             qa_port = QA_PORT
 
-        if QA_SECURE:
+        if QA_GRPC_SECURE:
             logger.warning("Secure connection not possible for Question&Answering.")
             logger.warning("Using insecure connection instead...")
 
-        logger.info("configuring INSECURE connection")
+        logger.info("configuring INGRPC_SECURE connection")
         config = ClientConfig(host=QA_HOST, port=qa_port, )
         client = Client(config=config, use_secure_channel=False)
         return config, client

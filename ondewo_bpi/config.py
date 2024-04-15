@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import os
 from typing import (
-    Dict,
     Optional,
 )
 
@@ -28,23 +26,26 @@ from ondewo.nlu.client import Client
 from ondewo.nlu.client_config import ClientConfig
 
 import ondewo_bpi.__init__ as file_anchor
+from ondewo_bpi.helpers import get_bool_from_env
 
 parent = os.path.abspath(os.path.join(os.path.dirname(file_anchor.__file__), os.path.pardir))
 
 # load default configuration from the environment
 load_dotenv("./bpi.env")
 
+# ONDEWO BPI
 PORT: str = os.getenv("PORT", "50051")
+
+# ONDEWO NLU CAI
 CAI_HOST: Optional[str] = os.getenv("CAI_HOST", "localhost")
 CAI_PORT: Optional[str] = os.getenv("CAI_PORT", "50055")
 CAI_TOKEN: Optional[str] = os.getenv("CAI_TOKEN")
-HTTP_AUTH_TOKEN: Optional[str] = os.getenv("HTTP_BASIC_AUTH")
+GRPC_CERT: Optional[str] = os.getenv("GRPC_CERT")
+HTTP_BASIC_AUTH_TOKEN: Optional[str] = os.getenv("HTTP_BASIC_AUTH_TOKEN")
+GRPC_SECURE: Optional[bool] = get_bool_from_env(env_variable_name="GRPC_SECURE", default_value="False")
+SENTENCE_TRUNCATION: int = int(os.getenv("SENTENCE_TRUNCATION", '130'))
 USER_NAME: Optional[str] = os.getenv("USER_NAME")
 USER_PASS: Optional[str] = os.getenv("USER_PASS")
-SECURE: Optional[str] = os.getenv("SECURE", "False")
-SENTENCE_TRUNCATION: int = int(os.getenv("SENTENCE_TRUNCATION", '130'))
-
-CONFIG_PATH: str = os.getenv("CONFIG_PATH", "/home/ondewo/config.json")
 
 
 class CentralClientProvider:
@@ -65,15 +66,12 @@ class CentralClientProvider:
 
     def _instantiate_client(self) -> Client:
 
-        if SECURE == "True":
-            with open(CONFIG_PATH, "r") as fi:
-                json_dict: Dict = json.load(fi)
-
+        if GRPC_SECURE:
             logger.info("configuring secure connection")
-            self._instantiate_config(grpc_cert=json_dict["grpc_cert"])
+            self._instantiate_config(grpc_cert=GRPC_CERT)
             self.client = Client(config=self.config)
         else:
-            logger.info("configuring INSECURE connection")
+            logger.info("configuring INGRPC_SECURE connection")
             self._instantiate_config()
             self.client = Client(config=self.config, use_secure_channel=False)
         return self.client
@@ -84,7 +82,7 @@ class CentralClientProvider:
             self.config: ClientConfig = ClientConfig(
                 host=CAI_HOST,
                 port=CAI_PORT,
-                http_token=HTTP_AUTH_TOKEN,
+                http_token=HTTP_BASIC_AUTH_TOKEN,
                 user_name=USER_NAME,
                 password=USER_PASS,
                 grpc_cert=grpc_cert
@@ -93,10 +91,10 @@ class CentralClientProvider:
     def _log_default_config(self) -> None:
         client_configuration_str = (
             "\nnlu-client configuration:\n"
-            + f"   Secure: {SECURE}\n"
+            + f"   Secure: {GRPC_SECURE}\n"
             + f"   Host: {CAI_HOST}\n"
             + f"   Port: {CAI_PORT}\n"
-            + f"   Http_token: {HTTP_AUTH_TOKEN}\n"
+            + f"   Http_token: {HTTP_BASIC_AUTH_TOKEN}\n"
             + f"   User_name: {USER_NAME}\n"
             + f"   Password: {USER_PASS}\n"
         )
