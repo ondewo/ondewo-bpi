@@ -249,7 +249,7 @@ import pandas as pd
 import six
 from google.protobuf.message import Message
 from ondewo.logging.logger import logger_console as log
-from py._path.local import LocalPath  # noqa
+from py._path.local import LocalPath
 
 T = TypeVar("T")
 
