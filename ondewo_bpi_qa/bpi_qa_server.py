@@ -25,7 +25,7 @@ from typing import (
 
 import grpc
 from ondewo.logging.decorators import Timer
-from ondewo.logging.logger import logger_console
+from ondewo.logging.logger import logger_console as log
 from ondewo.nlu import session_pb2
 from ondewo.nlu.context_pb2 import (
     Context,
@@ -86,7 +86,7 @@ class QAServer(BpiQABaseServer):
     def serve(self) -> None:
         super().serve()
 
-    @Timer(log_arguments=False, logger=logger_console.debug)
+    @Timer(log_arguments=False, logger=log.debug)
     def DetectIntent(
         self,
         request: DetectIntentRequest,
@@ -95,7 +95,7 @@ class QAServer(BpiQABaseServer):
         self.check_session_id(request)
 
         if len(request.query_input.text.text) > SENTENCE_TRUNCATION:
-            logger_console.info(
+            log.info(
                 f'The received text is too long, it will be truncated '
                 f'to {SENTENCE_TRUNCATION} characters!'
             )
@@ -117,7 +117,7 @@ class QAServer(BpiQABaseServer):
 
         for session in self.loops.copy():
             if time.time() - self.loops[session]["timestamp"] > session_pop_timeout:  # type: ignore
-                logger_console.debug(f"Popping old session: {session}.")
+                log.debug(f"Popping old session: {session}.")
                 loop = self.loops.pop(session)
                 loop["loop"].stop()
                 loop["loop"].close()
@@ -127,11 +127,11 @@ class QAServer(BpiQABaseServer):
                 "loop": asyncio.new_event_loop(),
                 "timestamp": time.time(),
             }
-            logger_console.debug(
+            log.debug(
                 f"New session in bpi: {request.session}. {len(self.loops)} sessions currently stored."
             )
 
-    @Timer(log_arguments=False, logger=logger_console.debug)
+    @Timer(log_arguments=False, logger=log.debug)
     def handle_context_injection_for_qa(self, request: DetectIntentRequest, ) -> DetectIntentRequest:
         """
         Note: to enable Q&A to leverage context injection, we made the context injection happen BEFORE
@@ -152,8 +152,9 @@ class QAServer(BpiQABaseServer):
             qa_url_context: Optional[Context] = self.client.services.contexts.get_context(
                 GetContextRequest(name=f'{request.session}/contexts/{QA_URL_FILTER_CONTEXT_NAME}')
             )
-        except Exception:
+        except Exception as e:
             qa_url_context = None
+            log.exception(f"{e}")
 
         for context in request.query_params.contexts:
 
@@ -168,21 +169,21 @@ class QAServer(BpiQABaseServer):
                 # Update
                 update_context_req: UpdateContextRequest = UpdateContextRequest(context=context_to_inject)
                 self.client.services.contexts.update_context(request=update_context_req)
-                logger_console.debug(f'Context: {context_to_inject.name} updated!')
+                log.debug(f'Context: {context_to_inject.name} updated!')
             else:
                 # Create
                 create_context_req: CreateContextRequest = CreateContextRequest(
-                    parent=parent,
+                    session_id=parent,
                     context=context_to_inject
                 )
                 self.client.services.contexts.create_context(request=create_context_req)
-                logger_console.debug(f'Context: {context_to_inject.name} created!')
+                log.debug(f'Context: {context_to_inject.name} created!')
 
         del request.query_params.contexts[:]
         request.query_params.contexts.extend(unaffected_contexts)
         return request
 
-    @Timer(log_arguments=False, logger=logger_console.debug)
+    @Timer(log_arguments=False, logger=log.debug)
     def handle_predictions(self, request: DetectIntentRequest, ) -> Tuple[DetectIntentResponse, str]:
         tasks: List[Coroutine] = [self.send_to_cai(request)]
         cai_response: Optional[DetectIntentResponse] = None
@@ -192,13 +193,13 @@ class QAServer(BpiQABaseServer):
             tasks.append(self.send_to_qa(request))
 
         while len(tasks):
-            logger_console.debug(f"Starting async loop with {len(tasks)} tasks of type: {type(tasks)}")
+            log.debug(f"Starting async loop with {len(tasks)} tasks of type: {type(tasks)}")
             try:
                 finished, tasks = self.loops[request.session]["loop"].run_until_complete(
                     asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)  # type: ignore
                 )
-            except Exception:
-                logger_console.exception("Task returned an exception!")
+            except Exception as e:
+                log.exception(f"Task returned an exception!, {e}")
                 return DetectIntentResponse(), "exception"
 
             # Allow the cai_response to return early if it finishes first
@@ -208,15 +209,15 @@ class QAServer(BpiQABaseServer):
                     cai_response = result[0]
                     intent_name_cai = cai_response.query_result.intent.display_name
                     if intent_name_cai != "Default Fallback Intent" or not QA_ACTIVE:
-                        logger_console.debug("CAI response good, returning early")
+                        log.debug("CAI response good, returning early")
                         return cai_response, CAI_RESPONSE_NAME
                 # If the QA response finishes first, save it for later
                 else:
-                    assert result[1] == QA_RESPONSE_NAME, "Somehow a different response snuck in!"
+                    assert result[1] == QA_RESPONSE_NAME, "Somehow a different response came in!"
                     qa_response = result[0]
 
         qa_confidence = qa_response.query_result.query_result.intent_detection_confidence
-        logger_console.debug(f"QA confidence is {qa_confidence}, cutoff is {QA_THRESHOLD_READER}")
+        log.debug(f"QA confidence is {qa_confidence}, cutoff is {QA_THRESHOLD_READER}")
         messages = qa_response.query_result.query_result.fulfillment_messages
 
         if messages:
@@ -239,7 +240,7 @@ class QAServer(BpiQABaseServer):
                 )
             return qa_response.query_result, QA_RESPONSE_NAME
 
-        logger_console.debug("No response from QA, passing back Default Fallback.")
+        log.debug("No response from QA, passing back Default Fallback.")
 
         return cai_response, CAI_RESPONSE_NAME
 
@@ -264,10 +265,10 @@ class QAServer(BpiQABaseServer):
                 active_filter = provisional_filter.value
 
         except Exception as e:
-            logger_console.info(f'No context: {QA_URL_FILTER_CONTEXT_NAME} found. {e}')
+            log.info(f'No context: {QA_URL_FILTER_CONTEXT_NAME} found. {e}')
         finally:
             if active_filter == QA_URL_DEFAULT_FILTER:
-                logger_console.info('No URL filters found')
+                log.info('No URL filters found')
 
         qa_request = qa_pb2.GetAnswerRequest(
             session_id=request.session,
@@ -278,7 +279,7 @@ class QAServer(BpiQABaseServer):
             url_filter=UrlFilter(regex_filter_include=active_filter)
         )
 
-        logger_console.info(
+        log.info(
             {
                 "message": f"QA-GetAnswerRequest to QA, text input: {text}",
                 "content": text,
@@ -291,12 +292,12 @@ class QAServer(BpiQABaseServer):
             None, self.qa_client_stub.GetAnswer, qa_request,
         )
         # intent_name_qa = qa_response.query_result.intent.display_name
-        logger_console.debug({"message": "QA-DetectIntentResponse from QA", "tags": ["text"]})
+        log.debug({"message": "QA-DetectIntentResponse from QA", "tags": ["text"]})
         return qa_response, QA_RESPONSE_NAME
 
     async def send_to_cai(self, request: DetectIntentRequest, ) -> Tuple[DetectIntentResponse, str]:
         text = request.query_input.text.text
-        logger_console.info(
+        log.info(
             {
                 "message": f"CAI-DetectIntentRequest to CAI, text input: {text}",
                 "content": text,
@@ -308,7 +309,7 @@ class QAServer(BpiQABaseServer):
             None, self.client.services.sessions.detect_intent, request,
         )
         intent_name_cai = cai_response.query_result.intent.display_name
-        logger_console.debug(
+        log.debug(
             {
                 "message": f"CAI-DetectIntentResponse from CAI, intent_name_cai: {intent_name_cai}",
                 "content": intent_name_cai,
@@ -319,20 +320,19 @@ class QAServer(BpiQABaseServer):
         return cai_response, CAI_RESPONSE_NAME
 
     def create_session_if_not_exists(self, request: DetectIntentRequest, ) -> None:
-
         try:
             self.client.services.sessions.get_session(
                 request=GetSessionRequest(session_id=request.session, session_view=Session.View.VIEW_SPARSE)
             )
-        except Exception:
-            logger_console.debug(f'Session {request.session} does not exists.')
+        except Exception:  # noqa
+            log.debug(f'Session {request.session} does not exists.')
             self.client.services.sessions.create_session(
                 CreateSessionRequest(
                     parent=ContextHelper.get_agent_path_from_path(request.session),
                     session_uuid=ContextHelper.get_last_uuid_from_path(request.session),
                 )
             )
-            logger_console.debug(f'Session {request.session} created!')
+            log.debug(f'Session {request.session} created!')
 
     # noinspection PyMethodMayBeStatic
     def _fill_in_qa_response_with_cai_response(

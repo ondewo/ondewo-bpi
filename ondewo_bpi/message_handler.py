@@ -24,7 +24,7 @@ from typing import (
 )
 
 from google.protobuf.json_format import MessageToJson
-from ondewo.logging.logger import logger_console
+from ondewo.logging.logger import logger_console as log
 from ondewo.nlu import (
     context_pb2,
     intent_pb2,
@@ -57,10 +57,10 @@ def create_parameter_dict(my_dict: Dict) -> Optional[Dict[str, context_pb2.Conte
 class MessageHandler:
     """
     This class takes a grpc response and decomposes the message into multiple parts, processes them asynchronously and
-    sends the reponses to all available enpoints. Once the processing is complete, the message is reassembled and sent
+    sends the responses to all available endpoints. Once the processing is complete, the message is reassembled and sent
     back.
 
-    The subclasser should implment 'quicksend_to_api' if they want messages to be send to an endpoint out of turn (aka
+    The subclass should implement 'quicksend_to_api' if they want messages to be sent to an endpoint out of turn (aka
     before the whole response is finished), and should implement functions for each of the triggers that they want to
     handle and update self.trigger_function_map with the new functions.
     """
@@ -72,12 +72,12 @@ class MessageHandler:
             if SingleMessageHandler.check_message_for_pattern(message, trigger.value):
                 content = SingleMessageHandler.get_pattern_from_message(message, trigger.value)
                 found_triggers[trigger.value] = content
-        for qtrigger in QueryTriggers:
-            if SingleMessageHandler.check_message_for_pattern(message, qtrigger.value):
-                content = SingleMessageHandler.get_pattern_from_message(message, qtrigger.value)
-                found_triggers[qtrigger.value] = content
+        for query_trigger in QueryTriggers:
+            if SingleMessageHandler.check_message_for_pattern(message, query_trigger.value):
+                content = SingleMessageHandler.get_pattern_from_message(message, query_trigger.value)
+                found_triggers[query_trigger.value] = content
         if len(found_triggers):
-            logger_console.info(
+            log.info(
                 {
                     "message": f"Found triggers: {found_triggers}",
                     "found_triggers": found_triggers,
@@ -99,14 +99,14 @@ class MessageHandler:
     def substitute_pattern(
         pattern: str, replace: str, response: session_pb2.DetectIntentResponse,
     ) -> session_pb2.DetectIntentResponse:
-        logger_console.info({"message": "replacing text in response", "pattern": pattern, "replace": replace})
+        log.info({"message": "replacing text in response", "pattern": pattern, "replace": replace})
         for j, message in enumerate(response.query_result.fulfillment_messages):
             SingleMessageHandler.substitute_pattern_in_message(message, pattern, replace)
         return response
 
     @staticmethod
     def reformat_date(response: session_pb2.DetectIntentResponse, ) -> session_pb2.DetectIntentResponse:
-        logger_console.info("reformatting date in response")
+        log.info("reformatting date in response")
         for message in response.query_result.fulfillment_messages:
             if not len(message.text.text):
                 continue
@@ -115,7 +115,7 @@ class MessageHandler:
 
     @staticmethod
     def strip_seconds(response: session_pb2.DetectIntentResponse, ) -> session_pb2.DetectIntentResponse:
-        logger_console.info("strip seconds from text in response")
+        log.info("strip seconds from text in response")
         for message in response.query_result.fulfillment_messages:
             if not len(message.text.text):
                 continue
@@ -127,7 +127,7 @@ class MessageHandler:
         response: session_pb2.DetectIntentResponse,
         days: Union[EnglishDays, GermanDays] = GermanDays,
     ) -> session_pb2.DetectIntentResponse:
-        logger_console.info("add weekday to date in response")
+        log.info("add weekday to date in response")
         for message in response.query_result.fulfillment_messages:
             if not len(message.text.text):
                 continue
@@ -149,7 +149,7 @@ class MessageHandler:
         return found_triggers, trigger_content  # type: ignore
 
     @staticmethod
-    def remove_triggers_from_reponse(response: session_pb2.DetectIntentResponse, ) -> session_pb2.DetectIntentResponse:
+    def remove_triggers_from_response(response: session_pb2.DetectIntentResponse, ) -> session_pb2.DetectIntentResponse:
         for j, message in enumerate(response.query_result.fulfillment_messages):
             if not len(message.text.text):
                 continue
@@ -161,16 +161,16 @@ class MessageHandler:
 class ParameterMethods:
     @staticmethod
     def get_context(response: session_pb2.DetectIntentResponse, context_name: str) -> Optional[context_pb2.Context]:
-        logger_console.info({"message": "searching for context", "content": context_name, "tags": ["contexts"]})
+        log.info({"message": "searching for context", "content": context_name, "tags": ["contexts"]})
         context = [c for c in response.query_result.output_contexts if c.name == context_name]
-        logger_console.info(
+        log.info(
             {"message": "found context", "content": MessageToJson(context[0]) if len(context) else "None"}
         )
         return context[0] if len(context) else None
 
     @staticmethod
     def get_param(response: session_pb2.DetectIntentResponse, param_name: str, context_name: str, ) -> Any:
-        logger_console.info({"message": "getting param", "content": context_name, "tags": ["parameters"]})
+        log.info({"message": "getting param", "content": context_name, "tags": ["parameters"]})
         context = ParameterMethods.get_context(response=response, context_name=context_name)
         if context is None:
             return None
@@ -186,17 +186,17 @@ class ParameterMethods:
         except AttributeError:
             pass
 
-        logger_console.info({"message": "found param", "content": returned_param})
+        log.info({"message": "found param", "content": returned_param})
         return context.parameters[param_name] if param_name in params else None
 
     @staticmethod
     def add_params_to_response(
         response: session_pb2.DetectIntentResponse, params: Dict[str, Any], context_name: str,
     ) -> session_pb2.DetectIntentResponse:
-        logger_console.info(
+        log.info(
             {
                 "message": "adding parameter to response",
-                "paramter": params,
+                "parameter": params,
                 "context": context_name,
                 "tags": ["parameters", "contexts"],
             }
@@ -210,7 +210,7 @@ class ParameterMethods:
 
     @staticmethod
     def delete_param_from_response(response: session_pb2.DetectIntentResponse, param_name: str) -> None:
-        logger_console.info(
+        log.info(
             {"message": "deleting parameter from response", "parameter": param_name, "tags": ["parameters"]}
         )
         for context in response.query_result.output_contexts:
@@ -221,7 +221,7 @@ class ParameterMethods:
 class SingleMessageHandler:
     @staticmethod
     def check_message_for_pattern(message: intent_pb2.Intent.Message, pattern: str) -> bool:
-        logger_console.debug({"message": "checking response for text", "content": pattern, "pattern": pattern})
+        log.debug({"message": "checking response for text", "content": pattern, "pattern": pattern})
         if message.HasField("text"):
             has_match = SingleMessageHandler._pattern_match_text(message, pattern)
             if has_match:
@@ -319,7 +319,7 @@ class SingleMessageHandler:
                     [match.groups()[0], date.strftime(DATE_FORMAT), match.groups()[2]]  # type: ignore
                 )
                 message.card.subtitle = new_response
-                logger_console.info(f"DATE: {date} formatted to DATE: {date.strftime(DATE_FORMAT)}")
+                log.info(f"DATE: {date} formatted to DATE: {date.strftime(DATE_FORMAT)}")
         return message
 
     @staticmethod
@@ -333,7 +333,7 @@ class SingleMessageHandler:
                     [match.groups()[0], date.strftime(DATE_FORMAT), match.groups()[2]]  # type: ignore
                 )
                 message.text.text[0] = new_response
-                logger_console.info(f"DATE: {date} formatted to DATE: {date.strftime(DATE_FORMAT)}")
+                log.info(f"DATE: {date} formatted to DATE: {date.strftime(DATE_FORMAT)}")
         return message
 
     @staticmethod
@@ -355,7 +355,7 @@ class SingleMessageHandler:
                     [match.groups()[0], time[:-3], match.groups()[2]]  # type: ignore
                 )
                 message.card.subtitle = new_response
-                logger_console.info(f"DATE: {time} formatted to DATE: {time[:-2]}")
+                log.info(f"DATE: {time} formatted to DATE: {time[:-2]}")
         return message
 
     @staticmethod
@@ -369,7 +369,7 @@ class SingleMessageHandler:
                     [match.groups()[0], time[:-3], match.groups()[2]]  # type: ignore
                 )
                 message.text.text[0] = new_response
-                logger_console.info(f"DATE: {time} formatted to DATE: {time[:-2]}")
+                log.info(f"DATE: {time} formatted to DATE: {time[:-2]}")
         return message
 
     @staticmethod
@@ -384,22 +384,23 @@ class SingleMessageHandler:
 
     @staticmethod
     def _add_weekday_card(
-        message: intent_pb2.Intent.Message, days: Union[EnglishDays, GermanDays]
+        message: intent_pb2.Intent.Message,
+        days: Union[EnglishDays, GermanDays],
     ) -> intent_pb2.Intent.Message:
         date_regex = r"\d\d\D\d\d\D\d\d\d\d"
         matches = len(re.findall(date_regex, message.card.subtitle))
         if matches > 1:
-            print("Multiple date subtitutions on one line! Not supported. Will only substitute the first")
+            log.debug("Multiple date substitutions on one line! Not supported. Will only substitute the first")
         match = re.match(rf"(.*)({date_regex})(.*)", message.card.subtitle)  # type: ignore
         if match:
             time = match.groups()[1]
             day_of_the_week_index = int(datetime.datetime.strptime(time, DATE_FORMAT_BACK).strftime("%w"))
-            day = list(iter(days))[day_of_the_week_index].value
+            day = list(iter(days))[day_of_the_week_index].value  # type:ignore
             new_response = "".join(
                 [match.groups()[0], day, time, match.groups()[2]]  # type: ignore
             )
             message.card.subtitle = new_response
-            logger_console.info(f"DATE: {time} formatted to DATE: {time[:-2]}")
+            log.info(f"DATE: {time} formatted to DATE: {time[:-2]}")
         return message
 
     @staticmethod
@@ -409,15 +410,13 @@ class SingleMessageHandler:
         date_regex = r"\d\d\D\d\d\D\d\d\d\d"
         matches = len(re.findall(date_regex, message.text.text[0]))
         if matches > 1:
-            print("Multiple date subtitutions on one line! Not supported. Will only substitute the first")
+            log.debug("Multiple date substitutions on one line! Not supported. Will only substitute the first")
         match = re.match(fr"(.*)({date_regex})(.*)", message.text.text[0])  # type: ignore
         if match:
             time = match.groups()[1]
             day_of_the_week_index = int(datetime.datetime.strptime(time, DATE_FORMAT_BACK).strftime("%w"))
-            day = list(iter(days))[day_of_the_week_index].value
-            new_response = "".join(
-                [match.groups()[0], day, time, match.groups()[2]]  # type: ignore
-            )
+            day = list(iter(days))[day_of_the_week_index].value  # type:ignore
+            new_response = "".join([match.groups()[0], day, time, match.groups()[2]])  # type:ignore
             message.text.text[0] = new_response
-            logger_console.info(f"DATE: {time} formatted to DATE: {time[:-2]}")
+            log.info(f"DATE: {time} formatted to DATE: {time[:-2]}")
         return message

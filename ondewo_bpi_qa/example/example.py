@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ondewo.logging.logger import logger_console
+from ondewo.logging.logger import logger_console as log
 from ondewo.nlu import session_pb2
 
 from ondewo_bpi_qa.bpi_qa_server import QAServer
@@ -28,12 +28,12 @@ class MyQAServer(QAServer):
 
     @staticmethod
     def handle_default_fallback(response: session_pb2.DetectIntentResponse) -> session_pb2.DetectIntentResponse:
-        logger_console.info("Default fallback was triggered!")
+        log.info("Default fallback was triggered!")
         return response
 
     @staticmethod
     def handle_default_exit(response: session_pb2.DetectIntentResponse) -> session_pb2.DetectIntentResponse:
-        logger_console.info("Default exit was triggered!")
+        log.info("Default exit was triggered!")
         return response
 
     def serve(self) -> None:

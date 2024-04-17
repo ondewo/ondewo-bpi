@@ -18,10 +18,7 @@ from typing import (
     Tuple,
 )
 
-from ondewo.logging.logger import (
-    logger,
-    logger_console,
-)
+from ondewo.logging.logger import logger_console as log
 from ondewo.qa.client import Client
 from ondewo.qa.client_config import ClientConfig
 
@@ -48,7 +45,7 @@ client_configuration_str = (
     + f"   Retriever threshold: {QA_THRESHOLD_RETRIEVER}\n"
     + f"   Is active?: {QA_ACTIVE}\n"
 )
-logger_console.info(client_configuration_str)
+log.info(client_configuration_str)
 
 
 class QAClientProvider:
@@ -66,16 +63,17 @@ class QAClientProvider:
             qa_port = QA_PORT
 
         if QA_GRPC_SECURE:
-            logger.warning("Secure connection not possible for Question&Answering.")
-            logger.warning("Using insecure connection instead...")
+            log.warning("Secure connection not possible for Question&Answering.")
+            log.warning("Using insecure connection instead...")
 
-        logger.info("configuring INGRPC_SECURE connection")
-        config = ClientConfig(host=QA_HOST, port=qa_port, )
-        client = Client(config=config, use_secure_channel=False)
-        return config, client
+        log.info("configuring INSECURE connection")
+        self.config = ClientConfig(host=QA_HOST, port=qa_port, )
+        self.client = Client(config=self.config, use_secure_channel=False)
+        return self.config, self.client
 
     def get_client(self, qa_port: str = "") -> Client:
         if not self._built:
             self.config, self.client = self.instantiate_client(qa_port=qa_port)
             self._built = True
+
         return self.client

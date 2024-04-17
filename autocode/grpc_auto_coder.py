@@ -26,6 +26,7 @@ from typing import (
 )
 
 import regex as re
+from ondewo.logging.logger import logger_console as log
 
 from autocode.base_coder import (
     ClassCoder,
@@ -360,12 +361,12 @@ class GRPCAutoCoder:
                     (request, response) = client_info[converted_function_name]
                 else:
                     if "Empty" in request and "Empty" in response:
-                        print(
+                        log.debug(
                             f"BOTH REQUEST AND RESPONSE EMPTY FOR > {client_service_name} < ENDPOINT: "
                             + f"{function_name}(); CANNOT ASSIGN CLIENT FUNCTION; --> SKIPPED"
                         )
                     else:
-                        print(
+                        log.debug(
                             f"COULD NOT FIND CLIENT FUNCTION FOR > {client_service_name} < ENDPOINT: "
                             + f"{function_name}() --> SKIPPED"
                         )
@@ -484,7 +485,7 @@ class GRPCAutoCoder:
                         f"response = self.{self.client_type_call}.services."
                         f"{client_service_name}.{client_function_name}({fc_input})",
                     ],
-                    returns=returns,
+                    returns=returns,  # noqa
                     docstring=docstring,
                 )
             )
@@ -528,7 +529,7 @@ class GRPCAutoCoder:
     ) -> None:
 
         # parse information from files
-        print(f'Generating code for proto file: {proto_file}')
+        log.debug(f'Generating code for proto file: {proto_file}')
         lines = self.read_file_lines(in_file=in_file)
         class_lines = self.find_class_in_python_file(lines=lines)
         class_info = self.get_class_info_from_lines(lines=class_lines)
@@ -553,7 +554,7 @@ class GRPCAutoCoder:
                 client_info=client_info,
                 client_service_name=client_service_name,
                 proto_file=proto_file,
-        )
+            )
 
         # create header
         header = (
@@ -563,7 +564,7 @@ class GRPCAutoCoder:
             + "# you may not use this file except in compliance with the License.\n"
             + "# You may obtain a copy of the License at\n"
             + "#\n"
-            + "#     http://www.apache.org/licenses/LICENSE-2.0\n"
+            + "#     https://www.apache.org/licenses/LICENSE-2.0\n"
             + "#\n"
             + "# Unless required by applicable law or agreed to in writing, software\n"
             + "# distributed under the License is distributed on an \"AS IS\" BASIS,\n"

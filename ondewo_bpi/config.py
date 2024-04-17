@@ -20,7 +20,7 @@ from typing import (
 from dotenv import load_dotenv
 from ondewo.logging.logger import (
     logger,
-    logger_console,
+    logger_console as log,
 )
 from ondewo.nlu.client import Client
 from ondewo.nlu.client_config import ClientConfig
@@ -71,14 +71,14 @@ class CentralClientProvider:
             self._instantiate_config(grpc_cert=GRPC_CERT)
             self.client = Client(config=self.config)
         else:
-            logger.info("configuring INGRPC_SECURE connection")
+            logger.info("configuring INSECURE connection")
             self._instantiate_config()
             self.client = Client(config=self.config, use_secure_channel=False)
         return self.client
 
     def _instantiate_config(self, grpc_cert: Optional[str] = None) -> None:
         if not self.config:
-            self._log_default_config()
+            CentralClientProvider._log_default_config()
             self.config: ClientConfig = ClientConfig(
                 host=CAI_HOST,
                 port=CAI_PORT,
@@ -88,7 +88,8 @@ class CentralClientProvider:
                 grpc_cert=grpc_cert
             )
 
-    def _log_default_config(self) -> None:
+    @staticmethod
+    def _log_default_config() -> None:
         client_configuration_str = (
             "\nnlu-client configuration:\n"
             + f"   Secure: {GRPC_SECURE}\n"
@@ -98,4 +99,4 @@ class CentralClientProvider:
             + f"   User_name: {USER_NAME}\n"
             + f"   Password: {USER_PASS}\n"
         )
-        logger_console.info(client_configuration_str)
+        log.info(client_configuration_str)

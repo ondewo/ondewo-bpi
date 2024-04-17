@@ -24,7 +24,6 @@ from grpc_reflection.v1alpha import reflection
 from ondewo.logging.decorators import Timer
 from ondewo.logging.logger import (
     logger,
-    logger_console,
     logger_console as log,
 )
 from ondewo.nlu import (
@@ -56,7 +55,6 @@ from ondewo.nlu import (
     utility_pb2_grpc,
 )
 from ondewo.nlu.client import Client as NLUClient
-from ondewo.qa import qa_pb2_grpc
 
 from ondewo_bpi.bpi_services import (
     BpiAgentsServices,
@@ -174,10 +172,10 @@ class BpiServer(
         message='BpiServer: serve: Elapsed time: {}'
     )
     def serve(self) -> None:
-        logger_console.info(f"attempting to start server on port {PORT}")
+        log.info(f"attempting to start server on port {PORT}")
         self._setup_server()
-        logger_console.info({"message": f"Server started on port {PORT}", "content": PORT})
-        logger_console.info(
+        log.info({"message": f"Server started on port {PORT}", "content": PORT})
+        log.info(
             {
                 "message": f"using intent handlers list: {self.intent_handlers}",
                 "content": self.intent_handlers,
@@ -187,8 +185,8 @@ class BpiServer(
             while True:
                 time.sleep(10)
         except KeyboardInterrupt:
-            logger_console.info("Keyboard interrupt, shutting down")
-        logger_console.info({"message": "server shut down", "tags": ["timing"]})
+            log.info("Keyboard interrupt, shutting down")
+        log.info({"message": "server shut down", "tags": ["timing"]})
 
 
 if __name__ == "__main__":

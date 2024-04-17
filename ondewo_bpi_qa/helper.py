@@ -5,8 +5,11 @@ from re import (
 )
 from typing import Optional
 
+from ondewo.logging.logger import logger_console as log
+
 
 class ContextHelper:
+
     AGENT_PATTERN: Pattern = re.compile(r'projects/([a-zA-Z\d_.-]+)/agent')
 
     @classmethod
@@ -46,16 +49,18 @@ class ContextHelper:
 
 
 if __name__ == '__main__':
-    print(
-        f'should match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2/agent/sessions/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2")}'
-    )
-    print(
-        f'should match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2/agent/sessions/")}'
-    )
-    print(
-        f'should match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2/agent")}'
-    )
-    print(
-        f'should NOT match: {ContextHelper.get_agent_path_from_path("projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2")}'
-    )
-    print(f'should NOT match: {ContextHelper.get_agent_path_from_path("9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2")}')
+    path: str
+    path = "projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2/agent/sessions/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2"
+    log.debug(f'should match: {ContextHelper.get_agent_path_from_path(path)}')
+
+    path = "projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2/agent/sessions/"
+    log.debug(f'should match: {ContextHelper.get_agent_path_from_path(path)}')
+
+    path = "projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2/agent"
+    log.debug(f'should match: {ContextHelper.get_agent_path_from_path(path)}')
+
+    path = "projects/9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2"
+    log.debug(f'should NOT match: {ContextHelper.get_agent_path_from_path(path)}')
+
+    path = "9c4e97ab-13ec-4b4b-bade-256b5c6e1bb2"
+    log.debug(f'should NOT match: {ContextHelper.get_agent_path_from_path(path)}')

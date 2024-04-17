@@ -11,22 +11,51 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import csv
+import errno
+import glob
+import io
+import json
+import os
+import pickle
+import re
+import shutil
+import stat
+from pathlib import Path
+from time import (
+    sleep,
+    time,
+)
 from typing import (
     Any,
     Dict,
     List,
+    Match,
     Optional,
     Pattern,
+    Tuple,
+    TypeVar,
+    Union,
 )
 
+import pandas as pd
+import six
+from google.protobuf.message import Message
 from grpc._channel import _InactiveRpcError  # noqa
-from ondewo.logging.logger import logger_console
+from ondewo.logging.logger import logger_console as log
 from ondewo.nlu import (
     context_pb2,
     session_pb2,
 )
 from ondewo.nlu.client import Client
+from py._path.local import LocalPath  # noqa
+
+T = TypeVar("T")
+
+UUID4_RGX: str = r'[^\W_]{8}-[^\W_]{4}-[^\W_]{4}-[^\W_]{4}-[^\W_]{12}'
+URL_REGEX: Pattern = re.compile(r'http://|https://|ftp://|file://|file:\\')
+DECAY_FUNCTION_TIME: str = 'time'
+DECAY_FUNCTION_INTERACTION: str = 'interaction'
 
 
 def add_params_to_cai_context(
@@ -49,10 +78,10 @@ def _add_params_to_cai_context(
     params: Dict[str, Any],
     context: str,
 ) -> None:
-    logger_console.info(
+    log.info(
         {
             "message": "adding parameter to cai",
-            "paramter": params,
+            "parameter": params,
             "context": context,
             "tags": ["parameters", "contexts"],
         }
@@ -64,9 +93,7 @@ def _add_params_to_cai_context(
         for k, v in parameters.items():
             existing_context.parameters[k].CopyFrom(v)
         client.services.contexts.update_context(
-            request=context_pb2.UpdateContextRequest(
-                context=existing_context
-            )
+            request=context_pb2.UpdateContextRequest(context=existing_context)
         )
     except _InactiveRpcError:
         context = context_pb2.Context(
@@ -77,7 +104,7 @@ def _add_params_to_cai_context(
         )
         client.services.contexts.create_context(
             request=context_pb2.CreateContextRequest(
-                parent=f'{session}',
+                session_id=f'{session}',
                 context=context,
             )
         )
@@ -89,10 +116,10 @@ def delete_param_from_cai_context(
     param_name: str,
     context: str
 ) -> None:
-    logger_console.info(
+    log.info(
         {
             "message": "deleting parameter from cai",
-            "paramter": param_name,
+            "parameter": param_name,
             "context": context,
             "tags": ["parameters", "contexts"],
         }
@@ -104,10 +131,10 @@ def delete_param_from_cai_context(
         del existing_context.parameters[param_name]
         client.services.contexts.delete_context(request=context_pb2.DeleteContextRequest(name=context_name))
         client.services.contexts.create_context(
-            request=context_pb2.CreateContextRequest(parent=session, context=existing_context)
+            request=context_pb2.CreateContextRequest(session_id=session, context=existing_context)
         )
     except KeyError:
-        logger_console.exception(
+        log.exception(
             {
                 "message": "tried to delete param that didnt exist",
                 "parameter": param_name,
@@ -122,11 +149,11 @@ def detect_intent(
     response: session_pb2.DetectIntentResponse,
     text: str
 ) -> session_pb2.DetectIntentResponse:
-    logger_console.info({"message": "detect intent triggered in bpi helpers", "tags": ["timing"]})
+    log.info({"message": "detect intent triggered in bpi helpers", "tags": ["timing"]})
     request = get_detect_intent_request(text=text, session=get_session_from_response(response=response), )
-    logger_console.info({"message": "detect intent returned in bpi helpers", "tags": ["timing"]})
+    log.info({"message": "detect intent returned in bpi helpers", "tags": ["timing"]})
     result = client.services.sessions.detect_intent(request)
-    logger_console.info(f"wrote {text}, received {result.query_result.fulfillment_messages}")
+    log.info(f"wrote {text}, received {result.query_result.fulfillment_messages}")
     return result
 
 
@@ -148,10 +175,7 @@ def create_parameter_dict(my_dict: Dict) -> Optional[Dict[str, context_pb2.Conte
     assert isinstance(my_dict, dict) or my_dict is None, "parameter must be a dict or None"
     if my_dict is not None:
         return {
-            key: context_pb2.Context.Parameter(
-                display_name=key,
-                value=my_dict[key]
-            )
+            key: context_pb2.Context.Parameter(display_name=key, value=my_dict[key])
             for key in my_dict
         }
     return None
@@ -182,7 +206,7 @@ def trigger_intent(
     if not additional_contexts:
         additional_contexts = []
 
-    logger_console.info({"message": "triggering specific intent", "intent_name": intent_name})
+    log.info({"message": "triggering specific intent", "intent_name": intent_name})
     trigger_context = create_context_struct(
         context=f"{session}/contexts/exact_intent",
         parameters=create_parameter_dict({"intent_name": intent_name}),
@@ -195,7 +219,7 @@ def trigger_intent(
         query_params=session_pb2.QueryParameters(contexts=[trigger_context, *additional_contexts]),
     )
     result = client.services.sessions.detect_intent(request)
-    logger_console.info(f"triggered {intent_name}")
+    log.info(f"triggered {intent_name}")
     return result
 
 
@@ -217,46 +241,6 @@ def strip_final_periods_from_request(request: session_pb2.DetectIntentRequest, )
 
 def get_session_from_response(response: session_pb2.DetectIntentResponse) -> str:
     return response.query_result.diagnostic_info["sessionId"]  # type: ignore
-
-
-import csv
-import errno
-import glob
-import io
-import json
-import os
-import pickle
-import re
-import shutil
-import stat
-from pathlib import Path
-from time import (
-    sleep,
-    time,
-)
-from typing import (
-    Any,
-    Dict,
-    List,
-    Match,
-    Optional,
-    Tuple,
-    TypeVar,
-    Union,
-)
-
-import pandas as pd
-import six
-from google.protobuf.message import Message
-from ondewo.logging.logger import logger_console as log
-from py._path.local import LocalPath
-
-T = TypeVar("T")
-
-UUID4_RGX: str = r'[^\W_]{8}-[^\W_]{4}-[^\W_]{4}-[^\W_]{4}-[^\W_]{12}'
-URL_REGEX: Pattern = re.compile(r'http://|https://|ftp://|file://|file:\\')
-DECAY_FUNCTION_TIME: str = 'time'
-DECAY_FUNCTION_INTERACTION: str = 'interaction'
 
 
 def remove_dir(dir_path: str, exception: bool = True) -> None:

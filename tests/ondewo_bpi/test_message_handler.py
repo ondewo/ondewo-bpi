@@ -65,8 +65,11 @@ def create_text_response(text: str) -> Any:
             f"message with birthday: {datetime.datetime(1989, 4, 28).strftime(DATE_FORMAT)} in middle",
         ),
         (
-            f"message with multiple birthdays: {datetime.datetime(1989, 4, 28, 22).isoformat()} in {datetime.datetime(1989, 4, 20).isoformat()} middle",
-            f"message with multiple birthdays: {datetime.datetime(1989, 4, 28).strftime(DATE_FORMAT)} in {datetime.datetime(1989, 4, 20).strftime(DATE_FORMAT)} middle",
+            f"message with multiple birthdays: "
+            f"{datetime.datetime(1989, 4, 28, 22).isoformat()} in "
+            f"{datetime.datetime(1989, 4, 20).isoformat()} middle",
+            f"message with multiple birthdays: {datetime.datetime(1989, 4, 28).strftime(DATE_FORMAT)} "
+            f"in {datetime.datetime(1989, 4, 20).strftime(DATE_FORMAT)} middle",
         ),
     ],
 )
@@ -103,7 +106,8 @@ def test_reformat_birthday_in_response(original_message, processed_message) -> N
             ([SipTriggers.SIP_SEND_NOW.value, SipTriggers.SIP_PAUSE.value], ["something else", "5s"],),
         ),
         (
-            f"{SipTriggers.SIP_HUMAN_HANDOVER.value} triggers <SIP:SEND_NOW=('trigger1')> aplenty <SIP:SEND_NOW=('trigger2')> different kinds <SIP:PAUSE=('10s')>",
+            f"{SipTriggers.SIP_HUMAN_HANDOVER.value} triggers <SIP:SEND_NOW=('trigger1')> "
+            f"aplenty <SIP:SEND_NOW=('trigger2')> different kinds <SIP:PAUSE=('10s')>",
             (
                 [SipTriggers.SIP_HUMAN_HANDOVER.value, SipTriggers.SIP_SEND_NOW.value, SipTriggers.SIP_PAUSE.value],
                 [SipTriggers.SIP_HUMAN_HANDOVER.value, "trigger1", "trigger2", "10s"],
@@ -131,14 +135,15 @@ def test_check_response_for_triggers(original_message, expected_trigger) -> None
         ("<SIP:PAUSE=('5s')> at start", " at start"),
         ("<SIP:PAUSE=('5s')> at start <SIP:SEND_NOW=('something else')>", " at start ",),
         (
-            f"{SipTriggers.SIP_HUMAN_HANDOVER.value} triggers <SIP:SEND_NOW=('trigger1')> aplenty <SIP:SEND_NOW=('trigger2')> different kinds <SIP:PAUSE=('10s')>",
+            f"{SipTriggers.SIP_HUMAN_HANDOVER.value} triggers <SIP:SEND_NOW=('trigger1')> "
+            f"aplenty <SIP:SEND_NOW=('trigger2')> different kinds <SIP:PAUSE=('10s')>",
             " triggers  aplenty  different kinds ",
         ),
     ],
 )
-def test_remove_triggers_from_reponse(original_message, processed_message) -> None:
+def test_remove_triggers_from_response(original_message, processed_message) -> None:
     response = create_text_response(original_message)
-    response = MessageHandler.remove_triggers_from_reponse(response)
+    response = MessageHandler.remove_triggers_from_response(response)
     assert response.query_result.fulfillment_messages[0].text.text[0] == processed_message
 
 
@@ -183,7 +188,7 @@ class TestMessageHandler(BpiServer):
 
     def replacement_function_self(
         self,
-        response: session_pb2.DetectIntentResponse,
+        response: session_pb2.DetectIntentResponse,  # noqa
         message: intent_pb2.Intent.Message,
         trigger: str,
         found_triggers: Dict[str, List[str]],
@@ -194,10 +199,10 @@ class TestMessageHandler(BpiServer):
 
     def replacement_function_string(
         self,
-        response: session_pb2.DetectIntentResponse,
+        response: session_pb2.DetectIntentResponse,  # noqa
         message: intent_pb2.Intent.Message,
         trigger: str,
-        found_triggers: Dict[str, List[str]],
+        found_triggers: Dict[str, List[str]],  # noqa
     ) -> intent_pb2.Intent.Message:
         SingleMessageHandler.substitute_pattern_in_message(message, trigger, REPLACEMENT_STRING)
         return message
@@ -214,10 +219,11 @@ class TestMessageHandler(BpiServer):
     ],
 )
 def test_trigger_functions(original_message, expectation):
-    response = create_text_response(original_message)
-    message_handler = TestMessageHandler()
+    response: session_pb2.DetectIntentResponse = create_text_response(original_message)
+    message_handler: TestMessageHandler = TestMessageHandler()
     with expectation:
         response = message_handler.process_messages(response)
+        assert response
 
 
 @pytest.mark.parametrize(
@@ -227,7 +233,8 @@ def test_trigger_functions(original_message, expectation):
         ("<SIP:SEND_NOW=('something')> at start", "something at start"),
         ("<SIP:PAUSE=('5s')> at start", " at start"),
         (
-            "triggers <SIP:SEND_NOW=('trigger1')> aplenty <SIP:SEND_NOW=('trigger2')> different kinds <SIP:PAUSE=('10s')>",
+            "triggers <SIP:SEND_NOW=('trigger1')> aplenty <SIP:SEND_NOW=('trigger2')> "
+            "different kinds <SIP:PAUSE=('10s')>",
             "triggers trigger2 aplenty trigger1 different kinds ",
         ),
         ("<c-examination.appointment_date>", REPLACEMENT_STRING),
@@ -286,7 +293,7 @@ def test_strip_seconds(original_message, processed_message):
 def test_adding_days_english(original_message, processed_message):
     response = create_text_response(original_message)
     assert response.query_result.fulfillment_messages[0].text.text[0] == original_message
-    MessageHandler.add_weekday(response, EnglishDays)
+    MessageHandler.add_weekday(response, EnglishDays)  # type:ignore
     assert response.query_result.fulfillment_messages[0].text.text[0] == processed_message
 
 
@@ -301,7 +308,7 @@ def test_adding_days_english(original_message, processed_message):
 def test_adding_days_german(original_message, processed_message):
     response = create_text_response(original_message)
     assert response.query_result.fulfillment_messages[0].text.text[0] == original_message
-    MessageHandler.add_weekday(response, GermanDays)
+    MessageHandler.add_weekday(response, GermanDays)  # type:ignore
     assert response.query_result.fulfillment_messages[0].text.text[0] == processed_message
 
 
