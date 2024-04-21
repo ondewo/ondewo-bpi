@@ -599,23 +599,38 @@ def log_keep_max_num(log_path: Union[str, LocalPath]) -> None:
 
 
 def get_int_from_env(env_variable_name: str, default_value: int) -> int:
-    int_str: str = os.getenv(env_variable_name, str(default_value))
+    int_str: str = os.getenv(env_variable_name, str(default_value)).strip()
     if int_str:
         try:
             int_value = int(int_str)
             return int_value
         except ValueError:
             return default_value
-
     else:
         return default_value
 
 
-def get_bool_from_env(env_variable_name: str, default_value: str = "False") -> bool:
-    bool_value: bool = bool(
-        str(os.getenv(env_variable_name, default_value)).lower() in ('true', '1', 't', 'True')
-    )
+def get_float_from_env(env_variable_name: str, default_value: float = 0.0) -> float:
+    float_str: str = os.getenv(env_variable_name, str(default_value)).strip()
+    if float_str:
+        try:
+            float_value = float(float_str)
+            return float_value
+        except ValueError:
+            return default_value
+    else:
+        return default_value
+
+
+def get_bool_from_env(env_variable_name: str, default_value: bool = False) -> bool:
+    bool_value: bool = bool(str(os.getenv(env_variable_name, str(default_value))).lower() in ('true', '1', 't', 'True'))
     return bool_value
+
+
+def get_str_from_env(env_variable_name: str, default_value: str = "") -> str:
+    str_value: str = os.getenv(env_variable_name, default_value).strip()
+    str_value = str_value.strip('\'"')  # Remove leading and trailing single or double quotes
+    return str_value
 
 
 def get_context_and_decay_from_context_name(context_name: str) -> Tuple[str, Dict]:
