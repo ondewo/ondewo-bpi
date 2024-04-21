@@ -598,7 +598,7 @@ def log_keep_max_num(log_path: Union[str, LocalPath]) -> None:
         os.remove(log_path + '/' + old_log)
 
 
-def get_int_from_env(env_variable_name: str, default_value: int) -> int:
+def get_int_from_env(env_variable_name: str, default_value: int = 0) -> int:
     int_str: str = os.getenv(env_variable_name, str(default_value)).strip()
     if int_str:
         try:
