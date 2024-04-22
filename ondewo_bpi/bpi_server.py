@@ -73,7 +73,7 @@ from ondewo_bpi.bpi_services import (
 )
 from ondewo_bpi.config import (
     CentralClientProvider,
-    PORT,
+    ONDEWO_BPI_PORT,
 )
 
 
@@ -101,8 +101,7 @@ class BpiServer(
         self._client = value
 
     @Timer(
-        logger=log.debug,
-        log_arguments=False,
+        logger=log.debug, log_arguments=False,
         message='BpiServer: __init__: Elapsed time: {}'
     )
     def __init__(self, client_provider: Optional[CentralClientProvider] = None) -> None:
@@ -128,12 +127,15 @@ class BpiServer(
             utility_pb2.DESCRIPTOR.services_by_name['Utilities'].full_name,
         ]
 
+    @Timer(
+        logger=log.debug, log_arguments=False,
+        message='BpiServer: _setup_reflection: Elapsed time: {}'
+    )
     def _setup_reflection(self) -> None:
         reflection.enable_server_reflection(service_names=self.services_descriptors, server=self.server)
 
     @Timer(
-        logger=log.debug,
-        log_arguments=False,
+        logger=log.debug, log_arguments=False,
         message='BpiServer: _add_services: Elapsed time: {}'
     )
     def _add_services(self) -> None:
@@ -152,8 +154,7 @@ class BpiServer(
         utility_pb2_grpc.add_UtilitiesServicer_to_server(self, self.server)
 
     @Timer(
-        logger=log.debug,
-        log_arguments=False,
+        logger=log.debug, log_arguments=False,
         message='BpiServer: _setup_server: Elapsed time: {}'
     )
     def _setup_server(self) -> None:
@@ -161,20 +162,19 @@ class BpiServer(
         self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         self._add_services()
         self._setup_reflection()
-        self.server.add_insecure_port(f"[::]:{PORT}")  # type: ignore
+        self.server.add_insecure_port(f"[::]:{ONDEWO_BPI_PORT}")  # type: ignore
         # self.server.add_insecure_port(f"0.0.0.0:{PORT}")  # type: ignore
-        logger.info(f"SERVING SERVER AT SERVING PORT {PORT}")
+        logger.info(f"SERVING SERVER AT SERVING PORT {ONDEWO_BPI_PORT}")
         self.server.start()  # type: ignore
 
     @Timer(
-        logger=log.debug,
-        log_arguments=False,
+        logger=log.debug, log_arguments=False,
         message='BpiServer: serve: Elapsed time: {}'
     )
     def serve(self) -> None:
-        log.info(f"attempting to start server on port {PORT}")
+        log.info(f"attempting to start server on port {ONDEWO_BPI_PORT}")
         self._setup_server()
-        log.info({"message": f"Server started on port {PORT}", "content": PORT})
+        log.info({"message": f"Server started on port {ONDEWO_BPI_PORT}", "content": ONDEWO_BPI_PORT})
         log.info(
             {
                 "message": f"using intent handlers list: {self.intent_handlers}",

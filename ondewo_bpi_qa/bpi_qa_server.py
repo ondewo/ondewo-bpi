@@ -53,7 +53,7 @@ from ondewo.qa.qa_pb2 import (
     UrlFilter,
 )
 
-from ondewo_bpi.config import SENTENCE_TRUNCATION
+from ondewo_bpi.config import ONDEWO_BPI_SENTENCE_TRUNCATION
 from ondewo_bpi_qa.bpi_qa_base_server import BpiQABaseServer
 from ondewo_bpi_qa.config import (
     QA_ACTIVE,
@@ -94,12 +94,12 @@ class QAServer(BpiQABaseServer):
     ) -> DetectIntentResponse:
         self.check_session_id(request)
 
-        if len(request.query_input.text.text) > SENTENCE_TRUNCATION:
+        if len(request.query_input.text.text) > ONDEWO_BPI_SENTENCE_TRUNCATION:
             log.info(
                 f'The received text is too long, it will be truncated '
-                f'to {SENTENCE_TRUNCATION} characters!'
+                f'to {ONDEWO_BPI_SENTENCE_TRUNCATION} characters!'
             )
-        truncated_text: TextInput = TextInput(text=request.query_input.text.text[:SENTENCE_TRUNCATION])
+        truncated_text: TextInput = TextInput(text=request.query_input.text.text[:ONDEWO_BPI_SENTENCE_TRUNCATION])
         request.query_input.text.CopyFrom(truncated_text)
 
         self.create_session_if_not_exists(request=request)

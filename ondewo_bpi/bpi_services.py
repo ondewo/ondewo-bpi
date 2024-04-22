@@ -52,7 +52,7 @@ from ondewo_bpi.autocoded.server_statistics_grpc_autocode import AutoServerStati
 from ondewo_bpi.autocoded.session_grpc_autocode import AutoSessionsServicer
 from ondewo_bpi.autocoded.user_grpc_autocode import AutoUsersServicer
 from ondewo_bpi.autocoded.utility_grpc_autocode import AutoUtilitiesServicer
-from ondewo_bpi.config import SENTENCE_TRUNCATION
+from ondewo_bpi.config import ONDEWO_BPI_SENTENCE_TRUNCATION
 from ondewo_bpi.constants import (
     QueryTriggers,
     SipTriggers,
@@ -89,8 +89,7 @@ class BpiSessionsServices(AutoSessionsServicer):
         pass
 
     @Timer(
-        logger=log.debug,
-        log_arguments=False,
+        logger=log.debug, log_arguments=False,
         message='BpiSessionsServices: __init__: Elapsed time: {}'
     )
     def __init__(self) -> None:
@@ -100,8 +99,7 @@ class BpiSessionsServices(AutoSessionsServicer):
         }
 
     @Timer(
-        logger=log.debug,
-        log_arguments=True,
+        logger=log.debug, log_arguments=True,
         message='BpiSessionsServices: register_intent_handler: Elapsed time: {}'
     )
     def register_intent_handler(self, intent_pattern: str, handlers: List[Callable]) -> None:
@@ -113,16 +111,14 @@ class BpiSessionsServices(AutoSessionsServicer):
         self.intent_handlers = sorted(self.intent_handlers, reverse=True)
 
     @Timer(
-        logger=log.debug,
-        log_arguments=False,
+        logger=log.debug, log_arguments=False,
         message='BpiSessionsServices: register_trigger_handler: Elapsed time: {}'
     )
     def register_trigger_handler(self, trigger: str, handler: Callable) -> None:
         self.trigger_handlers[trigger] = handler
 
     @Timer(
-        logger=log.debug,
-        log_arguments=True,
+        logger=log.debug, log_arguments=True,
         message='BpiSessionsServices: trigger_function_not_implemented: Elapsed time: {}'
     )
     def trigger_function_not_implemented(
@@ -141,8 +137,7 @@ class BpiSessionsServices(AutoSessionsServicer):
         )
 
     @Timer(
-        logger=log.debug,
-        log_arguments=True,
+        logger=log.debug, log_arguments=True,
         message='BpiSessionsServices: DetectIntent: Elapsed time: {}'
     )
     def DetectIntent(
@@ -151,13 +146,13 @@ class BpiSessionsServices(AutoSessionsServicer):
         context: grpc.ServicerContext,
     ) -> session_pb2.DetectIntentResponse:
         try:
-            if len(request.query_input.text.text) > SENTENCE_TRUNCATION:
+            if len(request.query_input.text.text) > ONDEWO_BPI_SENTENCE_TRUNCATION:
                 log.warning(
                     f'The received text is too long, it will be truncated '
-                    f'to {SENTENCE_TRUNCATION} characters!'
+                    f'to {ONDEWO_BPI_SENTENCE_TRUNCATION} characters!'
                 )
             log.debug(f'BpiSessionsServices: DetectIntent: request: \n{request}')
-            truncated_text: TextInput = TextInput(text=request.query_input.text.text[:SENTENCE_TRUNCATION])
+            truncated_text: TextInput = TextInput(text=request.query_input.text.text[:ONDEWO_BPI_SENTENCE_TRUNCATION])
             truncated_text.language_code = request.query_input.text.language_code
             log.debug(f'BpiSessionsServices: DetectIntent: truncated_text: \n{truncated_text}')
             request.query_input.text.CopyFrom(truncated_text)
@@ -193,9 +188,7 @@ class BpiSessionsServices(AutoSessionsServicer):
         return processed_cai_response
 
     @Timer(
-        logger=log.debug,
-        log_arguments=True,
-        recursive=True,
+        logger=log.debug, log_arguments=True, recursive=True,
         message='BpiSessionsServices: perform_detect_intent: Elapsed time: {}'
     )
     def perform_detect_intent(
@@ -208,9 +201,7 @@ class BpiSessionsServices(AutoSessionsServicer):
         return response
 
     @Timer(
-        logger=log.debug,
-        log_arguments=True,
-        recursive=True,
+        logger=log.debug, log_arguments=True, recursive=True,
         message='BpiSessionsServices: process_messages: Elapsed time: {}'
     )
     def process_messages(
@@ -241,8 +232,7 @@ class BpiSessionsServices(AutoSessionsServicer):
         return response
 
     @Timer(
-        logger=log.debug,
-        log_arguments=False,
+        logger=log.debug, log_arguments=False,
         message='BpiSessionsServices: quicksend_to_api: Elapsed time: {}'
     )
     def quicksend_to_api(
@@ -254,9 +244,7 @@ class BpiSessionsServices(AutoSessionsServicer):
         log.warning({"message": "quicksend_to_api not written, please subclass and implement"})
 
     @Timer(
-        logger=log.debug,
-        log_arguments=True,
-        recursive=True,
+        logger=log.debug, log_arguments=True, recursive=True,
         message='BpiSessionsServices: process_intent_handler: Elapsed time: {}'
     )
     def process_intent_handler(
@@ -280,8 +268,7 @@ class BpiSessionsServices(AutoSessionsServicer):
         return cai_response
 
     @Timer(
-        logger=log.debug,
-        log_arguments=False,
+        logger=log.debug, log_arguments=False,
         message='BpiSessionsServices: _get_handlers_for_intent: Elapsed time: {}'
     )
     def _get_handlers_for_intent(

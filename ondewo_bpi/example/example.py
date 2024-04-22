@@ -20,7 +20,7 @@ from ondewo.nlu import session_pb2
 from ondewo.nlu.client import Client
 
 from ondewo_bpi.bpi_server import BpiServer
-from ondewo_bpi.config import CAI_PORT
+from ondewo_bpi.config import ONDEWO_BPI_CAI_PORT
 from ondewo_bpi.example.login_mock import (
     MockUserLoginServer,
     PortChecker,
@@ -44,10 +44,10 @@ class MyServer(BpiServer):
     def __init__(self) -> None:
         log.debug("START: Initializing MyServer")
         os.environ["MODULE_NAME"] = "bpi_server"  # update module name for logger
-        port_in_use = PortChecker.check_client_users_stub(port=CAI_PORT)
+        port_in_use = PortChecker.check_client_users_stub(port=ONDEWO_BPI_CAI_PORT)
         if not port_in_use:
             self.mock_login_server = MockUserLoginServer()
-            self.mock_login_server.serve(port=CAI_PORT)  # start mock-login server
+            self.mock_login_server.serve(port=ONDEWO_BPI_CAI_PORT)  # start mock-login server
         super().__init__()  # BpiServer.__init__() triggers Client-init and Login() grpc call
         if not port_in_use:
             self.mock_login_server.kill_server()  # kill mock-login server

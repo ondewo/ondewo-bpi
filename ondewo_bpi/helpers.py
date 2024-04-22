@@ -42,6 +42,7 @@ import pandas as pd
 import six
 from google.protobuf.message import Message
 from grpc._channel import _InactiveRpcError  # noqa
+from ondewo.logging.decorators import Timer
 from ondewo.logging.logger import logger_console as log
 from ondewo.nlu import (
     context_pb2,
@@ -58,6 +59,10 @@ DECAY_FUNCTION_TIME: str = 'time'
 DECAY_FUNCTION_INTERACTION: str = 'interaction'
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: add_params_to_cai_context: Elapsed time: {}'
+)
 def add_params_to_cai_context(
     client: Client,
     response: session_pb2.DetectIntentResponse,
@@ -72,6 +77,10 @@ def add_params_to_cai_context(
     )
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: _add_params_to_cai_context: Elapsed time: {}'
+)
 def _add_params_to_cai_context(
     client: Client,
     session: str,
@@ -86,10 +95,10 @@ def _add_params_to_cai_context(
             "tags": ["parameters", "contexts"],
         }
     )
-    parameters = create_parameter_dict(params)
+    parameters = create_parameter_dict(parameter_dict=params)
     try:
         request = context_pb2.GetContextRequest(name=f"{session}/contexts/{context}")
-        existing_context = client.services.contexts.get_context(request)
+        existing_context = client.services.contexts.get_context(request=request)
         for k, v in parameters.items():
             existing_context.parameters[k].CopyFrom(v)
         client.services.contexts.update_context(
@@ -110,6 +119,10 @@ def _add_params_to_cai_context(
         )
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: delete_param_from_cai_context: Elapsed time: {}'
+)
 def delete_param_from_cai_context(
     client: Client,
     response: session_pb2.DetectIntentResponse,
@@ -124,9 +137,11 @@ def delete_param_from_cai_context(
             "tags": ["parameters", "contexts"],
         }
     )
-    session = get_session_from_response(response)
-    context_name = f"{session}/contexts/{context}"
-    existing_context = client.services.contexts.get_context(request=context_pb2.GetContextRequest(name=context_name))
+    session: str = get_session_from_response(response=response)
+    context_name: str = f"{session}/contexts/{context}"
+    existing_context: context_pb2.Context = client.services.contexts.get_context(
+        request=context_pb2.GetContextRequest(name=context_name),
+    )
     try:
         del existing_context.parameters[param_name]
         client.services.contexts.delete_context(request=context_pb2.DeleteContextRequest(name=context_name))
@@ -144,45 +159,66 @@ def delete_param_from_cai_context(
         )
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: detect_intent: Elapsed time: {}'
+)
 def detect_intent(
     client: Client,
     response: session_pb2.DetectIntentResponse,
     text: str
 ) -> session_pb2.DetectIntentResponse:
     log.info({"message": "detect intent triggered in bpi helpers", "tags": ["timing"]})
-    request = get_detect_intent_request(text=text, session=get_session_from_response(response=response), )
+    request: session_pb2.DetectIntentRequest = get_detect_intent_request(
+        text=text,
+        session=get_session_from_response(response=response),
+    )
     log.info({"message": "detect intent returned in bpi helpers", "tags": ["timing"]})
-    result = client.services.sessions.detect_intent(request)
+    result: session_pb2.DetectIntentResponse = client.services.sessions.detect_intent(request)
     log.info(f"wrote {text}, received {result.query_result.fulfillment_messages}")
     return result
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: get_detect_intent_request: Elapsed time: {}'
+)
 def get_detect_intent_request(
     session: str,
     text: str,
     language: str = 'de-DE',
     query_params: Optional[session_pb2.QueryParameters] = None
 ) -> session_pb2.DetectIntentRequest:
-    request = session_pb2.DetectIntentRequest(
+    request: session_pb2.DetectIntentRequest = session_pb2.DetectIntentRequest(
         session=session,
-        query_input=session_pb2.QueryInput(text=session_pb2.TextInput(text=text, language_code=language), ),
+        query_input=session_pb2.QueryInput(
+            text=session_pb2.TextInput(text=text, language_code=language)
+        ),
         query_params=query_params,
     )
     return request
 
 
-def create_parameter_dict(my_dict: Dict) -> Optional[Dict[str, context_pb2.Context.Parameter]]:
-    assert isinstance(my_dict, dict) or my_dict is None, "parameter must be a dict or None"
-    if my_dict is not None:
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: create_parameter_dict: Elapsed time: {}'
+)
+def create_parameter_dict(parameter_dict: Dict) -> Optional[Dict[str, context_pb2.Context.Parameter]]:
+    assert isinstance(parameter_dict, dict) or parameter_dict is None, "parameter must be a dict or None"
+    if parameter_dict is not None:
         return {
-            key: context_pb2.Context.Parameter(display_name=key, value=my_dict[key])
-            for key in my_dict
+            key: context_pb2.Context.Parameter(display_name=key, value=parameter_dict[key])
+            for key in parameter_dict
         }
     return None
 
 
 # This function creates a detect intent request that will trigger a specific intent
 #   using the 'exact intent' trigger
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: trigger_intent: Elapsed time: {}'
+)
 def trigger_intent(
     client: Client,
     session: str,
@@ -207,42 +243,61 @@ def trigger_intent(
         additional_contexts = []
 
     log.info({"message": "triggering specific intent", "intent_name": intent_name})
-    trigger_context = create_context_struct(
+    trigger_context: context_pb2.Context = create_context_struct(
         context=f"{session}/contexts/exact_intent",
         parameters=create_parameter_dict({"intent_name": intent_name}),
         lifespan_count=1,
     )
-    request = get_detect_intent_request(
+    request: session_pb2.DetectIntentRequest = get_detect_intent_request(
         text=f"Triggering Specific Intent: {intent_name}",
         session=session,
         language=language,
         query_params=session_pb2.QueryParameters(contexts=[trigger_context, *additional_contexts]),
     )
-    result = client.services.sessions.detect_intent(request)
+    result: session_pb2.DetectIntentResponse = client.services.sessions.detect_intent(request)
     log.info(f"triggered {intent_name}")
     return result
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: create_context_struct: Elapsed time: {}'
+)
 def create_context_struct(
-    context: str, parameters: Optional[Dict[str, context_pb2.Context.Parameter]], lifespan_count: int = 5
+    context: str,
+    parameters: Optional[Dict[str, context_pb2.Context.Parameter]],
+    lifespan_count: int = 5,
 ) -> context_pb2.Context:
     context_struct: context_pb2.Context = context_pb2.Context(
-        name=f"{context}", lifespan_count=lifespan_count, parameters=parameters
+        name=f"{context}",
+        lifespan_count=lifespan_count,
+        parameters=parameters,
     )
     return context_struct
 
 
 # This function deletes periods from the text in a request
-def strip_final_periods_from_request(request: session_pb2.DetectIntentRequest, ) -> session_pb2.DetectIntentRequest:
-    stripped = request.query_input.text.text.strip(".")
-    request.query_input.text.text = stripped
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: strip_final_periods_from_request: Elapsed time: {}'
+)
+def strip_final_periods_from_request(request: session_pb2.DetectIntentRequest) -> session_pb2.DetectIntentRequest:
+    request.query_input.text.text = request.query_input.text.text.strip(".")
     return request
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: get_session_from_response: Elapsed time: {}'
+)
 def get_session_from_response(response: session_pb2.DetectIntentResponse) -> str:
     return response.query_result.diagnostic_info["sessionId"]  # type: ignore
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: remove_dir: Elapsed time: {}'
+)
 def remove_dir(dir_path: str, exception: bool = True) -> None:
     """Removes a directory.
     Succeeds even if the path does not exist anymore."""
@@ -258,6 +313,10 @@ def remove_dir(dir_path: str, exception: bool = True) -> None:
     is_not_dir(dir_path=dir_path, exception=exception)
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: remove_dir_for_file_path: Elapsed time: {}'
+)
 def remove_dir_for_file_path(file_path: Union[str, LocalPath]) -> None:
     """Removes directory recursively for files path."""
     if os.path.isdir(file_path):
@@ -277,6 +336,10 @@ def remove_dir_for_file_path(file_path: Union[str, LocalPath]) -> None:
                         raise
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: remove_file_for_file_path: Elapsed time: {}'
+)
 def remove_file_for_file_path(file_path: Union[str, LocalPath], exception: bool = True) -> None:
     """Removes the file at filepath."""
     if is_file(file_path, exception=exception):
@@ -287,6 +350,10 @@ def remove_file_for_file_path(file_path: Union[str, LocalPath], exception: bool 
                 raise e
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: create_dir_for_file_path: Elapsed time: {}'
+)
 def create_dir_for_file_path(file_path: Union[str, LocalPath]) -> None:
     """Create directories for files path."""
     try:
@@ -296,6 +363,10 @@ def create_dir_for_file_path(file_path: Union[str, LocalPath]) -> None:
             raise
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: relative_normpath: Elapsed time: {}'
+)
 def relative_normpath(f: Optional[str], path: Union[str, LocalPath]) -> Optional[str]:
     """Return the path of file relative to `path`."""
     if f is not None:
@@ -304,6 +375,10 @@ def relative_normpath(f: Optional[str], path: Union[str, LocalPath]) -> Optional
         return None
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: create_dir: Elapsed time: {}'
+)
 def create_dir(dir_path: Union[str, LocalPath], exception: bool = True) -> None:
     """Creates a directory and its super paths.
     Succeeds even if the path already exists."""
@@ -319,6 +394,10 @@ def create_dir(dir_path: Union[str, LocalPath], exception: bool = True) -> None:
     is_dir(dir_path, exception=exception)
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: create_dir_for_file: Elapsed time: {}'
+)
 def create_dir_for_file(file_path: Union[str, LocalPath]) -> Optional[str]:
     """Creates any missing parent directories of this files path."""
     try:
@@ -332,6 +411,10 @@ def create_dir_for_file(file_path: Union[str, LocalPath]) -> Optional[str]:
     return None
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: list_directory: Elapsed time: {}'
+)
 def list_directory(path: Union[str, LocalPath]) -> List[str]:
     """Returns all files and folders excluding hidden files.
     If the path points to a file, returns the file. This is a recursive
@@ -358,22 +441,38 @@ def list_directory(path: Union[str, LocalPath]) -> List[str]:
         )
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: list_files: Elapsed time: {}'
+)
 def list_files(path: Union[str, LocalPath]) -> List[str]:
     """Returns all files excluding hidden files.
     If the path points to a file, returns the file."""
     return [fn for fn in list_directory(path) if os.path.isfile(fn)]
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: list_subdirectories: Elapsed time: {}'
+)
 def list_subdirectories(path: Union[str, LocalPath]) -> List[str]:
     """Returns all folders excluding hidden files.
      If the path points to a file, returns an empty list."""
     return [fn for fn in glob.glob(os.path.join(path, '*')) if os.path.isdir(fn)]
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: list_to_str: Elapsed time: {}'
+)
 def list_to_str(l: List[str], delim: str = ", ", quote: str = "'") -> str:  # noqa
     return delim.join([quote + e + quote for e in l])
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: is_file: Elapsed time: {}'
+)
 def is_file(
     file_path: Union[str, LocalPath],
     exception: bool = False,
@@ -381,7 +480,7 @@ def is_file(
     step: float = 0.1,
 ) -> bool:
     start_time: float = time()
-    file_exists = os.path.isfile(file_path)
+    file_exists: bool = os.path.isfile(file_path)
 
     if exception and not file_exists:
         raise FileNotFoundError(file_path)
@@ -397,34 +496,50 @@ def is_file(
     return file_exists
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: is_not_dir: Elapsed time: {}'
+)
 def is_not_dir(dir_path: Union[str, LocalPath], exception: object = False) -> bool:
-    dir_exists = os.path.isdir(dir_path)
-
+    dir_exists: bool = os.path.isdir(dir_path)
     if exception and dir_exists:
         raise IsADirectoryError(dir_path)
-
     return dir_exists
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: is_dir: Elapsed time: {}'
+)
 def is_dir(dir_path: Union[str, LocalPath], exception: bool = False) -> bool:
-    dir_exists = os.path.isdir(dir_path)
-
+    dir_exists: bool = os.path.isdir(dir_path)
     if exception and not dir_exists:
         raise NotADirectoryError(dir_path)
-
     return dir_exists
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: json_to_string: Elapsed time: {}'
+)
 def json_to_string(json_dict: Any, indent: int = 4, ensure_ascii: bool = False, **kwargs: Any) -> str:
     return json.dumps(json_dict, indent=indent, ensure_ascii=ensure_ascii, **kwargs)
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: write_json_to_file: Elapsed time: {}'
+)
 def write_json_to_file(file_path: Union[str, LocalPath], json_dict: Any, **kwargs: Any) -> Any:
     """Write an object as a json string to a file."""
     write_text_to_file(file_path, json_to_string(json_dict, **kwargs))
     return json_dict
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: write_pb_message_to_file: Elapsed time: {}'
+)
 def write_pb_message_to_file(file_path: Union[str, LocalPath], message: Message) -> None:
     # create dir if necessary
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
@@ -432,6 +547,10 @@ def write_pb_message_to_file(file_path: Union[str, LocalPath], message: Message)
         f.write(message.SerializeToString())
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: write_text_to_file: Elapsed time: {}'
+)
 def write_text_to_file(file_path: Union[str, LocalPath], text: str) -> str:
     """
     Write a text to a file.
@@ -449,6 +568,10 @@ def write_text_to_file(file_path: Union[str, LocalPath], text: str) -> str:
     return text
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: is_list_of_strings: Elapsed time: {}'
+)
 def is_list_of_strings(lst: Any) -> bool:
     """Returns True if input is list of strings and false otherwise"""
     if lst and isinstance(lst, list):
@@ -457,23 +580,37 @@ def is_list_of_strings(lst: Any) -> bool:
         return False
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: read_text_file: Elapsed time: {}'
+)
 def read_text_file(filename: Union[str, LocalPath], encoding: str = "utf-8-sig") -> str:
     """Read text from a file."""
     log.debug(f'START loading file {filename}')
     if not is_file(filename):
         raise FileNotFoundError(f'Text file "{filename}" not found.')
 
+    content: str
     with io.open(filename, encoding=encoding) as f:
         content = str(f.read())
     log.debug(f'DONE loading of file {filename}')
+
     return content
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: load_pickle: Elapsed time: {}'
+)
 def load_pickle(pickle_file: Union[str, LocalPath], access_mode: str = 'rb') -> Any:
     with open(pickle_file, access_mode) as f:
         return pickle.load(f)  # type:ignore
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: create_if_not_exists_containing_folder: Elapsed time: {}'
+)
 def create_if_not_exists_containing_folder(file_path: Union[str, LocalPath]) -> None:
     """
     create containing folder if not exists
@@ -486,6 +623,10 @@ def create_if_not_exists_containing_folder(file_path: Union[str, LocalPath]) -> 
     Path(os.path.dirname(file_path)).mkdir(parents=True, exist_ok=True)
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: dump_pickle: Elapsed time: {}'
+)
 def dump_pickle(obj: Any, pickle_file: Union[str, LocalPath], access_mode: str = 'wb') -> None:
     create_if_not_exists_containing_folder(file_path=pickle_file)
     with open(pickle_file, access_mode) as f:
@@ -493,9 +634,13 @@ def dump_pickle(obj: Any, pickle_file: Union[str, LocalPath], access_mode: str =
 
 
 # TODO(jober) typing should be read_json_file(filename: str) -> Union[dict, list] !!!
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: read_json_file: Elapsed time: {}'
+)
 def read_json_file(filename: Union[str, LocalPath]) -> Any:
     """Read json from a file."""
-    content = read_text_file(filename)
+    content: str = read_text_file(filename)
     try:
         log.debug(f'START JSON loading file {filename}')
         json_dict: Any = json.loads(content)
@@ -508,6 +653,10 @@ def read_json_file(filename: Union[str, LocalPath]) -> Any:
         )
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: read_list_from_file: Elapsed time: {}'
+)
 def read_list_from_file(filename: Union[str, LocalPath]) -> List[str]:
     """Read a list of strings from a file, line by line."""
     content = read_text_file(filename)
@@ -521,6 +670,10 @@ def read_list_from_file(filename: Union[str, LocalPath]) -> List[str]:
         )
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: read_csv_file: Elapsed time: {}'
+)
 def read_csv_file(input_path: Union[str, LocalPath]) -> List[str]:
     """Reads a csv from a file"""
     result: List[str] = []
@@ -531,6 +684,10 @@ def read_csv_file(input_path: Union[str, LocalPath]) -> List[str]:
     return result
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: dict_to_dataframe: Elapsed time: {}'
+)
 def dict_to_dataframe(
     dictionary: Dict[Any, List[str]],
     last_entry: Any = None,
@@ -567,6 +724,10 @@ def dict_to_dataframe(
     return df
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: write_dict_to_csv: Elapsed time: {}'
+)
 def write_dict_to_csv(
     dictionary: Dict[Any, List[str]],
     output_path: Union[str, LocalPath],
@@ -577,27 +738,36 @@ def write_dict_to_csv(
     """Takes a dictionary with where each value is a list and writes it to a csv from a file.
     It takes care to normalize the length of each value.
     If last_entry is provided, it is appended to each row"""
-    df = dict_to_dataframe(dictionary=dictionary, last_entry=last_entry, sort_columns=sort_columns)
+    df: pd.DataFrame = dict_to_dataframe(dictionary=dictionary, last_entry=last_entry, sort_columns=sort_columns)
     df.to_csv(output_path, index=index)
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: is_url: Elapsed time: {}'
+)
 def is_url(resource_name: str) -> bool:
     """Return True if string is a http, ftp, or file URL path.
     This implementation is the same as the one used by matplotlib"""
     return URL_REGEX.match(resource_name) is not None
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: log_keep_max_num: Elapsed time: {}'
+)
 def log_keep_max_num(log_path: Union[str, LocalPath]) -> None:
     """ Removes old logs"""
     if len(os.listdir(log_path)) > 10:
         # remove oldest file
-        old_log = min(
-            os.listdir(log_path),
-            key=lambda f: os.path.getctime("{}/{}".format(log_path, f))
-        )
+        old_log = min(os.listdir(log_path), key=lambda f: os.path.getctime("{}/{}".format(log_path, f)))
         os.remove(log_path + '/' + old_log)
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: get_int_from_env: Elapsed time: {}'
+)
 def get_int_from_env(env_variable_name: str, default_value: int = 0) -> int:
     int_str: str = os.getenv(env_variable_name, str(default_value)).strip()
     if int_str:
@@ -610,6 +780,10 @@ def get_int_from_env(env_variable_name: str, default_value: int = 0) -> int:
         return default_value
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: get_float_from_env: Elapsed time: {}'
+)
 def get_float_from_env(env_variable_name: str, default_value: float = 0.0) -> float:
     float_str: str = os.getenv(env_variable_name, str(default_value)).strip()
     if float_str:
@@ -622,17 +796,29 @@ def get_float_from_env(env_variable_name: str, default_value: float = 0.0) -> fl
         return default_value
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: get_bool_from_env: Elapsed time: {}'
+)
 def get_bool_from_env(env_variable_name: str, default_value: bool = False) -> bool:
     bool_value: bool = bool(str(os.getenv(env_variable_name, str(default_value))).lower() in ('true', '1', 't', 'True'))
     return bool_value
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: get_str_from_env: Elapsed time: {}'
+)
 def get_str_from_env(env_variable_name: str, default_value: str = "") -> str:
     str_value: str = os.getenv(env_variable_name, default_value).strip()
     str_value = str_value.strip('\'"')  # Remove leading and trailing single or double quotes
     return str_value
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: get_context_and_decay_from_context_name: Elapsed time: {}'
+)
 def get_context_and_decay_from_context_name(context_name: str) -> Tuple[str, Dict]:
     match: Optional[Match[str]] = re.search(r'([a-zA-Z-_]*)', context_name)
     if match:
@@ -650,6 +836,10 @@ def get_context_and_decay_from_context_name(context_name: str) -> Tuple[str, Dic
     }
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: safe_stringify: Elapsed time: {}'
+)
 def safe_stringify(dubious_object: Union[str, dict]) -> str:
     """
     if the parameter is already a string, fine. if it is a dict, stringify the hell out of it
@@ -665,6 +855,10 @@ def safe_stringify(dubious_object: Union[str, dict]) -> str:
         return dubious_object
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: find_key_in_nested_json: Elapsed time: {}'
+)
 def find_key_in_nested_json(json_object: Union[List[Any], Dict[str, Any]], key: str) -> Any:
     """
     Find a key in a nested JSON object and return its corresponding value.
@@ -693,21 +887,29 @@ def find_key_in_nested_json(json_object: Union[List[Any], Dict[str, Any]], key: 
     return None
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: list_directories_in_directory: Elapsed time: {}'
+)
 def list_directories_in_directory(path: str) -> List[str]:
     # Get a list of all entries (files and directories) in the directory
-    entries = os.listdir(path)
+    entries: List[str] = os.listdir(path)
 
     # Filter out directories from the list and return only directory names
-    directory_names = [entry for entry in entries if os.path.isdir(os.path.join(path, entry))]
+    directory_names: List[str] = [entry for entry in entries if os.path.isdir(os.path.join(path, entry))]
 
     return directory_names
 
 
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: list_files_in_directory_without_directories: Elapsed time: {}'
+)
 def list_files_in_directory_without_directories(path: str) -> List[str]:
     # Get a list of all files in the directory
-    files = os.listdir(path)
+    files: List[str] = os.listdir(path)
 
     # Filter out directories from the list and return only file names
-    file_names = [file for file in files if os.path.isfile(os.path.join(path, file))]
+    file_names: List[str] = [file for file in files if os.path.isfile(os.path.join(path, file))]
 
     return file_names

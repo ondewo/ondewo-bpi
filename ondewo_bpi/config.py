@@ -17,35 +17,51 @@ from typing import (
     Optional,
 )
 
-from dotenv import load_dotenv
-from ondewo.logging.logger import (
-    logger,
-    logger_console as log,
-)
+from ondewo.logging.decorators import Timer
+from ondewo.logging.logger import logger_console as log
 from ondewo.nlu.client import Client
 from ondewo.nlu.client_config import ClientConfig
 
 import ondewo_bpi.__init__ as file_anchor
-from ondewo_bpi.helpers import get_bool_from_env
+from ondewo_bpi.helpers import (
+    get_bool_from_env,
+    get_int_from_env,
+    get_str_from_env,
+)
 
 parent = os.path.abspath(os.path.join(os.path.dirname(file_anchor.__file__), os.path.pardir))
 
-# load default configuration from the environment
-load_dotenv("./bpi.env")
-
 # ONDEWO BPI
-PORT: str = os.getenv("PORT", "50051")
+ONDEWO_BPI_PORT: str = get_str_from_env(env_variable_name="ONDEWO_BPI_PORT", default_value="50051")
 
 # ONDEWO NLU CAI
-CAI_HOST: Optional[str] = os.getenv("CAI_HOST", "localhost")
-CAI_PORT: Optional[str] = os.getenv("CAI_PORT", "50055")
-CAI_TOKEN: Optional[str] = os.getenv("CAI_TOKEN")
-GRPC_CERT: Optional[str] = os.getenv("GRPC_CERT")
-HTTP_BASIC_AUTH_TOKEN: Optional[str] = os.getenv("HTTP_BASIC_AUTH_TOKEN")
-GRPC_SECURE: Optional[bool] = get_bool_from_env(env_variable_name="GRPC_SECURE", default_value="False")
-SENTENCE_TRUNCATION: int = int(os.getenv("SENTENCE_TRUNCATION", '130'))
-USER_NAME: Optional[str] = os.getenv("USER_NAME")
-USER_PASS: Optional[str] = os.getenv("USER_PASS")
+ONDEWO_BPI_CAI_HOST: Optional[str] = get_str_from_env(
+    env_variable_name="ONDEWO_BPI_CAI_HOST",
+    default_value="localhost"
+)
+ONDEWO_BPI_CAI_PORT: Optional[str] = get_str_from_env(env_variable_name="ONDEWO_BPI_CAI_PORT", default_value="50055")
+ONDEWO_BPI_CAI_TOKEN: Optional[str] = get_str_from_env(env_variable_name="ONDEWO_BPI_CAI_TOKEN", default_value="")
+ONDEWO_BPI_CAI_GRPC_CERT: Optional[str] = get_str_from_env(
+    env_variable_name="ONDEWO_BPI_CAI_GRPC_CERT",
+    default_value="",
+)
+ONDEWO_BPI_CAI_HTTP_BASIC_AUTH_TOKEN: Optional[str] = get_str_from_env(
+    env_variable_name="ONDEWO_BPI_CAI_HTTP_BASIC_AUTH_TOKEN",
+    default_value="",
+)
+ONDEWO_BPI_CAI_GRPC_SECURE: Optional[bool] = get_bool_from_env(
+    env_variable_name="ONDEWO_BPI_CAI_GRPC_SECURE",
+    default_value=False
+)
+ONDEWO_BPI_SENTENCE_TRUNCATION: int = get_int_from_env(env_variable_name="ONDEWO_BPI_SENTENCE_TRUNCATION", default=130)
+ONDEWO_BPI_CAI_USER_NAME: Optional[str] = get_str_from_env(
+    env_variable_name="ONDEWO_BPI_CAI_USER_NAME",
+    default_value="",
+)
+ONDEWO_BPI_CAI_USER_PASS: Optional[str] = get_str_from_env(
+    env_variable_name="ONDEWO_BPI_CAI_USER_PASS",
+    default_value="",
+)
 
 
 class CentralClientProvider:
@@ -58,45 +74,61 @@ class CentralClientProvider:
         self.client = None
         self._built = False
 
+    @Timer(
+        logger=log.debug, log_arguments=False,
+        message='CentralClientProvider: get_client: Elapsed time: {}'
+    )
     def get_client(self) -> Client:
         if not self._built:
             self._instantiate_client()
             self._built = True
         return self.client
 
+    @Timer(
+        logger=log.debug, log_arguments=False,
+        message='CentralClientProvider: _instantiate_client: Elapsed time: {}'
+    )
     def _instantiate_client(self) -> Client:
 
-        if GRPC_SECURE:
-            logger.info("configuring secure connection")
-            self._instantiate_config(grpc_cert=GRPC_CERT)
+        if ONDEWO_BPI_CAI_GRPC_SECURE:
+            log.info("configuring secure connection")
+            self._instantiate_config(grpc_cert=ONDEWO_BPI_CAI_GRPC_CERT)
             self.client = Client(config=self.config)
         else:
-            logger.info("configuring INSECURE connection")
+            log.info("configuring INSECURE connection")
             self._instantiate_config()
             self.client = Client(config=self.config, use_secure_channel=False)
         return self.client
 
+    @Timer(
+        logger=log.debug, log_arguments=False,
+        message='CentralClientProvider: _instantiate_config: Elapsed time: {}'
+    )
     def _instantiate_config(self, grpc_cert: Optional[str] = None) -> None:
         if not self.config:
             CentralClientProvider._log_default_config()
             self.config: ClientConfig = ClientConfig(
-                host=CAI_HOST,
-                port=CAI_PORT,
-                http_token=HTTP_BASIC_AUTH_TOKEN,
-                user_name=USER_NAME,
-                password=USER_PASS,
+                host=ONDEWO_BPI_CAI_HOST,
+                port=ONDEWO_BPI_CAI_PORT,
+                http_token=ONDEWO_BPI_CAI_HTTP_BASIC_AUTH_TOKEN,
+                user_name=ONDEWO_BPI_CAI_USER_NAME,
+                password=ONDEWO_BPI_CAI_USER_PASS,
                 grpc_cert=grpc_cert
             )
 
     @staticmethod
+    @Timer(
+        logger=log.debug, log_arguments=False,
+        message='CentralClientProvider: _log_default_config: Elapsed time: {}'
+    )
     def _log_default_config() -> None:
         client_configuration_str = (
             "\nnlu-client configuration:\n"
-            + f"   Secure: {GRPC_SECURE}\n"
-            + f"   Host: {CAI_HOST}\n"
-            + f"   Port: {CAI_PORT}\n"
-            + f"   Http_token: {HTTP_BASIC_AUTH_TOKEN}\n"
-            + f"   User_name: {USER_NAME}\n"
-            + f"   Password: {USER_PASS}\n"
+            + f"   Secure: {ONDEWO_BPI_CAI_GRPC_SECURE}\n"
+            + f"   Host: {ONDEWO_BPI_CAI_HOST}\n"
+            + f"   Port: {ONDEWO_BPI_CAI_PORT}\n"
+            + f"   Http_token: {ONDEWO_BPI_CAI_HTTP_BASIC_AUTH_TOKEN}\n"
+            + f"   User_name: {ONDEWO_BPI_CAI_USER_NAME}\n"
+            + f"   Password: {ONDEWO_BPI_CAI_USER_PASS}\n"
         )
         log.info(client_configuration_str)
