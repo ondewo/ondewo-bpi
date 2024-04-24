@@ -169,9 +169,16 @@ class ParameterMethods:
         return context[0] if len(context) else None
 
     @staticmethod
-    def get_param(response: session_pb2.DetectIntentResponse, param_name: str, context_name: str, ) -> Any:
+    def get_param(
+        response: session_pb2.DetectIntentResponse,
+        param_name: str,
+        context_name: str,
+    ) -> Optional[context_pb2.Context.Parameter]:
         log.info({"message": "getting param", "content": context_name, "tags": ["parameters"]})
-        context = ParameterMethods.get_context(response=response, context_name=context_name)
+        context: Optional[context_pb2.Context] = ParameterMethods.get_context(
+            response=response,
+            context_name=context_name,
+        )
         if context is None:
             return None
 
@@ -187,7 +194,11 @@ class ParameterMethods:
             pass
 
         log.info({"message": "found param", "content": returned_param})
-        return context.parameters[param_name] if param_name in params else None
+        if param_name in context.parameters:
+            parameter: context_pb2.Context.Parameter = context.parameters[param_name]
+            return parameter
+        else:
+            return None
 
     @staticmethod
     def add_params_to_response(
