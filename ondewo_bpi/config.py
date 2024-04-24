@@ -53,13 +53,21 @@ ONDEWO_BPI_CAI_GRPC_SECURE: Optional[bool] = get_bool_from_env(
     env_variable_name="ONDEWO_BPI_CAI_GRPC_SECURE",
     default_value=False
 )
-ONDEWO_BPI_SENTENCE_TRUNCATION: int = get_int_from_env(env_variable_name="ONDEWO_BPI_SENTENCE_TRUNCATION", default=130)
+ONDEWO_BPI_SENTENCE_TRUNCATION: int = get_int_from_env(
+    env_variable_name="ONDEWO_BPI_SENTENCE_TRUNCATION",
+    default_value=130,
+)
 ONDEWO_BPI_CAI_USER_NAME: Optional[str] = get_str_from_env(
     env_variable_name="ONDEWO_BPI_CAI_USER_NAME",
     default_value="",
 )
 ONDEWO_BPI_CAI_USER_PASS: Optional[str] = get_str_from_env(
     env_variable_name="ONDEWO_BPI_CAI_USER_PASS",
+    default_value="",
+)
+
+ONDEWO_BPI_CAI_CAI_TOKEN: Optional[str] = get_str_from_env(
+    env_variable_name="ONDEWO_BPI_CAI_CAI_TOKEN",
     default_value="",
 )
 
@@ -124,11 +132,13 @@ class CentralClientProvider:
     def _log_default_config() -> None:
         client_configuration_str = (
             "\nnlu-client configuration:\n"
-            + f"   Secure: {ONDEWO_BPI_CAI_GRPC_SECURE}\n"
-            + f"   Host: {ONDEWO_BPI_CAI_HOST}\n"
-            + f"   Port: {ONDEWO_BPI_CAI_PORT}\n"
-            + f"   Http_token: {ONDEWO_BPI_CAI_HTTP_BASIC_AUTH_TOKEN}\n"
-            + f"   User_name: {ONDEWO_BPI_CAI_USER_NAME}\n"
-            + f"   Password: {ONDEWO_BPI_CAI_USER_PASS}\n"
+            + f"   ONDEWO_BPI_CAI_HOST: '{ONDEWO_BPI_CAI_HOST}'\n"
+            + f"   ONDEWO_BPI_CAI_PORT: '{ONDEWO_BPI_CAI_PORT}'\n"
+            + f"   ONDEWO_BPI_CAI_GRPC_SECURE: '{ONDEWO_BPI_CAI_GRPC_SECURE}'\n"
+            + f"   ONDEWO_BPI_CAI_GRPC_CERT: '{ONDEWO_BPI_CAI_GRPC_CERT}'\n"
+            + f"   ONDEWO_BPI_CAI_HTTP_BASIC_AUTH_TOKEN:' {ONDEWO_BPI_CAI_HTTP_BASIC_AUTH_TOKEN}'\n"
+            + f"   ONDEWO_BPI_CAI_USER_NAME: '{ONDEWO_BPI_CAI_USER_NAME}'\n"
+            + f"   ONDEWO_BPI_CAI_USER_PASS: '{ONDEWO_BPI_CAI_USER_PASS}'\n"
+            + f"   ONDEWO_BPI_CAI_CAI_TOKEN: '{ONDEWO_BPI_CAI_CAI_TOKEN}'\n"
         )
         log.info(client_configuration_str)
