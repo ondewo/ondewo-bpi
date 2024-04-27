@@ -243,7 +243,7 @@ def trigger_intent(
         additional_contexts = []
 
     log.info({"message": "triggering specific intent", "intent_name": intent_name})
-    trigger_context: context_pb2.Context = create_context_struct(
+    trigger_context: context_pb2.Context = create_context(
         context=f"{session}/contexts/exact_intent",
         parameters=create_parameter_dict({"intent_name": intent_name}),
         lifespan_count=1,
@@ -263,7 +263,7 @@ def trigger_intent(
     logger=log.debug, log_arguments=True,
     message='BPI helpers.py: create_context_struct: Elapsed time: {}'
 )
-def create_context_struct(
+def create_context(
     context: str,
     parameters: Optional[Dict[str, context_pb2.Context.Parameter]],
     lifespan_count: int = 5,
