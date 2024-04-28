@@ -205,11 +205,18 @@ def get_detect_intent_request(
 )
 def create_parameter_dict(parameter_dict: Dict) -> Optional[Dict[str, context_pb2.Context.Parameter]]:
     assert isinstance(parameter_dict, dict) or parameter_dict is None, "parameter must be a dict or None"
+
     if parameter_dict is not None:
-        return {
-            key: context_pb2.Context.Parameter(display_name=key, value=parameter_dict[key])
+        context_dict: Dict[str, context_pb2.Context.Parameter] = {
+            key: context_pb2.Context.Parameter(
+                display_name=key,
+                value=parameter_dict[key],
+                value_original=parameter_dict[key],
+            )
             for key in parameter_dict
         }
+        return context_dict
+
     return None
 
 
@@ -268,12 +275,12 @@ def create_context(
     parameters: Optional[Dict[str, context_pb2.Context.Parameter]],
     lifespan_count: int = 5,
 ) -> context_pb2.Context:
-    context_struct: context_pb2.Context = context_pb2.Context(
+    context_proto: context_pb2.Context = context_pb2.Context(
         name=f"{context}",
         lifespan_count=lifespan_count,
         parameters=parameters,
     )
-    return context_struct
+    return context_proto
 
 
 # This function deletes periods from the text in a request
