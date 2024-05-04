@@ -159,7 +159,7 @@ class BpiServer(
     )
     def _setup_server(self) -> None:
         logger.info("attempting to setup server...")
-        self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+        self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=100))
         self._add_services()
         self._setup_reflection()
         self.server.add_insecure_port(f"[::]:{ONDEWO_BPI_PORT}")  # type: ignore
