@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ondewo.nlu.client import Client as NLUClient
+from ondewo.nlu.client import Client as NluClient
 from ondewo.qa import (
     qa_pb2,
     qa_pb2_grpc,
@@ -29,11 +29,11 @@ class BpiQABaseServer(
     BpiQAServices,
 ):
     @property
-    def client(self) -> NLUClient:
+    def client(self) -> NluClient:
         return self._client
 
     @client.setter
-    def client(self, value: NLUClient) -> None:
+    def client(self, value: NluClient) -> None:
         self._client = value
 
     @property

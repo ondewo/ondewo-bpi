@@ -36,7 +36,7 @@ from ondewo.nlu import (
     session_pb2,
     user_pb2,
 )
-from ondewo.nlu.client import Client as NLUClient
+from ondewo.nlu.client import Client as NluClient
 from ondewo.nlu.session_pb2 import TextInput
 
 from ondewo_bpi.autocoded.agent_grpc_autocode import AutoAgentsServicer
@@ -85,7 +85,7 @@ class BpiSessionsServices(AutoSessionsServicer):
 
     @property
     @abstractmethod
-    def client(self) -> NLUClient:
+    def client(self) -> NluClient:
         pass
 
     @Timer(
@@ -287,7 +287,7 @@ class BpiUsersServices(AutoUsersServicer):
 
     @property
     @abstractmethod
-    def client(self) -> NLUClient:
+    def client(self) -> NluClient:
         pass
 
     def Login(self, request: user_pb2.LoginRequest, context: grpc.ServicerContext) -> user_pb2.LoginResponse:
@@ -300,7 +300,7 @@ class BpiContextServices(AutoContextsServicer):
 
     @property
     @abstractmethod
-    def client(self) -> NLUClient:
+    def client(self) -> NluClient:
         pass
 
     def CreateContext(
@@ -315,7 +315,7 @@ class BpiAgentsServices(AutoAgentsServicer):
 
     @property
     @abstractmethod
-    def client(self) -> NLUClient:
+    def client(self) -> NluClient:
         pass
 
 
@@ -324,7 +324,7 @@ class BpiEntityTypeServices(AutoEntityTypesServicer):
 
     @property
     @abstractmethod
-    def client(self) -> NLUClient:
+    def client(self) -> NluClient:
         pass
 
 
@@ -333,7 +333,7 @@ class BpiAiServicesServices(AutoAiServicesServicer):
 
     @property
     @abstractmethod
-    def client(self) -> NLUClient:
+    def client(self) -> NluClient:
         pass
 
 
@@ -342,7 +342,7 @@ class BpiIntentsServices(AutoIntentsServicer):
 
     @property
     @abstractmethod
-    def client(self) -> NLUClient:
+    def client(self) -> NluClient:
         pass
 
 
@@ -351,7 +351,7 @@ class BpiProjectRolesServices(AutoProjectRolesServicer):
 
     @property
     @abstractmethod
-    def client(self) -> NLUClient:
+    def client(self) -> NluClient:
         pass
 
 
@@ -360,7 +360,7 @@ class BpiCcaiProjectsServices(AutoCcaiProjectsServicer):
 
     @property
     @abstractmethod
-    def client(self) -> NLUClient:
+    def client(self) -> NluClient:
         pass
 
 
@@ -369,7 +369,7 @@ class BpiProjectStatisticsServices(AutoProjectStatisticsServicer):
 
     @property
     @abstractmethod
-    def client(self) -> NLUClient:
+    def client(self) -> NluClient:
         pass
 
 
@@ -378,7 +378,7 @@ class BpiServerStatisticsServices(AutoServerStatisticsServicer):
 
     @property
     @abstractmethod
-    def client(self) -> NLUClient:
+    def client(self) -> NluClient:
         pass
 
 
@@ -387,7 +387,7 @@ class BpiOperationsServices(AutoOperationsServicer):
 
     @property
     @abstractmethod
-    def client(self) -> NLUClient:
+    def client(self) -> NluClient:
         pass
 
 
@@ -396,5 +396,5 @@ class BpiUtilitiesServices(AutoUtilitiesServicer):
 
     @property
     @abstractmethod
-    def client(self) -> NLUClient:
+    def client(self) -> NluClient:
         pass

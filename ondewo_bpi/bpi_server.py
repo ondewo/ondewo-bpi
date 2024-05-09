@@ -54,7 +54,7 @@ from ondewo.nlu import (
     utility_pb2,
     utility_pb2_grpc,
 )
-from ondewo.nlu.client import Client as NLUClient
+from ondewo.nlu.client import Client as NluClient
 
 from ondewo_bpi.bpi_services import (
     BpiAgentsServices,
@@ -93,11 +93,11 @@ class BpiServer(
     BpiUtilitiesServices,
 ):
     @property
-    def client(self) -> NLUClient:
+    def client(self) -> NluClient:
         return self._client
 
     @client.setter
-    def client(self, value: NLUClient) -> None:
+    def client(self, value: NluClient) -> None:
         self._client = value
 
     @Timer(
