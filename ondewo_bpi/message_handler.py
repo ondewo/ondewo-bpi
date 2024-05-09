@@ -182,7 +182,7 @@ class ParameterMethods:
         if context is None:
             return None
 
-        params = list(context.parameters)
+        params: List[str] = list(context.parameters)
         if param_name in params:
             returned_param = context.parameters[param_name]
         else:
