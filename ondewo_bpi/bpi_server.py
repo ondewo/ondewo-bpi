@@ -73,6 +73,7 @@ from ondewo_bpi.bpi_services import (
 )
 from ondewo_bpi.config import (
     CentralClientProvider,
+    ONDEWO_BPI_HOST,
     ONDEWO_BPI_PORT,
 )
 
@@ -126,6 +127,7 @@ class BpiServer(
             user_pb2.DESCRIPTOR.services_by_name['Users'].full_name,
             utility_pb2.DESCRIPTOR.services_by_name['Utilities'].full_name,
         ]
+        self.server_is_running: bool = False
 
     @Timer(
         logger=log.debug, log_arguments=False,
@@ -162,8 +164,12 @@ class BpiServer(
         self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=100))
         self._add_services()
         self._setup_reflection()
-        self.server.add_insecure_port(f"[::]:{ONDEWO_BPI_PORT}")  # type: ignore
-        # self.server.add_insecure_port(f"0.0.0.0:{PORT}")  # type: ignore
+        if ONDEWO_BPI_HOST:
+            self.server.add_insecure_port(f"{ONDEWO_BPI_HOST}:{ONDEWO_BPI_PORT}")
+        else:
+            self.server.add_insecure_port(f"[::]:{ONDEWO_BPI_PORT}")
+
+            # self.server.add_insecure_port(f"0.0.0.0:{PORT}")  # type: ignore
         logger.info(f"SERVING SERVER AT SERVING PORT {ONDEWO_BPI_PORT}")
         self.server.start()  # type: ignore
 
@@ -182,9 +188,11 @@ class BpiServer(
             }
         )
         try:
+            self.server_is_running = True
             while True:
                 time.sleep(10)
         except KeyboardInterrupt:
+            self.server_is_running = False
             log.info("Keyboard interrupt, shutting down")
         log.info({"message": "server shut down", "tags": ["timing"]})
 

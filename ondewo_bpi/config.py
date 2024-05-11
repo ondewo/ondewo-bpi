@@ -32,6 +32,7 @@ from ondewo_bpi.helpers import (
 parent = os.path.abspath(os.path.join(os.path.dirname(file_anchor.__file__), os.path.pardir))
 
 # ONDEWO BPI
+ONDEWO_BPI_HOST: str = get_str_from_env(env_variable_name="ONDEWO_BPI_HOST", default_value="[::]")  # accept all
 ONDEWO_BPI_PORT: str = get_str_from_env(env_variable_name="ONDEWO_BPI_PORT", default_value="50051")
 
 # ONDEWO NLU CAI
@@ -131,14 +132,14 @@ class CentralClientProvider:
     )
     def _log_default_config() -> None:
         client_configuration_str = (
-            "\nnlu-client configuration:\n"
-            + f"   ONDEWO_BPI_CAI_HOST: '{ONDEWO_BPI_CAI_HOST}'\n"
-            + f"   ONDEWO_BPI_CAI_PORT: '{ONDEWO_BPI_CAI_PORT}'\n"
-            + f"   ONDEWO_BPI_CAI_GRPC_SECURE: '{ONDEWO_BPI_CAI_GRPC_SECURE}'\n"
-            + f"   ONDEWO_BPI_CAI_GRPC_CERT: '{ONDEWO_BPI_CAI_GRPC_CERT}'\n"
-            + f"   ONDEWO_BPI_CAI_HTTP_BASIC_AUTH_TOKEN:' {ONDEWO_BPI_CAI_HTTP_BASIC_AUTH_TOKEN}'\n"
-            + f"   ONDEWO_BPI_CAI_USER_NAME: '{ONDEWO_BPI_CAI_USER_NAME}'\n"
-            + f"   ONDEWO_BPI_CAI_USER_PASS: '{ONDEWO_BPI_CAI_USER_PASS}'\n"
-            + f"   ONDEWO_BPI_CAI_CAI_TOKEN: '{ONDEWO_BPI_CAI_CAI_TOKEN}'\n"
+                "\nnlu-client configuration:\n"
+                + f"   ONDEWO_BPI_CAI_HOST: '{ONDEWO_BPI_CAI_HOST}'\n"
+                + f"   ONDEWO_BPI_CAI_PORT: '{ONDEWO_BPI_CAI_PORT}'\n"
+                + f"   ONDEWO_BPI_CAI_GRPC_SECURE: '{ONDEWO_BPI_CAI_GRPC_SECURE}'\n"
+                + f"   ONDEWO_BPI_CAI_GRPC_CERT: '{ONDEWO_BPI_CAI_GRPC_CERT}'\n"
+                + f"   ONDEWO_BPI_CAI_HTTP_BASIC_AUTH_TOKEN:' {ONDEWO_BPI_CAI_HTTP_BASIC_AUTH_TOKEN}'\n"
+                + f"   ONDEWO_BPI_CAI_USER_NAME: '{ONDEWO_BPI_CAI_USER_NAME}'\n"
+                + f"   ONDEWO_BPI_CAI_USER_PASS: '{ONDEWO_BPI_CAI_USER_PASS}'\n"
+                + f"   ONDEWO_BPI_CAI_CAI_TOKEN: '{ONDEWO_BPI_CAI_CAI_TOKEN}'\n"
         )
         log.info(client_configuration_str)
