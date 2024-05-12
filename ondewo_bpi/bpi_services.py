@@ -277,6 +277,7 @@ class BpiSessionsServices(AutoSessionsServicer):
         assignors: List[IntentCallbackAssignor],
     ) -> List[Callable]:
         for assignor in assignors:
+            # NOTE: the intent names are regex patterns. For exact intent match, prefix with ^ and postfix with $
             if re.match(assignor.intent_pattern, intent_name):
                 return assignor.handlers
         return []
