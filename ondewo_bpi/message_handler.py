@@ -189,7 +189,8 @@ class ParameterMethods:
             returned_param = "None"
 
         try:
-            returned_param = MessageToJson(returned_param)
+            if returned_param is not None and returned_param != "None":
+                returned_param = MessageToJson(returned_param)
         except AttributeError:
             pass
 
