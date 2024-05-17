@@ -97,7 +97,9 @@ class MessageHandler:
 
     @staticmethod
     def substitute_pattern(
-        pattern: str, replace: str, response: session_pb2.DetectIntentResponse,
+        pattern: str,
+        replace: str,
+        response: session_pb2.DetectIntentResponse,
     ) -> session_pb2.DetectIntentResponse:
         log.info({"message": "replacing text in response", "pattern": pattern, "replace": replace})
         for j, message in enumerate(response.query_result.fulfillment_messages):

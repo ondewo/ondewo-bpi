@@ -66,10 +66,10 @@ DECAY_FUNCTION_INTERACTION: str = 'interaction'
 def add_params_to_cai_context(
     client: Client,
     response: session_pb2.DetectIntentResponse,
-    params: Dict[str, Any],
+    params: Dict[str, Union[str, float, int, bool, context_pb2.Context.Parameter]],
     context: str,
-) -> None:
-    _add_params_to_cai_context(
+) -> Dict[str, context_pb2.Context.Parameter]:
+    return _add_params_to_cai_context(
         client=client,
         session=get_session_from_response(response),
         params=params,
@@ -84,9 +84,9 @@ def add_params_to_cai_context(
 def _add_params_to_cai_context(
     client: Client,
     session: str,
-    params: Dict[str, Any],
+    params: Dict[str, Union[str, float, int, bool, context_pb2.Context.Parameter]],
     context: str,
-) -> None:
+) -> Dict[str, context_pb2.Context.Parameter]:
     log.info(
         {
             "message": "adding parameter to cai",
@@ -101,22 +101,30 @@ def _add_params_to_cai_context(
         existing_context = client.services.contexts.get_context(request=request)
         for k, v in parameters.items():
             existing_context.parameters[k].CopyFrom(v)
-        client.services.contexts.update_context(
-            request=context_pb2.UpdateContextRequest(context=existing_context)
-        )
+
+        # clear metadata
+        existing_context.ClearField("created_at")
+        existing_context.ClearField("modified_at")
+        existing_context.ClearField('created_by')
+        existing_context.ClearField('modified_by')
+        client.services.contexts.update_context(request=context_pb2.UpdateContextRequest(context=existing_context))
+
     except _InactiveRpcError:
         context = context_pb2.Context(
             name=f"{session}/contexts/{context}",
             lifespan_count=100,
             parameters=parameters,
-            lifespan_time=1000
+            lifespan_time=1000,
         )
+        context.ClearField("created_at")
+        context.ClearField("modified_at")
+        context.ClearField('created_by')
+        context.ClearField('modified_by')
         client.services.contexts.create_context(
-            request=context_pb2.CreateContextRequest(
-                session_id=f'{session}',
-                context=context,
-            )
+            request=context_pb2.CreateContextRequest(session_id=f'{session}', context=context)
         )
+
+    return parameters
 
 
 @Timer(
@@ -203,18 +211,36 @@ def get_detect_intent_request(
     logger=log.debug, log_arguments=True,
     message='BPI helpers.py: create_parameter_dict: Elapsed time: {}'
 )
-def create_parameter_dict(parameter_dict: Dict) -> Optional[Dict[str, context_pb2.Context.Parameter]]:
+def create_parameter_dict(
+    parameter_dict: Dict[str, Union[str, float, int, bool, context_pb2.Context.Parameter]],
+) -> Optional[Dict[str, context_pb2.Context.Parameter]]:
     assert isinstance(parameter_dict, dict) or parameter_dict is None, "parameter must be a dict or None"
 
+    # if parameter_dict is not None:
+    #     context_dict: Dict[str, context_pb2.Context.Parameter] = {
+    #         key: context_pb2.Context.Parameter(
+    #             display_name=key,
+    #             value=parameter_dict[key],
+    #             value_original=parameter_dict[key],
+    #         )
+    #         for key in parameter_dict
+    #     }
+    #     return context_dict
+
     if parameter_dict is not None:
-        context_dict: Dict[str, context_pb2.Context.Parameter] = {
-            key: context_pb2.Context.Parameter(
-                display_name=key,
-                value=parameter_dict[key],
-                value_original=parameter_dict[key],
-            )
-            for key in parameter_dict
-        }
+        context_dict: Dict[str, context_pb2.Context.Parameter] = {}
+        for key in parameter_dict:
+            if isinstance(parameter_dict[key], context_pb2.Context.Parameter):
+                # if it is already a parameter, then just add it to the context
+                context_dict[key] = parameter_dict[key]
+            else:
+                # if it is a value then create a parameter object from it
+                context_dict[key] = context_pb2.Context.Parameter(
+                    display_name=key,
+                    value=parameter_dict[key],
+                    value_original=parameter_dict[key],
+                )
+
         return context_dict
 
     return None
@@ -230,7 +256,7 @@ def trigger_intent(
     client: Client,
     session: str,
     intent_name: str,
-    language: str = "de-DE",
+    language: str = "de",
     additional_contexts: Optional[List[context_pb2.Context]] = None,
 ) -> session_pb2.DetectIntentResponse:
     """

@@ -128,6 +128,7 @@ class BpiServer(
             utility_pb2.DESCRIPTOR.services_by_name['Utilities'].full_name,
         ]
         self.server_is_running: bool = False
+        self.server_should_run: bool = True
 
     @Timer(
         logger=log.debug, log_arguments=False,
@@ -189,12 +190,19 @@ class BpiServer(
         )
         try:
             self.server_is_running = True
-            while True:
-                time.sleep(10)
+            while self.server_should_run:
+                time.sleep(3)
         except KeyboardInterrupt:
             self.server_is_running = False
             log.info("Keyboard interrupt, shutting down")
         log.info({"message": "server shut down", "tags": ["timing"]})
+
+    @Timer(
+        logger=log.debug, log_arguments=False,
+        message='BpiServer: stop: Elapsed time: {}'
+    )
+    def stop(self) -> None:
+        self.server_should_run = False
 
 
 if __name__ == "__main__":
