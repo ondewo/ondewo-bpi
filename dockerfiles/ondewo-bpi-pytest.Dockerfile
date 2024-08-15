@@ -1,5 +1,5 @@
 # test runner when you need ubuntu installs
-FROM ubuntu:22.04 AS ubuntu_test_runner
+FROM ubuntu:24.04 AS ubuntu_test_runner
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y <installs>
@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y <installs>
 
 
 # test runner for when you dont
-FROM python:3.10-slim AS python_test_runner
+FROM python:3.12-slim AS python_test_runner
 # /python
 
 

@@ -2,5 +2,5 @@ grpcio>=1.59.3,<1.60.0
 grpcio-reflection>=1.59.3,<1.60.0
 grpcio-status>=1.59.3,<1.60.0
 grpcio-tools>=1.59.3,<1.60.0
-ondewo-logging>=3.3
+ondewo-logging>=3.3.3
 python-dotenv

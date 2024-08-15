@@ -1,7 +1,7 @@
-flake8>=7.0.0
-mypy>=1.9.0
+flake8>=7.1.1
+mypy>=1.11.1
 
-#mypy types
+# mypy types
 types-mock
 types-protobuf
 types-python-dateutil

@@ -1,4 +1,4 @@
-FROM python:3.10-slim as pybase
+FROM python:3.12-slim as pybase
 COPY --from=fullstorydev/grpcurl:latest /bin/grpcurl /usr/local/bin/
 ENV GIT_REPO_NAME=ondewo-bpi
 

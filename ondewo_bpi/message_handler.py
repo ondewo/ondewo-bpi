@@ -24,6 +24,7 @@ from typing import (
 )
 
 from google.protobuf.json_format import MessageToJson
+from google.protobuf.message import Message
 from ondewo.logging.logger import logger_console as log
 from ondewo.nlu import (
     context_pb2,
@@ -161,10 +162,11 @@ class MessageHandler:
 
 
 class ParameterMethods:
+
     @staticmethod
     def get_context(response: session_pb2.DetectIntentResponse, context_name: str) -> Optional[context_pb2.Context]:
         log.info({"message": "searching for context", "content": context_name, "tags": ["contexts"]})
-        context = [c for c in response.query_result.output_contexts if c.name == context_name]
+        context = [c for c in response.query_result.output_contexts if c.name.endswith(context_name)]
         log.info(
             {"message": "found context", "content": MessageToJson(context[0]) if len(context) else "None"}
         )
@@ -185,6 +187,7 @@ class ParameterMethods:
             return None
 
         params: List[str] = list(context.parameters)
+        returned_param: Union[str, Message]
         if param_name in params:
             returned_param = context.parameters[param_name]
         else:
@@ -205,7 +208,9 @@ class ParameterMethods:
 
     @staticmethod
     def add_params_to_response(
-        response: session_pb2.DetectIntentResponse, params: Dict[str, Any], context_name: str,
+        response: session_pb2.DetectIntentResponse,
+        params: Dict[str, Any],
+        context_name: str,
     ) -> session_pb2.DetectIntentResponse:
         log.info(
             {
