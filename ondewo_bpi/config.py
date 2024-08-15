@@ -11,12 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import json
 import os
 from typing import (
+    Any,
     Optional,
+    Set,
+    Tuple,
 )
 
+import grpc
 from ondewo.logging.decorators import Timer
 from ondewo.logging.logger import logger_console as log
 from ondewo.nlu.client import Client
@@ -54,6 +58,7 @@ ONDEWO_BPI_CAI_GRPC_SECURE: Optional[bool] = get_bool_from_env(
     env_variable_name="ONDEWO_BPI_CAI_GRPC_SECURE",
     default_value=False
 )
+ONDEWO_BPI_CAI_MAX_MESSAGE_LENGTH: int = int(os.getenv("ONDEWO_BPI_CAI_MAX_MESSAGE_LENGTH", "2147483647").strip())
 ONDEWO_BPI_SENTENCE_TRUNCATION: int = get_int_from_env(
     env_variable_name="ONDEWO_BPI_SENTENCE_TRUNCATION",
     default_value=130,
@@ -98,15 +103,68 @@ class CentralClientProvider:
         message='CentralClientProvider: _instantiate_client: Elapsed time: {}'
     )
     def _instantiate_client(self) -> Client:
+        # https://github.com/grpc/grpc-proto/blob/master/grpc/service_config/service_config.proto
+        service_config_json: str = json.dumps(
+            {
+                "methodConfig": [
+                    {
+                        "name": [
+                            # To apply retry to all methods, put [{}] as a value in the "name" field
+                            {}
+                            # List single  rpc method call
+                            # {"service": "ondewo.nlu.Agents", "method": "GetAgent"},
+                            # {"service": "ondewo.nlu.Agents", "method": "ListAgents"},
+                            # {"service": "ondewo.nlu.Contexts", "method": "CreateContext"},
+                            # {"service": "ondewo.nlu.Contexts", "method": "ListContexts"},
+                            # {"service": "ondewo.nlu.Contexts", "method": "UpdateContext"},
+                            # {"service": "ondewo.nlu.Sessions", "method": "CreateSession"},
+                            # {"service": "ondewo.nlu.Sessions", "method": "DetectIntent"},
+                            # {"service": "ondewo.nlu.Users", "method": "Login"},
+                        ],
+                        "retryPolicy": {
+                            "maxAttempts": 100,
+                            "initialBackoff": "0.1s",
+                            "maxBackoff": "30s",
+                            "backoffMultiplier": 2,
+                            "retryableStatusCodes": [
+                                grpc.StatusCode.CANCELLED.name,
+                                grpc.StatusCode.UNKNOWN.name,
+                                grpc.StatusCode.DEADLINE_EXCEEDED.name,
+                                grpc.StatusCode.NOT_FOUND.name,
+                                grpc.StatusCode.RESOURCE_EXHAUSTED.name,
+                                grpc.StatusCode.ABORTED.name,
+                                grpc.StatusCode.INTERNAL.name,
+                                grpc.StatusCode.UNAVAILABLE.name,
+                                grpc.StatusCode.DATA_LOSS.name,
+                            ],
+                        },
+                    }
+                ]
+            }
+        )
+
+        options: Set[Tuple[str, Any]] = {
+            ("grpc.max_send_message_length", ONDEWO_BPI_CAI_MAX_MESSAGE_LENGTH),
+            ("grpc.max_receive_message_length", ONDEWO_BPI_CAI_MAX_MESSAGE_LENGTH),
+            # Example of setting KeepAlive options through generic channel_args
+            ("grpc.keepalive_time_ms", 2 ** 31 - 1),
+            ("grpc.keepalive_timeout_ms", 60000),
+            ("grpc.keepalive_permit_without_calls", False),
+            ("grpc.http2.max_pings_without_data", 4),
+            # Example arg requested for the feature
+            ("grpc.dns_enable_srv_queries", 1),
+            ("grpc.enable_retries", 1),
+            ("grpc.service_config", service_config_json)
+        }
 
         if ONDEWO_BPI_CAI_GRPC_SECURE:
             log.info("configuring secure connection")
             self._instantiate_config(grpc_cert=ONDEWO_BPI_CAI_GRPC_CERT)
-            self.client = Client(config=self.config)
+            self.client = Client(config=self.config, options=options)
         else:
             log.info("configuring INSECURE connection")
             self._instantiate_config()
-            self.client = Client(config=self.config, use_secure_channel=False)
+            self.client = Client(config=self.config, use_secure_channel=False, options=options)
         return self.client
 
     @Timer(
@@ -132,14 +190,14 @@ class CentralClientProvider:
     )
     def _log_default_config() -> None:
         client_configuration_str = (
-                "\nnlu-client configuration:\n"
-                + f"   ONDEWO_BPI_CAI_HOST: '{ONDEWO_BPI_CAI_HOST}'\n"
-                + f"   ONDEWO_BPI_CAI_PORT: '{ONDEWO_BPI_CAI_PORT}'\n"
-                + f"   ONDEWO_BPI_CAI_GRPC_SECURE: '{ONDEWO_BPI_CAI_GRPC_SECURE}'\n"
-                + f"   ONDEWO_BPI_CAI_GRPC_CERT: '{ONDEWO_BPI_CAI_GRPC_CERT}'\n"
-                + f"   ONDEWO_BPI_CAI_HTTP_BASIC_AUTH_TOKEN:' {ONDEWO_BPI_CAI_HTTP_BASIC_AUTH_TOKEN}'\n"
-                + f"   ONDEWO_BPI_CAI_USER_NAME: '{ONDEWO_BPI_CAI_USER_NAME}'\n"
-                + f"   ONDEWO_BPI_CAI_USER_PASS: '{ONDEWO_BPI_CAI_USER_PASS}'\n"
-                + f"   ONDEWO_BPI_CAI_CAI_TOKEN: '{ONDEWO_BPI_CAI_CAI_TOKEN}'\n"
+            "\nnlu-client configuration:\n"
+            + f"   ONDEWO_BPI_CAI_HOST: '{ONDEWO_BPI_CAI_HOST}'\n"
+            + f"   ONDEWO_BPI_CAI_PORT: '{ONDEWO_BPI_CAI_PORT}'\n"
+            + f"   ONDEWO_BPI_CAI_GRPC_SECURE: '{ONDEWO_BPI_CAI_GRPC_SECURE}'\n"
+            + f"   ONDEWO_BPI_CAI_GRPC_CERT: '{ONDEWO_BPI_CAI_GRPC_CERT}'\n"
+            + f"   ONDEWO_BPI_CAI_HTTP_BASIC_AUTH_TOKEN:' {ONDEWO_BPI_CAI_HTTP_BASIC_AUTH_TOKEN}'\n"
+            + f"   ONDEWO_BPI_CAI_USER_NAME: '{ONDEWO_BPI_CAI_USER_NAME}'\n"
+            + f"   ONDEWO_BPI_CAI_USER_PASS: '{ONDEWO_BPI_CAI_USER_PASS}'\n"
+            + f"   ONDEWO_BPI_CAI_CAI_TOKEN: '{ONDEWO_BPI_CAI_CAI_TOKEN}'\n"
         )
         log.info(client_configuration_str)
