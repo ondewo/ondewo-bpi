@@ -27,23 +27,18 @@ from time import (
     time,
 )
 from typing import (
-    Any,
     Dict,
     List,
     Match,
-    Optional,
     Pattern,
     Tuple,
     TypeVar,
-    Union,
 )
 
 import pandas as pd
 import six
-from google.protobuf.message import Message
 from grpc._channel import _InactiveRpcError  # noqa
 from ondewo.logging.decorators import Timer
-from ondewo.logging.logger import logger_console as log
 from ondewo.nlu import (
     context_pb2,
     session_pb2,
@@ -57,6 +52,21 @@ UUID4_RGX: str = r'[^\W_]{8}-[^\W_]{4}-[^\W_]{4}-[^\W_]{4}-[^\W_]{12}'
 URL_REGEX: Pattern = re.compile(r'http://|https://|ftp://|file://|file:\\')
 DECAY_FUNCTION_TIME: str = 'time'
 DECAY_FUNCTION_INTERACTION: str = 'interaction'
+
+from typing import (
+    Any,
+    Optional,
+    Set,
+    Union,
+)
+
+from google.protobuf.internal.containers import MessageMap
+from google.protobuf.message import Message
+from google.protobuf.struct_pb2 import Struct
+from google.protobuf.type_pb2 import Enum
+from ondewo.logging.logger import logger_console as log
+
+CREATED_BY_MODIFIED_BY_CREATED_AT_MODIFIED_AT_SET: Set[str] = {'created_by', 'modified_by', 'created_at', 'modified_at'}
 
 
 @Timer(
@@ -946,3 +956,59 @@ def list_files_in_directory_without_directories(path: str) -> List[str]:
     file_names: List[str] = [file for file in files if os.path.isfile(os.path.join(path, file))]
 
     return file_names
+
+
+@Timer(
+    logger=log.debug, log_arguments=True,
+    message='BPI helpers.py: clear_created_modified: Elapsed time: {}'
+)
+def clear_created_modified(
+    msg: Union[Message, str, int, float, bool, Enum, Struct],
+) -> Union[Message, str, int, float, bool, Enum, Struct]:
+    assert msg is not None, "msg object must not be None"
+
+    if isinstance(msg, str) or isinstance(msg, int) or isinstance(msg, float) or isinstance(msg, bool):
+        return msg
+
+    if isinstance(msg, Struct) or isinstance(msg, Enum):
+        return msg
+
+    for field_descriptor in msg.DESCRIPTOR.fields:
+        field_value: Any = getattr(msg, field_descriptor.name)
+
+        # If this is a nested message, recursively process it
+        if field_descriptor.type == field_descriptor.TYPE_MESSAGE:
+
+            # Map
+            if isinstance(field_value, MessageMap):
+                for key, value in field_value.items():
+                    if value is not None:
+                        clear_created_modified(msg=value)
+
+            # If it's a repeated field
+            elif field_descriptor.label == field_descriptor.LABEL_REPEATED:
+                for item in field_value:
+                    if item is not None:
+                        clear_created_modified(msg=item)
+            else:
+                # augment the created_at and modified_at Message fields
+                if field_descriptor.name in CREATED_BY_MODIFIED_BY_CREATED_AT_MODIFIED_AT_SET:
+                    if field_descriptor.name == 'created_at':
+                        # augment these fields only if it is a create method
+                        msg.ClearField("created_at")  # type:ignore
+                    if field_descriptor.name == 'modified_at':
+                        msg.ClearField("modified_at")  # type:ignore
+                else:
+                    if field_value is not None:
+                        clear_created_modified(msg=field_value)
+        else:
+
+            # augment the created_by and modified_by fields
+            if field_descriptor.name in CREATED_BY_MODIFIED_BY_CREATED_AT_MODIFIED_AT_SET:
+                if field_descriptor.name == 'created_by':
+                    msg.ClearField('created_by')
+
+                if field_descriptor.name == 'modified_by':
+                    msg.ClearField('modified_by')
+
+    return msg

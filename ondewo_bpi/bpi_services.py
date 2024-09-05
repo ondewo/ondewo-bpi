@@ -15,6 +15,7 @@ from abc import (
     ABCMeta,
     abstractmethod,
 )
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import (
     dataclass,
     field,
@@ -24,10 +25,12 @@ from typing import (
     Dict,
     List,
     Optional,
+    Tuple,
 )
 
 import grpc
 import regex as re
+from google.protobuf.json_format import MessageToJson
 from ondewo.logging.decorators import Timer
 from ondewo.logging.logger import logger_console as log
 from ondewo.nlu import (
@@ -57,7 +60,10 @@ from ondewo_bpi.constants import (
     QueryTriggers,
     SipTriggers,
 )
-from ondewo_bpi.helpers import get_session_from_response
+from ondewo_bpi.helpers import (
+    clear_created_modified,
+    get_session_from_response,
+)
 from ondewo_bpi.message_handler import (
     MessageHandler,
 )
@@ -173,6 +179,10 @@ class BpiSessionsServices(AutoSessionsServicer):
             }
         )
         cai_response: session_pb2.DetectIntentResponse = self.perform_detect_intent(request)
+        output_contexts_cai_response_dict: Dict[str, Tuple[str, context_pb2.Context]] = {
+            output_context.name: (MessageToJson(message=output_context, sort_keys=True, indent=True), output_context)
+            for output_context in cai_response.query_result.output_contexts
+        }
         intent_name: str = cai_response.query_result.intent.display_name
         log.debug(
             {
@@ -185,7 +195,70 @@ class BpiSessionsServices(AutoSessionsServicer):
         )
         cai_response = self.process_messages(cai_response)
         processed_cai_response: session_pb2.DetectIntentResponse = self.process_intent_handler(cai_response)
+
+        output_contexts_cai_response_processed_dict: Dict[str, Tuple[str, context_pb2.Context]] = {
+            output_context.name: (MessageToJson(message=output_context, sort_keys=True, indent=True), output_context)
+            for output_context in cai_response.query_result.output_contexts
+        }
+        # region single thread context update
+        # for context_name in output_contexts_cai_response_dict.keys():
+        #     context_str: str = output_contexts_cai_response_dict[context_name][0]
+        #     context_processed_str = output_contexts_cai_response_processed_dict[context_name][0]
+        #     if context_str != context_processed_str:
+        #         # Update the modified context from bpi in cai
+        #         context_to_update: context_pb2.Context = output_contexts_cai_response_dict[context_name][1]
+        #         clear_created_modified(context_to_update)
+        #         update_context_request: context_pb2.UpdateContextRequest = context_pb2.UpdateContextRequest(
+        #             context=context_to_update,
+        #         )
+        #         self.client.services.contexts.update_context(update_context_request)
+        # endregion single thread context update
+        # region multi thread context update
+        BpiSessionsServices.process_in_threadpool(
+            output_contexts_cai_response_dict=output_contexts_cai_response_dict,
+            output_contexts_cai_response_processed_dict=output_contexts_cai_response_processed_dict,
+            client=self.client,
+        )
+        # endregion multi thread context update
+
+        # TODO(arath): add here to update the modified response in ondewo-cai session step once API is ready
         return processed_cai_response
+
+    @staticmethod
+    def process_context(
+        context_name: str,
+        output_contexts_cai_response_dict: Dict[str, Tuple[str, context_pb2.Context]],
+        output_contexts_cai_response_processed_dict: Dict[str, Tuple[str, context_pb2.Context]],
+        client: NluClient,
+    ) -> None:
+        context_str: str = output_contexts_cai_response_dict[context_name][0]
+        context_processed_str: str = output_contexts_cai_response_processed_dict[context_name][0]
+
+        if context_str != context_processed_str:
+            # Update the modified context from bpi in cai
+            context_to_update: context_pb2.Context = output_contexts_cai_response_dict[context_name][1]
+            clear_created_modified(context_to_update)
+            update_context_request: context_pb2.UpdateContextRequest = context_pb2.UpdateContextRequest(
+                context=context_to_update,
+            )
+            client.services.contexts.update_context(update_context_request)
+
+    @staticmethod
+    def process_in_threadpool(
+        output_contexts_cai_response_dict: Dict[str, Tuple[str, context_pb2.Context]],
+        output_contexts_cai_response_processed_dict: Dict[str, Tuple[str, context_pb2.Context]],
+        client: NluClient,
+    ) -> None:
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            # Submit tasks to the thread pool
+            for context_name in output_contexts_cai_response_dict.keys():
+                executor.submit(
+                    BpiSessionsServices.process_context,
+                    context_name=context_name,
+                    output_contexts_cai_response_dict=output_contexts_cai_response_dict,
+                    output_contexts_cai_response_processed_dict=output_contexts_cai_response_processed_dict,
+                    client=client,
+                )
 
     @Timer(
         logger=log.debug, log_arguments=True, recursive=True,
