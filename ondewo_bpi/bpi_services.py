@@ -237,11 +237,14 @@ class BpiSessionsServices(AutoSessionsServicer):
         if context_str != context_processed_str:
             # Update the modified context from bpi in cai
             context_to_update: context_pb2.Context = output_contexts_cai_response_dict[context_name][1]
-            clear_created_modified(context_to_update)
-            update_context_request: context_pb2.UpdateContextRequest = context_pb2.UpdateContextRequest(
-                context=context_to_update,
-            )
-            client.services.contexts.update_context(update_context_request)
+            if context_to_update.lifespan_count > 0:
+                clear_created_modified(context_to_update)
+                update_context_request: context_pb2.UpdateContextRequest = context_pb2.UpdateContextRequest(
+                    context=context_to_update,
+                )
+                log.debug(f"START: Send process_context for context {context_name} ...")
+                client.services.contexts.update_context(update_context_request)
+                log.debug(f"DONE: Send process_context for context {context_name}.")
 
     @staticmethod
     def process_in_threadpool(
