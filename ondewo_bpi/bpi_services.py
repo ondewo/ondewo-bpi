@@ -231,20 +231,16 @@ class BpiSessionsServices(AutoSessionsServicer):
         output_contexts_cai_response_processed_dict: Dict[str, Tuple[str, context_pb2.Context]],
         client: NluClient,
     ) -> None:
-        context_str: str = output_contexts_cai_response_dict[context_name][0]
-        context_processed_str: str = output_contexts_cai_response_processed_dict[context_name][0]
-
-        if context_str != context_processed_str:
-            # Update the modified context from bpi in cai
-            context_to_update: context_pb2.Context = output_contexts_cai_response_dict[context_name][1]
-            if context_to_update.lifespan_count > 0:
-                clear_created_modified(context_to_update)
-                update_context_request: context_pb2.UpdateContextRequest = context_pb2.UpdateContextRequest(
-                    context=context_to_update,
-                )
-                log.debug(f"START: Send process_context for context {context_name} ...")
-                client.services.contexts.update_context(update_context_request)
-                log.debug(f"DONE: Send process_context for context {context_name}.")
+        # Update the modified context from bpi in cai
+        context_to_update: context_pb2.Context = output_contexts_cai_response_dict[context_name][1]
+        if context_to_update.lifespan_count > 0:
+            clear_created_modified(context_to_update)
+            update_context_request: context_pb2.UpdateContextRequest = context_pb2.UpdateContextRequest(
+                context=context_to_update,
+            )
+            log.debug(f"START: Send process_context for context {context_name} ...")
+            client.services.contexts.update_context(update_context_request)
+            log.debug(f"DONE: Send process_context for context {context_name}.")
 
     @staticmethod
     def process_in_threadpool(
@@ -255,6 +251,13 @@ class BpiSessionsServices(AutoSessionsServicer):
         with ThreadPoolExecutor(max_workers=10) as executor:
             # Submit tasks to the thread pool
             for context_name in output_contexts_cai_response_dict.keys():
+                if context_name in output_contexts_cai_response_processed_dict:
+                    context_str: str = output_contexts_cai_response_dict[context_name][0]
+                    context_processed_str: str = output_contexts_cai_response_processed_dict[context_name][0]
+                    if context_str == context_processed_str:
+                        # do not update context if context has not changed through ondewo-bpi processing
+                        continue
+
                 executor.submit(
                     BpiSessionsServices.process_context,
                     context_name=context_name,
