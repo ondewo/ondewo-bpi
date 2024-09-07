@@ -239,7 +239,13 @@ class BpiSessionsServices(AutoSessionsServicer):
                 context=context_to_update,
             )
             log.debug(f"START: Send process_context for context {context_name} ...")
-            client.services.contexts.update_context(update_context_request)
+            try:
+                client.services.contexts.update_context(update_context_request)
+            except Exception as e:
+                if "StatusCode.NOT_FOUND" not in str(e):  # if context does not exist anymore then ignore the update
+                    log.warning(f"Context update failed for {context_name}, hence retry: {e}")
+                    client.services.contexts.update_context(update_context_request)
+
             log.debug(f"DONE: Send process_context for context {context_name}.")
 
     @staticmethod
