@@ -40,7 +40,7 @@ class MockUserLoginServer(user_pb2_grpc.UsersServicer):
     @Timer(
         logger=log.debug,
         log_arguments=False,
-        message='MockUserLoginServer: __init__: Elapsed time: {}'
+        message='MockUserLoginServer: __init__: Elapsed time: {:0.4f}'
     )
     def __init__(self) -> None:
         self.server = None
@@ -50,7 +50,7 @@ class MockUserLoginServer(user_pb2_grpc.UsersServicer):
     @Timer(
         logger=log.debug,
         log_arguments=True,
-        message='MockUserLoginServer: Login: Elapsed time: {}'
+        message='MockUserLoginServer: Login: Elapsed time: {:0.4f}'
     )
     def Login(self, request: user_pb2.LoginRequest, context: grpc.ServicerContext) -> user_pb2.LoginResponse:
         response = user_pb2.LoginResponse(auth_token="mocked", )
@@ -59,7 +59,7 @@ class MockUserLoginServer(user_pb2_grpc.UsersServicer):
     @Timer(
         logger=log.debug,
         log_arguments=False,
-        message='MockUserLoginServer: setup_reflection: Elapsed time: {}'
+        message='MockUserLoginServer: setup_reflection: Elapsed time: {:0.4f}'
     )
     def setup_reflection(self) -> None:
         service_names = [
@@ -71,7 +71,7 @@ class MockUserLoginServer(user_pb2_grpc.UsersServicer):
     @Timer(
         logger=log.debug,
         log_arguments=True,
-        message='MockUserLoginServer: serve: Elapsed time: {}'
+        message='MockUserLoginServer: serve: Elapsed time: {:0.4f}'
     )
     def serve(self, port: str = "50055") -> None:
         self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
@@ -99,7 +99,7 @@ class MockUserLoginServer(user_pb2_grpc.UsersServicer):
     @Timer(
         logger=log.debug,
         log_arguments=False,
-        message='MockUserLoginServer: kill_server: Elapsed time: {}'
+        message='MockUserLoginServer: kill_server: Elapsed time: {:0.4f}'
     )
     def kill_server(self) -> None:
         self.kill = True
@@ -112,7 +112,7 @@ class PortChecker:
     @Timer(
         logger=log.debug,
         log_arguments=True,
-        message='MockUserLoginServer: check_client_users_stub: Elapsed time: {}'
+        message='MockUserLoginServer: check_client_users_stub: Elapsed time: {:0.4f}'
     )
     def check_client_users_stub(port: str) -> bool:
         """checks if a LoginRequest sent to the given port returns a response (e.g. if cai is reachable)"""

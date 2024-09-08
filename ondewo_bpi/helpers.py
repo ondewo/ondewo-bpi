@@ -70,8 +70,8 @@ CREATED_BY_MODIFIED_BY_CREATED_AT_MODIFIED_AT_SET: Set[str] = {'created_by', 'mo
 
 
 @Timer(
-    logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: add_params_to_cai_context: Elapsed time: {}'
+    logger=log.debug, log_arguments=False,
+    message='BPI helpers.py: add_params_to_cai_context: Elapsed time: {:0.4f}'
 )
 def add_params_to_cai_context(
     client: Client,
@@ -89,7 +89,7 @@ def add_params_to_cai_context(
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: _add_params_to_cai_context: Elapsed time: {}'
+    message='BPI helpers.py: _add_params_to_cai_context: Elapsed time: {:0.4f}'
 )
 def _add_params_to_cai_context(
     client: Client,
@@ -139,7 +139,7 @@ def _add_params_to_cai_context(
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: delete_param_from_cai_context: Elapsed time: {}'
+    message='BPI helpers.py: delete_param_from_cai_context: Elapsed time: {:0.4f}'
 )
 def delete_param_from_cai_context(
     client: Client,
@@ -179,7 +179,7 @@ def delete_param_from_cai_context(
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: detect_intent: Elapsed time: {}'
+    message='BPI helpers.py: detect_intent: Elapsed time: {:0.4f}'
 )
 def detect_intent(
     client: Client,
@@ -199,7 +199,7 @@ def detect_intent(
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: get_detect_intent_request: Elapsed time: {}'
+    message='BPI helpers.py: get_detect_intent_request: Elapsed time: {:0.4f}'
 )
 def get_detect_intent_request(
     session: str,
@@ -219,7 +219,7 @@ def get_detect_intent_request(
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: create_parameter_dict: Elapsed time: {}'
+    message='BPI helpers.py: create_parameter_dict: Elapsed time: {:0.4f}'
 )
 def create_parameter_dict(
     parameter_dict: Dict[str, Union[str, float, int, bool, context_pb2.Context.Parameter]],
@@ -260,7 +260,7 @@ def create_parameter_dict(
 #   using the 'exact intent' trigger
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: trigger_intent: Elapsed time: {}'
+    message='BPI helpers.py: trigger_intent: Elapsed time: {:0.4f}'
 )
 def trigger_intent(
     client: Client,
@@ -304,7 +304,7 @@ def trigger_intent(
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: create_context_struct: Elapsed time: {}'
+    message='BPI helpers.py: create_context_struct: Elapsed time: {:0.4f}'
 )
 def create_context(
     context: str,
@@ -322,7 +322,7 @@ def create_context(
 # This function deletes periods from the text in a request
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: strip_final_periods_from_request: Elapsed time: {}'
+    message='BPI helpers.py: strip_final_periods_from_request: Elapsed time: {:0.4f}'
 )
 def strip_final_periods_from_request(request: session_pb2.DetectIntentRequest) -> session_pb2.DetectIntentRequest:
     request.query_input.text.text = request.query_input.text.text.strip(".")
@@ -331,7 +331,7 @@ def strip_final_periods_from_request(request: session_pb2.DetectIntentRequest) -
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: get_session_from_response: Elapsed time: {}'
+    message='BPI helpers.py: get_session_from_response: Elapsed time: {:0.4f}'
 )
 def get_session_from_response(response: session_pb2.DetectIntentResponse) -> str:
     return response.query_result.diagnostic_info["sessionId"]  # type: ignore
@@ -339,7 +339,7 @@ def get_session_from_response(response: session_pb2.DetectIntentResponse) -> str
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: remove_dir: Elapsed time: {}'
+    message='BPI helpers.py: remove_dir: Elapsed time: {:0.4f}'
 )
 def remove_dir(dir_path: str, exception: bool = True) -> None:
     """Removes a directory.
@@ -358,7 +358,7 @@ def remove_dir(dir_path: str, exception: bool = True) -> None:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: remove_dir_for_file_path: Elapsed time: {}'
+    message='BPI helpers.py: remove_dir_for_file_path: Elapsed time: {:0.4f}'
 )
 def remove_dir_for_file_path(file_path: Union[str, LocalPath]) -> None:
     """Removes directory recursively for files path."""
@@ -381,7 +381,7 @@ def remove_dir_for_file_path(file_path: Union[str, LocalPath]) -> None:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: remove_file_for_file_path: Elapsed time: {}'
+    message='BPI helpers.py: remove_file_for_file_path: Elapsed time: {:0.4f}'
 )
 def remove_file_for_file_path(file_path: Union[str, LocalPath], exception: bool = True) -> None:
     """Removes the file at filepath."""
@@ -395,7 +395,7 @@ def remove_file_for_file_path(file_path: Union[str, LocalPath], exception: bool 
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: create_dir_for_file_path: Elapsed time: {}'
+    message='BPI helpers.py: create_dir_for_file_path: Elapsed time: {:0.4f}'
 )
 def create_dir_for_file_path(file_path: Union[str, LocalPath]) -> None:
     """Create directories for files path."""
@@ -408,7 +408,7 @@ def create_dir_for_file_path(file_path: Union[str, LocalPath]) -> None:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: relative_normpath: Elapsed time: {}'
+    message='BPI helpers.py: relative_normpath: Elapsed time: {:0.4f}'
 )
 def relative_normpath(f: Optional[str], path: Union[str, LocalPath]) -> Optional[str]:
     """Return the path of file relative to `path`."""
@@ -420,7 +420,7 @@ def relative_normpath(f: Optional[str], path: Union[str, LocalPath]) -> Optional
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: create_dir: Elapsed time: {}'
+    message='BPI helpers.py: create_dir: Elapsed time: {:0.4f}'
 )
 def create_dir(dir_path: Union[str, LocalPath], exception: bool = True) -> None:
     """Creates a directory and its super paths.
@@ -439,7 +439,7 @@ def create_dir(dir_path: Union[str, LocalPath], exception: bool = True) -> None:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: create_dir_for_file: Elapsed time: {}'
+    message='BPI helpers.py: create_dir_for_file: Elapsed time: {:0.4f}'
 )
 def create_dir_for_file(file_path: Union[str, LocalPath]) -> Optional[str]:
     """Creates any missing parent directories of this files path."""
@@ -456,7 +456,7 @@ def create_dir_for_file(file_path: Union[str, LocalPath]) -> Optional[str]:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: list_directory: Elapsed time: {}'
+    message='BPI helpers.py: list_directory: Elapsed time: {:0.4f}'
 )
 def list_directory(path: Union[str, LocalPath]) -> List[str]:
     """Returns all files and folders excluding hidden files.
@@ -486,7 +486,7 @@ def list_directory(path: Union[str, LocalPath]) -> List[str]:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: list_files: Elapsed time: {}'
+    message='BPI helpers.py: list_files: Elapsed time: {:0.4f}'
 )
 def list_files(path: Union[str, LocalPath]) -> List[str]:
     """Returns all files excluding hidden files.
@@ -496,7 +496,7 @@ def list_files(path: Union[str, LocalPath]) -> List[str]:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: list_subdirectories: Elapsed time: {}'
+    message='BPI helpers.py: list_subdirectories: Elapsed time: {:0.4f}'
 )
 def list_subdirectories(path: Union[str, LocalPath]) -> List[str]:
     """Returns all folders excluding hidden files.
@@ -506,7 +506,7 @@ def list_subdirectories(path: Union[str, LocalPath]) -> List[str]:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: list_to_str: Elapsed time: {}'
+    message='BPI helpers.py: list_to_str: Elapsed time: {:0.4f}'
 )
 def list_to_str(l: List[str], delim: str = ", ", quote: str = "'") -> str:  # noqa
     return delim.join([quote + e + quote for e in l])
@@ -514,7 +514,7 @@ def list_to_str(l: List[str], delim: str = ", ", quote: str = "'") -> str:  # no
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: is_file: Elapsed time: {}'
+    message='BPI helpers.py: is_file: Elapsed time: {:0.4f}'
 )
 def is_file(
     file_path: Union[str, LocalPath],
@@ -541,7 +541,7 @@ def is_file(
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: is_not_dir: Elapsed time: {}'
+    message='BPI helpers.py: is_not_dir: Elapsed time: {:0.4f}'
 )
 def is_not_dir(dir_path: Union[str, LocalPath], exception: object = False) -> bool:
     dir_exists: bool = os.path.isdir(dir_path)
@@ -552,7 +552,7 @@ def is_not_dir(dir_path: Union[str, LocalPath], exception: object = False) -> bo
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: is_dir: Elapsed time: {}'
+    message='BPI helpers.py: is_dir: Elapsed time: {:0.4f}'
 )
 def is_dir(dir_path: Union[str, LocalPath], exception: bool = False) -> bool:
     dir_exists: bool = os.path.isdir(dir_path)
@@ -563,7 +563,7 @@ def is_dir(dir_path: Union[str, LocalPath], exception: bool = False) -> bool:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: json_to_string: Elapsed time: {}'
+    message='BPI helpers.py: json_to_string: Elapsed time: {:0.4f}'
 )
 def json_to_string(json_dict: Any, indent: int = 4, ensure_ascii: bool = False, **kwargs: Any) -> str:
     return json.dumps(json_dict, indent=indent, ensure_ascii=ensure_ascii, **kwargs)
@@ -571,7 +571,7 @@ def json_to_string(json_dict: Any, indent: int = 4, ensure_ascii: bool = False, 
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: write_json_to_file: Elapsed time: {}'
+    message='BPI helpers.py: write_json_to_file: Elapsed time: {:0.4f}'
 )
 def write_json_to_file(file_path: Union[str, LocalPath], json_dict: Any, **kwargs: Any) -> Any:
     """Write an object as a json string to a file."""
@@ -581,7 +581,7 @@ def write_json_to_file(file_path: Union[str, LocalPath], json_dict: Any, **kwarg
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: write_pb_message_to_file: Elapsed time: {}'
+    message='BPI helpers.py: write_pb_message_to_file: Elapsed time: {:0.4f}'
 )
 def write_pb_message_to_file(file_path: Union[str, LocalPath], message: Message) -> None:
     # create dir if necessary
@@ -592,7 +592,7 @@ def write_pb_message_to_file(file_path: Union[str, LocalPath], message: Message)
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: write_text_to_file: Elapsed time: {}'
+    message='BPI helpers.py: write_text_to_file: Elapsed time: {:0.4f}'
 )
 def write_text_to_file(file_path: Union[str, LocalPath], text: str) -> str:
     """
@@ -613,7 +613,7 @@ def write_text_to_file(file_path: Union[str, LocalPath], text: str) -> str:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: is_list_of_strings: Elapsed time: {}'
+    message='BPI helpers.py: is_list_of_strings: Elapsed time: {:0.4f}'
 )
 def is_list_of_strings(lst: Any) -> bool:
     """Returns True if input is list of strings and false otherwise"""
@@ -625,7 +625,7 @@ def is_list_of_strings(lst: Any) -> bool:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: read_text_file: Elapsed time: {}'
+    message='BPI helpers.py: read_text_file: Elapsed time: {:0.4f}'
 )
 def read_text_file(filename: Union[str, LocalPath], encoding: str = "utf-8-sig") -> str:
     """Read text from a file."""
@@ -643,7 +643,7 @@ def read_text_file(filename: Union[str, LocalPath], encoding: str = "utf-8-sig")
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: load_pickle: Elapsed time: {}'
+    message='BPI helpers.py: load_pickle: Elapsed time: {:0.4f}'
 )
 def load_pickle(pickle_file: Union[str, LocalPath], access_mode: str = 'rb') -> Any:
     with open(pickle_file, access_mode) as f:
@@ -652,7 +652,7 @@ def load_pickle(pickle_file: Union[str, LocalPath], access_mode: str = 'rb') -> 
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: create_if_not_exists_containing_folder: Elapsed time: {}'
+    message='BPI helpers.py: create_if_not_exists_containing_folder: Elapsed time: {:0.4f}'
 )
 def create_if_not_exists_containing_folder(file_path: Union[str, LocalPath]) -> None:
     """
@@ -668,7 +668,7 @@ def create_if_not_exists_containing_folder(file_path: Union[str, LocalPath]) -> 
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: dump_pickle: Elapsed time: {}'
+    message='BPI helpers.py: dump_pickle: Elapsed time: {:0.4f}'
 )
 def dump_pickle(obj: Any, pickle_file: Union[str, LocalPath], access_mode: str = 'wb') -> None:
     create_if_not_exists_containing_folder(file_path=pickle_file)
@@ -679,7 +679,7 @@ def dump_pickle(obj: Any, pickle_file: Union[str, LocalPath], access_mode: str =
 # TODO(jober) typing should be read_json_file(filename: str) -> Union[dict, list] !!!
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: read_json_file: Elapsed time: {}'
+    message='BPI helpers.py: read_json_file: Elapsed time: {:0.4f}'
 )
 def read_json_file(filename: Union[str, LocalPath]) -> Any:
     """Read json from a file."""
@@ -698,7 +698,7 @@ def read_json_file(filename: Union[str, LocalPath]) -> Any:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: read_list_from_file: Elapsed time: {}'
+    message='BPI helpers.py: read_list_from_file: Elapsed time: {:0.4f}'
 )
 def read_list_from_file(filename: Union[str, LocalPath]) -> List[str]:
     """Read a list of strings from a file, line by line."""
@@ -715,7 +715,7 @@ def read_list_from_file(filename: Union[str, LocalPath]) -> List[str]:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: read_csv_file: Elapsed time: {}'
+    message='BPI helpers.py: read_csv_file: Elapsed time: {:0.4f}'
 )
 def read_csv_file(input_path: Union[str, LocalPath]) -> List[str]:
     """Reads a csv from a file"""
@@ -729,7 +729,7 @@ def read_csv_file(input_path: Union[str, LocalPath]) -> List[str]:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: dict_to_dataframe: Elapsed time: {}'
+    message='BPI helpers.py: dict_to_dataframe: Elapsed time: {:0.4f}'
 )
 def dict_to_dataframe(
     dictionary: Dict[Any, List[str]],
@@ -769,7 +769,7 @@ def dict_to_dataframe(
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: write_dict_to_csv: Elapsed time: {}'
+    message='BPI helpers.py: write_dict_to_csv: Elapsed time: {:0.4f}'
 )
 def write_dict_to_csv(
     dictionary: Dict[Any, List[str]],
@@ -787,7 +787,7 @@ def write_dict_to_csv(
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: is_url: Elapsed time: {}'
+    message='BPI helpers.py: is_url: Elapsed time: {:0.4f}'
 )
 def is_url(resource_name: str) -> bool:
     """Return True if string is a http, ftp, or file URL path.
@@ -797,7 +797,7 @@ def is_url(resource_name: str) -> bool:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: log_keep_max_num: Elapsed time: {}'
+    message='BPI helpers.py: log_keep_max_num: Elapsed time: {:0.4f}'
 )
 def log_keep_max_num(log_path: Union[str, LocalPath]) -> None:
     """ Removes old logs"""
@@ -809,7 +809,7 @@ def log_keep_max_num(log_path: Union[str, LocalPath]) -> None:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: get_int_from_env: Elapsed time: {}'
+    message='BPI helpers.py: get_int_from_env: Elapsed time: {:0.4f}'
 )
 def get_int_from_env(env_variable_name: str, default_value: int = 0) -> int:
     int_str: str = os.getenv(env_variable_name, str(default_value)).strip()
@@ -825,7 +825,7 @@ def get_int_from_env(env_variable_name: str, default_value: int = 0) -> int:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: get_float_from_env: Elapsed time: {}'
+    message='BPI helpers.py: get_float_from_env: Elapsed time: {:0.4f}'
 )
 def get_float_from_env(env_variable_name: str, default_value: float = 0.0) -> float:
     float_str: str = os.getenv(env_variable_name, str(default_value)).strip()
@@ -841,7 +841,7 @@ def get_float_from_env(env_variable_name: str, default_value: float = 0.0) -> fl
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: get_bool_from_env: Elapsed time: {}'
+    message='BPI helpers.py: get_bool_from_env: Elapsed time: {:0.4f}'
 )
 def get_bool_from_env(env_variable_name: str, default_value: bool = False) -> bool:
     bool_value: bool = bool(str(os.getenv(env_variable_name, str(default_value))).lower() in ('true', '1', 't', 'True'))
@@ -850,7 +850,7 @@ def get_bool_from_env(env_variable_name: str, default_value: bool = False) -> bo
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: get_str_from_env: Elapsed time: {}'
+    message='BPI helpers.py: get_str_from_env: Elapsed time: {:0.4f}'
 )
 def get_str_from_env(env_variable_name: str, default_value: str = "") -> str:
     str_value: str = os.getenv(env_variable_name, default_value).strip()
@@ -860,7 +860,7 @@ def get_str_from_env(env_variable_name: str, default_value: str = "") -> str:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: get_context_and_decay_from_context_name: Elapsed time: {}'
+    message='BPI helpers.py: get_context_and_decay_from_context_name: Elapsed time: {:0.4f}'
 )
 def get_context_and_decay_from_context_name(context_name: str) -> Tuple[str, Dict]:
     match: Optional[Match[str]] = re.search(r'([a-zA-Z-_]*)', context_name)
@@ -881,7 +881,7 @@ def get_context_and_decay_from_context_name(context_name: str) -> Tuple[str, Dic
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: safe_stringify: Elapsed time: {}'
+    message='BPI helpers.py: safe_stringify: Elapsed time: {:0.4f}'
 )
 def safe_stringify(dubious_object: Union[str, dict]) -> str:
     """
@@ -900,7 +900,7 @@ def safe_stringify(dubious_object: Union[str, dict]) -> str:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: find_key_in_nested_json: Elapsed time: {}'
+    message='BPI helpers.py: find_key_in_nested_json: Elapsed time: {:0.4f}'
 )
 def find_key_in_nested_json(json_object: Union[List[Any], Dict[str, Any]], key: str) -> Any:
     """
@@ -932,7 +932,7 @@ def find_key_in_nested_json(json_object: Union[List[Any], Dict[str, Any]], key: 
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: list_directories_in_directory: Elapsed time: {}'
+    message='BPI helpers.py: list_directories_in_directory: Elapsed time: {:0.4f}'
 )
 def list_directories_in_directory(path: str) -> List[str]:
     # Get a list of all entries (files and directories) in the directory
@@ -946,7 +946,7 @@ def list_directories_in_directory(path: str) -> List[str]:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: list_files_in_directory_without_directories: Elapsed time: {}'
+    message='BPI helpers.py: list_files_in_directory_without_directories: Elapsed time: {:0.4f}'
 )
 def list_files_in_directory_without_directories(path: str) -> List[str]:
     # Get a list of all files in the directory
@@ -960,7 +960,7 @@ def list_files_in_directory_without_directories(path: str) -> List[str]:
 
 @Timer(
     logger=log.debug, log_arguments=True,
-    message='BPI helpers.py: clear_created_modified: Elapsed time: {}'
+    message='BPI helpers.py: clear_created_modified: Elapsed time: {:0.4f}'
 )
 def clear_created_modified(
     msg: Union[Message, str, int, float, bool, Enum, Struct],

@@ -27,7 +27,7 @@ class IntentMaxTriggerHandler:
     @classmethod
     @Timer(
         logger=log.debug, log_arguments=True,
-        message='IntentMaxTriggerHandler: _get_session: Elapsed time: {}'
+        message='IntentMaxTriggerHandler: _get_session: Elapsed time: {:0.4f}'
     )
     def _get_session(cls, nlu_client: Client, session_id: str) -> Session:
         get_session_request: GetSessionRequest = GetSessionRequest(
@@ -40,7 +40,7 @@ class IntentMaxTriggerHandler:
     @classmethod
     @Timer(
         logger=log.debug, log_arguments=True,
-        message='IntentMaxTriggerHandler: _get_matched_intents: Elapsed time: {}'
+        message='IntentMaxTriggerHandler: _get_matched_intents: Elapsed time: {:0.4f}'
     )
     def _get_matched_intents(cls, nlu_client: Client, session_id: str) -> List[Dict]:
         session_dict: Dict = MessageToDict(cls._get_session(nlu_client, session_id))
@@ -50,7 +50,7 @@ class IntentMaxTriggerHandler:
     @classmethod
     @Timer(
         logger=log.debug, log_arguments=True,
-        message='IntentMaxTriggerHandler: _get_intent_display_name_list: Elapsed time: {}'
+        message='IntentMaxTriggerHandler: _get_intent_display_name_list: Elapsed time: {:0.4f}'
     )
     def _get_intent_display_name_list(cls, nlu_client: Client, session_id: str) -> List[str]:
         matched_intents: List[Dict] = cls._get_matched_intents(nlu_client, session_id)
@@ -62,7 +62,7 @@ class IntentMaxTriggerHandler:
     @classmethod
     @Timer(
         logger=log.debug, log_arguments=True,
-        message='IntentMaxTriggerHandler: _get_intent_display_name_counter: Elapsed time: {}'
+        message='IntentMaxTriggerHandler: _get_intent_display_name_counter: Elapsed time: {:0.4f}'
     )
     def _get_intent_display_name_counter(cls, nlu_client: Client, session_id: str) -> Counter:
         intent_display_name_list: List[str] = cls._get_intent_display_name_list(nlu_client, session_id)
@@ -71,7 +71,7 @@ class IntentMaxTriggerHandler:
     @classmethod
     @Timer(
         logger=log.debug, log_arguments=True,
-        message='IntentMaxTriggerHandler: _check_if_intent_reached_number_triggers_max: Elapsed time: {}'
+        message='IntentMaxTriggerHandler: _check_if_intent_reached_number_triggers_max: Elapsed time: {:0.4f}'
     )
     def _check_if_intent_reached_number_triggers_max(cls, intent_name: str, nlu_client: Client, session_id: str):
         max_number_triggers_for_intent: Optional[int] = cls.intent_with_max_number_triggers_dict.get(intent_name)
@@ -85,7 +85,7 @@ class IntentMaxTriggerHandler:
     @classmethod
     @Timer(
         logger=log.debug, log_arguments=True,
-        message='IntentMaxTriggerHandler: _get_default_exit_detect_intent_request: Elapsed time: {}'
+        message='IntentMaxTriggerHandler: _get_default_exit_detect_intent_request: Elapsed time: {:0.4f}'
     )
     def _get_default_exit_detect_intent_request(cls, session_id: str, language_code: str) -> DetectIntentRequest:
         context: context_pb2.Context = cls._create_context_for_triggering_default_exit_intent(session_id)
@@ -107,7 +107,7 @@ class IntentMaxTriggerHandler:
     @classmethod
     @Timer(
         logger=log.debug, log_arguments=True,
-        message='IntentMaxTriggerHandler: _create_context_for_triggering_default_exit_intent: Elapsed time: {}'
+        message='IntentMaxTriggerHandler: _create_context_for_triggering_default_exit_intent: Elapsed time: {:0.4f}'
     )
     def _create_context_for_triggering_default_exit_intent(cls, session_id: str) -> context_pb2.Context:
         # Enter intent name .. Example would be i.order.pizza
@@ -133,7 +133,7 @@ class IntentMaxTriggerHandler:
     @classmethod
     @Timer(
         logger=log.debug, log_arguments=True,
-        message='IntentMaxTriggerHandler: handle_if_intent_reached_number_triggers_max: Elapsed time: {}'
+        message='IntentMaxTriggerHandler: handle_if_intent_reached_number_triggers_max: Elapsed time: {:0.4f}'
     )
     def handle_if_intent_reached_number_triggers_max(
         cls,

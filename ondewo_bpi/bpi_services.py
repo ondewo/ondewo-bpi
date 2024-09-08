@@ -20,11 +20,14 @@ from dataclasses import (
     dataclass,
     field,
 )
+from datetime import datetime
+from threading import Thread
 from typing import (
     Callable,
     Dict,
     List,
     Optional,
+    Set,
     Tuple,
 )
 
@@ -40,6 +43,10 @@ from ondewo.nlu import (
     user_pb2,
 )
 from ondewo.nlu.client import Client as NluClient
+from ondewo.nlu.context_pb2 import (
+    ListContextsRequest,
+    ListContextsResponse,
+)
 from ondewo.nlu.session_pb2 import TextInput
 
 from ondewo_bpi.autocoded.agent_grpc_autocode import AutoAgentsServicer
@@ -96,7 +103,7 @@ class BpiSessionsServices(AutoSessionsServicer):
 
     @Timer(
         logger=log.debug, log_arguments=False,
-        message='BpiSessionsServices: __init__: Elapsed time: {}'
+        message='BpiSessionsServices: __init__: Elapsed time: {:0.4f}'
     )
     def __init__(self) -> None:
         self.intent_handlers: List[IntentCallbackAssignor] = list()
@@ -106,7 +113,7 @@ class BpiSessionsServices(AutoSessionsServicer):
 
     @Timer(
         logger=log.debug, log_arguments=True,
-        message='BpiSessionsServices: register_intent_handler: Elapsed time: {}'
+        message='BpiSessionsServices: register_intent_handler: Elapsed time: {:0.4f}'
     )
     def register_intent_handler(self, intent_pattern: str, handlers: List[Callable]) -> None:
         intent_handler: IntentCallbackAssignor = IntentCallbackAssignor(
@@ -118,14 +125,14 @@ class BpiSessionsServices(AutoSessionsServicer):
 
     @Timer(
         logger=log.debug, log_arguments=False,
-        message='BpiSessionsServices: register_trigger_handler: Elapsed time: {}'
+        message='BpiSessionsServices: register_trigger_handler: Elapsed time: {:0.4f}'
     )
     def register_trigger_handler(self, trigger: str, handler: Callable) -> None:
         self.trigger_handlers[trigger] = handler
 
     @Timer(
         logger=log.debug, log_arguments=True,
-        message='BpiSessionsServices: trigger_function_not_implemented: Elapsed time: {}'
+        message='BpiSessionsServices: trigger_function_not_implemented: Elapsed time: {:0.4f}'
     )
     def trigger_function_not_implemented(
         self,
@@ -144,7 +151,7 @@ class BpiSessionsServices(AutoSessionsServicer):
 
     @Timer(
         logger=log.debug, log_arguments=True,
-        message='BpiSessionsServices: DetectIntent: Elapsed time: {}'
+        message='BpiSessionsServices: DetectIntent: Elapsed time: {:0.4f}'
     )
     def DetectIntent(
         self,
@@ -200,35 +207,29 @@ class BpiSessionsServices(AutoSessionsServicer):
             output_context.name: (MessageToJson(message=output_context, sort_keys=True, indent=True), output_context)
             for output_context in cai_response.query_result.output_contexts
         }
-        # region single thread context update
-        # for context_name in output_contexts_cai_response_dict.keys():
-        #     context_str: str = output_contexts_cai_response_dict[context_name][0]
-        #     context_processed_str = output_contexts_cai_response_processed_dict[context_name][0]
-        #     if context_str != context_processed_str:
-        #         # Update the modified context from bpi in cai
-        #         context_to_update: context_pb2.Context = output_contexts_cai_response_dict[context_name][1]
-        #         clear_created_modified(context_to_update)
-        #         update_context_request: context_pb2.UpdateContextRequest = context_pb2.UpdateContextRequest(
-        #             context=context_to_update,
-        #         )
-        #         self.client.services.contexts.update_context(update_context_request)
-        # endregion single thread context update
-        # region multi thread context update
-        BpiSessionsServices.process_in_threadpool(
-            output_contexts_cai_response_dict=output_contexts_cai_response_dict,
-            output_contexts_cai_response_processed_dict=output_contexts_cai_response_processed_dict,
-            client=self.client,
+        # region multi thread context update in a thread
+        bpi_services_process_threadpool_for_context_update_thread: Thread = Thread(
+            target=lambda: BpiSessionsServices.update_contexts_in_threadpool(
+                output_contexts_cai_response_dict=output_contexts_cai_response_dict,
+                output_contexts_cai_response_processed_dict=output_contexts_cai_response_processed_dict,
+                session_name=request.session,
+                client=self.client,
+            ), name=f"bpi_services_process_threadpool_for_context_update_thread {datetime.now()}"
         )
-        # endregion multi thread context update
+        bpi_services_process_threadpool_for_context_update_thread.start()
+        # endregion multi thread context update in a thread
 
         # TODO(arath): add here to update the modified response in ondewo-cai session step once API is ready
         return processed_cai_response
 
     @staticmethod
+    @Timer(
+        logger=log.debug, log_arguments=False, recursive=False,
+        message='BpiSessionsServices: process_context: Elapsed time: {:0.4f}'
+    )
     def process_context(
         context_name: str,
         output_contexts_cai_response_dict: Dict[str, Tuple[str, context_pb2.Context]],
-        output_contexts_cai_response_processed_dict: Dict[str, Tuple[str, context_pb2.Context]],
         client: NluClient,
     ) -> None:
         # Update the modified context from bpi in cai
@@ -249,15 +250,33 @@ class BpiSessionsServices(AutoSessionsServicer):
             log.debug(f"DONE: Send process_context for context {context_name}.")
 
     @staticmethod
-    def process_in_threadpool(
+    @Timer(
+        logger=log.debug, log_arguments=False, recursive=False,
+        message='BpiSessionsServices: update_contexts_in_threadpool: Elapsed time: {:0.4f}'
+    )
+    def update_contexts_in_threadpool(
         output_contexts_cai_response_dict: Dict[str, Tuple[str, context_pb2.Context]],
         output_contexts_cai_response_processed_dict: Dict[str, Tuple[str, context_pb2.Context]],
+        session_name: str,
         client: NluClient,
     ) -> None:
+        # Get the currently active contexts from NLU to prevent updating a decayed or non-existing context
+        list_context_response: ListContextsResponse = client.services.contexts.list_contexts(
+            request=ListContextsRequest(session_id=session_name),
+        )
+        nlu_context_names: Set[str] = {
+            c.name for c in list_context_response.contexts if c.lifespan_count > 0
+        }
+        if len(nlu_context_names) == 0:
+            return None
+
         with ThreadPoolExecutor(max_workers=10) as executor:
             # Submit tasks to the thread pool
             for context_name in output_contexts_cai_response_dict.keys():
-                if context_name in output_contexts_cai_response_processed_dict:
+                if (
+                    context_name in output_contexts_cai_response_processed_dict
+                    and context_name in nlu_context_names  # no need to update a context not existing in NLU
+                ):
                     context_str: str = output_contexts_cai_response_dict[context_name][0]
                     context_processed_str: str = output_contexts_cai_response_processed_dict[context_name][0]
                     if context_str == context_processed_str:
@@ -268,13 +287,12 @@ class BpiSessionsServices(AutoSessionsServicer):
                     BpiSessionsServices.process_context,
                     context_name=context_name,
                     output_contexts_cai_response_dict=output_contexts_cai_response_dict,
-                    output_contexts_cai_response_processed_dict=output_contexts_cai_response_processed_dict,
                     client=client,
                 )
 
     @Timer(
         logger=log.debug, log_arguments=True, recursive=True,
-        message='BpiSessionsServices: perform_detect_intent: Elapsed time: {}'
+        message='BpiSessionsServices: perform_detect_intent: Elapsed time: {:0.4f}'
     )
     def perform_detect_intent(
         self,
@@ -287,7 +305,7 @@ class BpiSessionsServices(AutoSessionsServicer):
 
     @Timer(
         logger=log.debug, log_arguments=True, recursive=True,
-        message='BpiSessionsServices: process_messages: Elapsed time: {}'
+        message='BpiSessionsServices: process_messages: Elapsed time: {:0.4f}'
     )
     def process_messages(
         self,
@@ -318,7 +336,7 @@ class BpiSessionsServices(AutoSessionsServicer):
 
     @Timer(
         logger=log.debug, log_arguments=False,
-        message='BpiSessionsServices: quicksend_to_api: Elapsed time: {}'
+        message='BpiSessionsServices: quicksend_to_api: Elapsed time: {:0.4f}'
     )
     def quicksend_to_api(
         self,
@@ -330,7 +348,7 @@ class BpiSessionsServices(AutoSessionsServicer):
 
     @Timer(
         logger=log.debug, log_arguments=True, recursive=True,
-        message='BpiSessionsServices: process_intent_handler: Elapsed time: {}'
+        message='BpiSessionsServices: process_intent_handler: Elapsed time: {:0.4f}'
     )
     def process_intent_handler(
         self,
@@ -357,7 +375,7 @@ class BpiSessionsServices(AutoSessionsServicer):
 
     @Timer(
         logger=log.debug, log_arguments=False,
-        message='BpiSessionsServices: _get_handlers_for_intent: Elapsed time: {}'
+        message='BpiSessionsServices: _get_handlers_for_intent: Elapsed time: {:0.4f}'
     )
     def _get_handlers_for_intent(
         self,

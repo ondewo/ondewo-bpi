@@ -90,7 +90,7 @@ class CentralClientProvider:
 
     @Timer(
         logger=log.debug, log_arguments=False,
-        message='CentralClientProvider: get_client: Elapsed time: {}'
+        message='CentralClientProvider: get_client: Elapsed time: {:0.4f}'
     )
     def get_client(self) -> Client:
         if not self._built:
@@ -100,7 +100,7 @@ class CentralClientProvider:
 
     @Timer(
         logger=log.debug, log_arguments=False,
-        message='CentralClientProvider: _instantiate_client: Elapsed time: {}'
+        message='CentralClientProvider: _instantiate_client: Elapsed time: {:0.4f}'
     )
     def _instantiate_client(self) -> Client:
         # https://github.com/grpc/grpc-proto/blob/master/grpc/service_config/service_config.proto
@@ -169,7 +169,7 @@ class CentralClientProvider:
 
     @Timer(
         logger=log.debug, log_arguments=False,
-        message='CentralClientProvider: _instantiate_config: Elapsed time: {}'
+        message='CentralClientProvider: _instantiate_config: Elapsed time: {:0.4f}'
     )
     def _instantiate_config(self, grpc_cert: Optional[str] = None) -> None:
         if not self.config:
@@ -186,7 +186,7 @@ class CentralClientProvider:
     @staticmethod
     @Timer(
         logger=log.debug, log_arguments=False,
-        message='CentralClientProvider: _log_default_config: Elapsed time: {}'
+        message='CentralClientProvider: _log_default_config: Elapsed time: {:0.4f}'
     )
     def _log_default_config() -> None:
         client_configuration_str = (

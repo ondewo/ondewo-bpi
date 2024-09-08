@@ -39,7 +39,7 @@ class MyServer(BpiServer):
     @Timer(
         logger=log.debug,
         log_arguments=False,
-        message='MyServer: __init__: Elapsed time: {}'
+        message='MyServer: __init__: Elapsed time: {:0.4f}'
     )
     def __init__(self) -> None:
         log.debug("START: Initializing MyServer")
@@ -57,7 +57,7 @@ class MyServer(BpiServer):
     @Timer(
         logger=log.debug,
         log_arguments=False,
-        message='MyServer: register_handlers: Elapsed time: {}'
+        message='MyServer: register_handlers: Elapsed time: {:0.4f}'
     )
     def register_handlers(self) -> None:
         log.debug("START: register_handlers")
@@ -92,7 +92,7 @@ class MyServer(BpiServer):
     @Timer(
         logger=log.debug,
         log_arguments=False,
-        message='MyServer: reformat_text_in_intent: Elapsed time: {}'
+        message='MyServer: reformat_text_in_intent: Elapsed time: {:0.4f}'
     )
     def reformat_text_in_intent(
         response: session_pb2.DetectIntentResponse,
@@ -106,7 +106,7 @@ class MyServer(BpiServer):
     @Timer(
         logger=log.debug,
         log_arguments=False,
-        message='MyServer: handle_default_fallback: Elapsed time: {}'
+        message='MyServer: handle_default_fallback: Elapsed time: {:0.4f}'
     )
     def handle_default_fallback(
         response: session_pb2.DetectIntentResponse,
@@ -119,7 +119,7 @@ class MyServer(BpiServer):
     @Timer(
         logger=log.debug,
         log_arguments=False,
-        message='MyServer: handle_default_exit: Elapsed time: {}'
+        message='MyServer: handle_default_exit: Elapsed time: {:0.4f}'
     )
     def handle_default_exit(
         response: session_pb2.DetectIntentResponse,
@@ -132,7 +132,7 @@ class MyServer(BpiServer):
     @Timer(
         logger=log.debug,
         log_arguments=False,
-        message='MyServer: handle_if_intent_reached_number_triggers_max: Elapsed time: {}'
+        message='MyServer: handle_if_intent_reached_number_triggers_max: Elapsed time: {:0.4f}'
     )
     def handle_if_intent_reached_number_triggers_max(
         response: session_pb2.DetectIntentResponse,

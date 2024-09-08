@@ -103,7 +103,7 @@ class BpiServer(
 
     @Timer(
         logger=log.debug, log_arguments=False,
-        message='BpiServer: __init__: Elapsed time: {}'
+        message='BpiServer: __init__: Elapsed time: {:0.4f}'
     )
     def __init__(self, client_provider: Optional[CentralClientProvider] = None) -> None:
         super().__init__()
@@ -132,14 +132,14 @@ class BpiServer(
 
     @Timer(
         logger=log.debug, log_arguments=False,
-        message='BpiServer: _setup_reflection: Elapsed time: {}'
+        message='BpiServer: _setup_reflection: Elapsed time: {:0.4f}'
     )
     def _setup_reflection(self) -> None:
         reflection.enable_server_reflection(service_names=self.services_descriptors, server=self.server)
 
     @Timer(
         logger=log.debug, log_arguments=False,
-        message='BpiServer: _add_services: Elapsed time: {}'
+        message='BpiServer: _add_services: Elapsed time: {:0.4f}'
     )
     def _add_services(self) -> None:
         agent_pb2_grpc.add_AgentsServicer_to_server(self, self.server)
@@ -158,7 +158,7 @@ class BpiServer(
 
     @Timer(
         logger=log.debug, log_arguments=False,
-        message='BpiServer: _setup_server: Elapsed time: {}'
+        message='BpiServer: _setup_server: Elapsed time: {:0.4f}'
     )
     def _setup_server(self) -> None:
         logger.info("attempting to setup server...")
@@ -176,7 +176,7 @@ class BpiServer(
 
     @Timer(
         logger=log.debug, log_arguments=False,
-        message='BpiServer: serve: Elapsed time: {}'
+        message='BpiServer: serve: Elapsed time: {:0.4f}'
     )
     def serve(self) -> None:
         log.info(f"attempting to start server on port {ONDEWO_BPI_PORT}")
@@ -199,7 +199,7 @@ class BpiServer(
 
     @Timer(
         logger=log.debug, log_arguments=False,
-        message='BpiServer: stop: Elapsed time: {}'
+        message='BpiServer: stop: Elapsed time: {:0.4f}'
     )
     def stop(self) -> None:
         self.server_should_run = False
